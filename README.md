@@ -6,7 +6,7 @@ La plataforma permite registrar y administrar créditos, gestionar prestatarios,
 
 🚀 Funcionalidades principales
 
-Gestión de créditos
+- Gestión de créditos
 
 Alta de nuevos créditos
 
@@ -14,7 +14,7 @@ Consulta de créditos activos y finalizados
 
 Visualización del monto total, cantidad de cuotas y estado
 
-Gestión de prestatarios
+- Gestión de prestatarios
 
 Registro y consulta de prestatarios
 
@@ -22,7 +22,7 @@ Acceso al historial de créditos de cada uno
 
 Detalle de cuotas pagadas, pendientes y vencidas
 
-Cuotas y pagos
+- Cuotas y pagos
 
 Seguimiento individual de cada cuota
 
@@ -30,7 +30,7 @@ Registro de pagos y medio de pago utilizado
 
 Control de estados de cuotas
 
-Calculadora de intereses
+- Calculadora de intereses
 
 Cálculo de intereses sobre el monto del crédito
 
@@ -47,23 +47,23 @@ Obtención del tipo de cambio en tiempo real mediante la API externa
 
 Este proyecto fue desarrollado como una experiencia personal, sin fines comerciales, con el objetivo de:
 
-Consolidar conocimientos técnicos
+-Consolidar conocimientos técnicos
 
-Aplicar buenas prácticas de diseño
+-Aplicar buenas prácticas de diseño
 
 🛠️ Tecnologías utilizadas
 
-Base de datos:
+-Base de datos:
 
 SQL 
 
-Backend:
+-Backend:
 
 C#
 
 .NET 
 
-Frontend:
+-Frontend:
 
 HTML 
 
@@ -71,6 +71,6 @@ CSS
 
 JavaScript 
 
-Control de versiones y colaboración:
+-Control de versiones y colaboración:
 
 GitHub 
