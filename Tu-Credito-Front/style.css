@@ -1,0 +1,163 @@
+:root {
+    --bg-color: #0b1120; 
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --accent-blue: #38bdf8; 
+    --accent-blue-dim: #0ea5e9;
+    --accent-orange: #f97316;
+    --accent-orange-glow: rgba(249, 115, 22, 0.4);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+header {
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(56, 189, 248, 0.1);
+    background: linear-gradient(to right, rgba(11, 17, 32, 0.9), rgba(15, 23, 42, 0.9));
+    backdrop-filter: blur(10px);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.coin-logo {
+    width: 40px;
+    height: 40px;
+    color: var(--accent-orange);
+    filter: drop-shadow(0 0 5px var(--accent-orange-glow));
+    animation: float 6s ease-in-out infinite;
+}
+
+h1.brand-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, var(--text-primary), var(--accent-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+}
+
+main::before {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.05) 0%, transparent 70%);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+}
+
+.status-container {
+    padding: 3rem;
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 16px;
+    background: rgba(15, 23, 42, 0.5);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+    transition: transform 0.3s ease;
+}
+
+.status-container:hover {
+    transform: translateY(-5px);
+    border-color: rgba(56, 189, 248, 0.4);
+}
+
+h2.status-text {
+    font-size: 3rem;
+    font-weight: 300;
+    margin-bottom: 1rem;
+    color: var(--accent-blue);
+    text-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+}
+
+p.status-subtext {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    max-width: 600px;
+    line-height: 1.6;
+}
+
+.loading-dots span {
+    display: inline-block;
+    animation: bounce 1.4s infinite ease-in-out both;
+    color: var(--accent-orange);
+    font-size: 3rem;
+    line-height: 0;
+    margin-left: 2px;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+footer {
+    padding: 1.5rem;
+    text-align: center;
+    border-top: 1px solid rgba(56, 189, 248, 0.1);
+    background-color: rgba(11, 17, 32, 0.8);
+}
+
+.footer-text {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.footer-text span {
+    color: var(--accent-blue);
+    font-weight: 500;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
+}
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+}
+
+@media (max-width: 600px) {
+    h2.status-text {
+        font-size: 2rem;
+    }
+    .status-container {
+        padding: 2rem;
+        width: 90%;
+    }
+}
