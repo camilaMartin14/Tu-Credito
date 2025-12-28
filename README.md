@@ -1,76 +1,74 @@
-📌 TuCrédito – Sistema Web de Gestión de Créditos
+# 📌 Tu Crédito – Sistema Web de Gestión de Préstamos
 
-TuCrédito es una aplicación web desarrollada como proyecto independiente con el objetivo de poner en práctica y demostrar conocimientos en diseño de sistemas, modelado de bases de datos y desarrollo web.
+**Tu Crédito** es una aplicación web desarrollada como proyecto independiente, orientada a la gestión integral de créditos y prestatarios.  
+El objetivo principal del proyecto es poner en práctica y demostrar conocimientos en análisis de requerimientos, diseño de sistemas, modelado de bases de datos y desarrollo web full stack.
 
-La plataforma permite registrar y administrar créditos, gestionar prestatarios, realizar el seguimiento detallado de cuotas y consultar información financiera de manera clara y ordenada.
+La plataforma permite registrar y administrar créditos, gestionar prestatarios, realizar el seguimiento detallado de cuotas y consultar información financiera de forma clara, estructurada y accesible.
 
-🚀 Funcionalidades principales
+---
 
-- Gestión de créditos
+ 🧮 [Deploy (Front-end)](https://tu-credito.vercel.app/) 
+## 🚀 Funcionalidades principales
 
-Alta de nuevos créditos
+### 🔹 Gestión de créditos
+- Alta de nuevos créditos.
+- Consulta de créditos activos y finalizados.
+- Visualización del monto total, cantidad de cuotas y estado del crédito.
 
-Consulta de créditos activos y finalizados
+### 🔹 Gestión de prestatarios
+- Registro y consulta de prestatarios.
+- Acceso al historial completo de créditos por prestatario.
+- Visualización del detalle de cuotas pagadas, pendientes y vencidas.
 
-Visualización del monto total, cantidad de cuotas y estado
+### 🔹 Cuotas y pagos
+- Seguimiento individual de cada cuota.
+- Registro de pagos con indicación del medio de pago utilizado.
+- Control de estados de cuotas (pagada, pendiente, vencida).
 
-- Gestión de prestatarios
+### 🔹 Calculadora de intereses
+- Cálculo automático de intereses sobre el monto del crédito.
+- Visualización clara del valor de las cuotas según condiciones definidas.
 
-Registro y consulta de prestatarios
+### 🔹 Conversión de moneda
+- Visualización de montos en **pesos argentinos (ARS)** y **dólares estadounidenses (USD)**.
+- Obtención del tipo de cambio en tiempo real mediante una API externa:  
+  👉 https://dolarapi.com
 
-Acceso al historial de créditos de cada uno
+---
 
-Detalle de cuotas pagadas, pendientes y vencidas
+## 🎯 Objetivo del proyecto
 
-- Cuotas y pagos
+Este proyecto fue desarrollado como una experiencia personal, **sin fines comerciales**, con el propósito de:
 
-Seguimiento individual de cada cuota
+- Consolidar conocimientos técnicos en desarrollo web y backend.
+- Aplicar buenas prácticas de diseño y organización del código.
+- Trabajar con un modelo de datos coherente y escalable.
+- Integrar servicios externos mediante APIs.
 
-Registro de pagos y medio de pago utilizado
+---
+## 👩‍💻 Desarrolladoras
 
-Control de estados de cuotas
+| Nombre          | LinkedIn |
+|-----------------|----------|
+| Camila Martín   | [Ver perfil](https://www.linkedin.com/in/camilamartindev/) |
+| Aylen García Maestri | [Ver perfil](https://www.linkedin.com/in/aylen-garcia-maestri/) |
 
-- Calculadora de intereses
+## 🛠️ Tecnologías utilizadas
 
-Cálculo de intereses sobre el monto del crédito
+### Base de datos
+- SQL
 
-Visualización clara del valor de las cuotas
+### Backend
+- C#
+- .NET
 
-Conversión de moneda
+### Frontend
+- Angular
+- HTML
+- CSS
+- JavaScript
 
-Visualización de montos tanto en pesos argentinos (ARS) como en dólares (USD)
+### Control de versiones
+- Git
+- GitHub
 
-Obtención del tipo de cambio en tiempo real mediante la API externa
-👉 dolarapi.com
-
-🛠️ Objetivo del proyecto
-
-Este proyecto fue desarrollado como una experiencia personal, sin fines comerciales, con el objetivo de:
-
--Consolidar conocimientos técnicos
-
--Aplicar buenas prácticas de diseño
-
-🛠️ Tecnologías utilizadas
-
--Base de datos:
-
-SQL 
-
--Backend:
-
-C#
-
-.NET 
-
--Frontend:
-
-HTML 
-
-CSS 
-
-JavaScript 
-
--Control de versiones y colaboración:
-
-GitHub 
