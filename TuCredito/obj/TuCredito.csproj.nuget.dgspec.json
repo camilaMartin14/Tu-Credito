@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\admin\\OneDrive\\Desktop\\TuCredito\\TuCredito\\TuCredito.csproj": {}
+    "C:\\Users\\camil\\OneDrive\\Escritorio\\Tu-Credito\\TuCredito\\TuCredito.csproj": {}
   },
   "projects": {
-    "C:\\Users\\admin\\OneDrive\\Desktop\\TuCredito\\TuCredito\\TuCredito.csproj": {
+    "C:\\Users\\camil\\OneDrive\\Escritorio\\Tu-Credito\\TuCredito\\TuCredito.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\admin\\OneDrive\\Desktop\\TuCredito\\TuCredito\\TuCredito.csproj",
+        "projectUniqueName": "C:\\Users\\camil\\OneDrive\\Escritorio\\Tu-Credito\\TuCredito\\TuCredito.csproj",
         "projectName": "TuCredito",
-        "projectPath": "C:\\Users\\admin\\OneDrive\\Desktop\\TuCredito\\TuCredito\\TuCredito.csproj",
-        "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\admin\\OneDrive\\Desktop\\TuCredito\\TuCredito\\obj\\",
+        "projectPath": "C:\\Users\\camil\\OneDrive\\Escritorio\\Tu-Credito\\TuCredito\\TuCredito.csproj",
+        "packagesPath": "C:\\Users\\camil\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\camil\\OneDrive\\Escritorio\\Tu-Credito\\TuCredito\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\camil\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -78,7 +78,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.307/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.308/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
