@@ -1,6 +1,18 @@
-﻿namespace TuCredito.Mappings
+﻿using AutoMapper;
+using TuCredito.Models;
+using TuCredito.DTOs;
+
+namespace TuCredito.Mappings
 {
-    public class MappingProfile
+    public class MappingProfile : Profile
     {
+        public MappingProfile()
+        {
+            CreateMap<Prestamo, PrestamoDTO>();
+            CreateMap<PrestamoDTO, Prestamo>();
+            CreateMap<Prestatario, PrestatarioDTO>();
+            CreateMap<PrestatarioDTO, Prestatario>();
+        }
+
     }
 }
