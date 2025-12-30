@@ -1,0 +1,6 @@
+@TuCredito_HostAddress = http://localhost:5134
+
+GET {{TuCredito_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

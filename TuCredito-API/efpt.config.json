@@ -1,0 +1,86 @@
+﻿{
+   "CodeGenerationMode": 4,
+   "ContextClassName": "TuCreditoContext",
+   "ContextNamespace": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": false,
+   "MinimumProductVersion": "2.6.1166",
+   "ModelNamespace": null,
+   "OutputContextPath": null,
+   "OutputPath": "Models",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "TuCredito",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 2,
+   "SelectedToBeGenerated": 0,
+   "T4TemplatePath": null,
+   "Tables": [
+      {
+         "Name": "[dbo].[Cuotas]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Estado_Cuota]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Estado_Prestamo]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Garante]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[MediosDePago]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Pagos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Prestamista]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Prestamos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Prestatario]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[SistAmortizacion]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": null,
+   "UncountableWords": null,
+   "UseAsyncStoredProcedureCalls": true,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDatabaseNamesForRoutines": true,
+   "UseDateOnlyTimeOnly": true,
+   "UseDbContextSplitting": false,
+   "UseDecimalDataAnnotationForSprocResult": true,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseInternalAccessModifiersForSprocsAndFunctions": false,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UsePrefixNavigationNaming": false,
+   "UseSchemaFolders": false,
+   "UseSchemaNamespaces": false,
+   "UseSpatial": false,
+   "UseT4": false,
+   "UseT4Split": false
+}
