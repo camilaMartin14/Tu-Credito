@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using TuCredito.DTOs;
+using TuCredito.Security;
+using TuCredito.Services.Interfaces;
 
 namespace TuCredito.Controllers
 {
@@ -8,36 +11,59 @@ namespace TuCredito.Controllers
     [ApiController]
     public class PrestamistaController : ControllerBase
     {
-        // GET: api/<PrestamistaController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private readonly IPrestamistaService _service;
+        private readonly JwtTokenGenerator _jwt;
+        public PrestamistaController(IPrestamistaService service, JwtTokenGenerator jwt)
         {
-            return new string[] { "value1", "value2" };
+            _service = service;
+            _jwt = jwt;
         }
 
-        // GET api/<PrestamistaController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpPost("registro")]
+        public async Task<IActionResult> Registrar([FromBody] PrestamistaRegisterDto dto)
         {
-            return "value";
+            try
+            {
+                var id = await _service.RegistrarPrestamistaAsync(dto);
+                return CreatedAtAction(nameof(ObtenerActual), new { id }, null);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        // POST api/<PrestamistaController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> ObtenerActual()
         {
+            var prestamistaIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (prestamistaIdClaim == null)
+                return Unauthorized();
+
+            int prestamistaId = int.Parse(prestamistaIdClaim.Value);
+
+            var prestamista= await _service.ObtenerPrestamistaPorIdAsync(prestamistaId);
+            if (prestamista== null)
+                return NotFound();
+
+            return Ok(prestamista);
         }
 
-        // PUT api/<PrestamistaController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] PrestamistaLoginDTO dto)
         {
-        }
+            var prestamista= await _service.LoginAsync(dto.Usuario, dto.Contrasenia);
+            if (prestamista== null)
+                return Unauthorized();
 
-        // DELETE api/<PrestamistaController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            var token = _jwt.GenerateToken(prestamista.Id, prestamista.Usuario);
+
+            return Ok(new
+            {
+                token,
+                prestamista
+            });
         }
     }
 }
