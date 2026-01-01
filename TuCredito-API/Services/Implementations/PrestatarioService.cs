@@ -1,6 +1,8 @@
-﻿namespace TuCredito.Services.Implementations
+﻿using TuCredito.Services.Interfaces;
+
+namespace TuCredito.Services.Implementations
 {
-    public class PrestatarioService
+    public class PrestatarioService : IPrestatarioService
     {
     }
 }
