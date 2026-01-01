@@ -1,6 +1,9 @@
-﻿using TuCredito.DTOs;
+﻿using Microsoft.AspNetCore.Identity;
+using System.Linq.Expressions;
+using TuCredito.DTOs;
 using TuCredito.Models;
 using TuCredito.Repositories.Interfaces;
+using TuCredito.Security;
 using TuCredito.Services.Interfaces;
 
 namespace TuCredito.Services.Implementations
@@ -13,24 +16,71 @@ namespace TuCredito.Services.Implementations
             _repository = repository;
         }
 
-        public Task<Prestamista?> LoginAsync(string email, string contrasenia)
+        public async Task<Prestamista?> LoginAsync(string email, string contrasenia)
         {
-            throw new NotImplementedException();
+            var prestamista = await _repository.ObtenerPrestamistaPorEmail(email);
+
+            if (prestamista == null)
+                return null;
+
+            if (!PasswordHasher.Verify(contrasenia, prestamista.ContraseñaHash))
+                return null;
+
+            return prestamista;
         }
 
-        public Task<Prestamista?> ObtenerPrestamistaPorEmailAsync(string email)
+        public async Task<Prestamista?> ObtenerPrestamistaPorEmailAsync(string email)
         {
-            throw new NotImplementedException();
+            var prestamista = await _repository.ObtenerPrestamistaPorEmail(email);
+            if (prestamista == null) return null;
+
+            return new Prestamista
+            {
+                Id = prestamista.Id,
+                Nombre = prestamista.Nombre,
+                Apellido = prestamista.Apellido,
+                Correo = prestamista.Correo,
+                EsActivo = prestamista.EsActivo,
+                Usuario = prestamista.Usuario,
+                ContraseñaHash = prestamista.ContraseñaHash
+            };
+
         }
 
-        public Task<Prestamista?> ObtenerPrestamistaPorIdAsync(int idPrestamista)
+        public async Task<Prestamista?> ObtenerPrestamistaPorIdAsync(int idPrestamista)
         {
-            throw new NotImplementedException();
+            var usuario = await _repository.ObtenerPrestamistaPorId(idPrestamista);
+            if (usuario == null) return null;
+
+            return new Prestamista
+            {
+                Id = usuario.Id,
+                Nombre = usuario.Nombre,
+                Apellido = usuario.Apellido,
+                Correo = usuario.Correo,
+                EsActivo = usuario.EsActivo,
+                Usuario = usuario.Usuario,
+                ContraseñaHash = usuario.ContraseñaHash
+            };
         }
 
-        public Task<int> RegistrarPrestamistaAsync(PrestamistaRegisterDto dto)
+        public async Task<int> RegistrarPrestamistaAsync(PrestamistaRegisterDto dto)
         {
-            throw new NotImplementedException();
+            var existente = await _repository.ObtenerPrestamistaPorEmail(dto.Correo);
+            if (existente != null)
+                throw new Exception("El email ya está registrado");
+
+            var prestamista = new Prestamista
+            {
+                Nombre = dto.Nombre,
+                Apellido = dto.Apellido,
+                Correo = dto.Correo,
+                EsActivo = true,
+                Usuario = dto.Usuario,
+                ContraseñaHash = PasswordHasher.Hash(dto.Contrasenia)
+            };
+
+            return await _repository.RegistrarPrestamista(prestamista);
         }
     }
 }
