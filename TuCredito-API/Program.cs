@@ -109,7 +109,7 @@ builder.Services.AddScoped<IPrestamistaRepository, PrestamistaRepository>();
 
 builder.Services.AddScoped<IPrestamoService, PrestamoService>();
 builder.Services.AddScoped<IPrestatarioService, PrestatarioService>();
-builder.Services.AddScoped<IPrestamistaRepository, PrestamistaRepository>();
+builder.Services.AddScoped<IPrestamistaService, PrestamistaService>();
 
 builder.Services.AddScoped<JwtTokenGenerator>();
 
