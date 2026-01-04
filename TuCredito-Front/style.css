@@ -105,6 +105,105 @@ h2.status-text {
     text-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
 }
 
+/* Auth Forms */
+.form-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 2.5rem;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.form-title {
+    color: var(--text-primary);
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(11, 17, 32, 0.6);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 0.875rem;
+    background: linear-gradient(135deg, var(--accent-blue-dim), var(--accent-blue));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 1rem;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.form-footer {
+    margin-top: 1.5rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.form-footer a {
+    color: var(--accent-blue);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.form-footer a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    display: none;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
 p.status-subtext {
     color: var(--text-secondary);
     font-size: 1.1rem;
@@ -152,7 +251,45 @@ footer {
     40% { transform: scale(1); }
 }
 
+/* Navigation */
+.nav-links {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.btn-nav {
+    padding: 0.5rem 1rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.btn-nav:hover {
+    color: var(--accent-blue);
+    background: rgba(56, 189, 248, 0.1);
+}
+
+.btn-nav-primary {
+    background: var(--accent-blue-dim);
+    color: white;
+}
+
+.btn-nav-primary:hover {
+    background: var(--accent-blue);
+    color: white;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
 @media (max-width: 600px) {
+    header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
     h2.status-text {
         font-size: 2rem;
     }

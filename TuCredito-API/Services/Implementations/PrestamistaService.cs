@@ -16,6 +16,7 @@ namespace TuCredito.Services.Implementations
             _repository = repository;
         }
 
+        //Lo tengo que corregir, se inicia sesion con usuario
         public async Task<Prestamista?> LoginAsync(string email, string contrasenia)
         {
             var prestamista = await _repository.ObtenerPrestamistaPorEmail(email);

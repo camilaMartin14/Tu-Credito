@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu Crédito - Registro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <svg class="coin-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
+                <path d="M12 18V6"></path>
+            </svg>
+            <h1 class="brand-name">Tu Crédito</h1>
+        </div>
+    </header>
+
+    <main>
+        <div class="form-container" style="max-width: 500px;">
+            <h2 class="form-title">Crear Cuenta</h2>
+            <div id="errorMessage" class="error-message"></div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="apellido">Apellido</label>
+                    <input type="text" id="apellido" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="correo">Correo Electrónico</label>
+                    <input type="email" id="correo" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="usuario">Usuario</label>
+                    <input type="text" id="usuario" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="contrasenia">Contraseña</label>
+                    <input type="password" id="contrasenia" class="form-control" required>
+                </div>
+                <button type="submit" class="btn-primary">Registrarse</button>
+            </form>
+            <div class="form-footer">
+                ¿Ya tienes cuenta? <a href="login.html">Inicia Sesión</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p class="footer-text">
+            Desarrollado por <span>Camila Martin</span> y <span>Aylen García Maestri</span>
+        </p>
+    </footer>
+
+    <script src="auth.js"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const userData = {
+                nombre: document.getElementById('nombre').value,
+                apellido: document.getElementById('apellido').value,
+                correo: document.getElementById('correo').value,
+                usuario: document.getElementById('usuario').value,
+                contrasenia: document.getElementById('contrasenia').value
+            };
+
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.style.display = 'none';
+            errorDiv.textContent = '';
+
+            const result = await register(userData);
+            
+            if (result.success) {
+                alert('Registro exitoso! Ahora puedes iniciar sesión.');
+                window.location.href = 'login.html'; 
+            } else {
+                errorDiv.textContent = result.message;
+                errorDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
