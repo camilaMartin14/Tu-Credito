@@ -24,7 +24,7 @@ namespace TuCredito.Services.Implementations
             if (prestamista == null)
                 return null;
 
-            if (!PasswordHasher.Verify(contrasenia, prestamista.ContraseñaHash))
+            if (!PasswordHasher.Verify(contrasenia, prestamista.ContraseniaHash))
                 return null;
 
             return prestamista;
@@ -43,7 +43,7 @@ namespace TuCredito.Services.Implementations
                 Correo = prestamista.Correo,
                 EsActivo = prestamista.EsActivo,
                 Usuario = prestamista.Usuario,
-                ContraseñaHash = prestamista.ContraseñaHash
+                ContraseniaHash = prestamista.ContraseniaHash
             };
 
         }
@@ -61,7 +61,7 @@ namespace TuCredito.Services.Implementations
                 Correo = usuario.Correo,
                 EsActivo = usuario.EsActivo,
                 Usuario = usuario.Usuario,
-                ContraseñaHash = usuario.ContraseñaHash
+                ContraseniaHash = usuario.ContraseniaHash
             };
         }
 
@@ -78,7 +78,7 @@ namespace TuCredito.Services.Implementations
                 Correo = dto.Correo,
                 EsActivo = true,
                 Usuario = dto.Usuario,
-                ContraseñaHash = PasswordHasher.Hash(dto.Contrasenia)
+                ContraseniaHash = PasswordHasher.Hash(dto.Contrasenia)
             };
 
             return await _repository.RegistrarPrestamista(prestamista);

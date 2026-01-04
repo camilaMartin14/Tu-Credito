@@ -33,7 +33,7 @@ public partial class Prestamo
 
     public virtual Prestatario DniPrestatarioNavigation { get; set; }
 
-    public virtual EstadoPrestamo IdEstadoNavigation { get; set; }
+    public virtual EstadosPrestamo IdEstadoNavigation { get; set; }
 
     public virtual Prestamista IdPrestamistaNavigation { get; set; }
 

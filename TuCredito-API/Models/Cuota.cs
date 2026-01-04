@@ -21,7 +21,7 @@ public partial class Cuota
 
     public decimal? Interes { get; set; }
 
-    public virtual EstadoCuota IdEstadoNavigation { get; set; }
+    public virtual EstadosCuota IdEstadoNavigation { get; set; }
 
     public virtual Prestamo IdPrestamoNavigation { get; set; }
 
