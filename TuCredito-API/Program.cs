@@ -1,29 +1,36 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using TuCredito.Mappings;
 using TuCredito.Models;
-using TuCredito.Repositories;
 using TuCredito.Repositories.Implementations;
 using TuCredito.Repositories.Interfaces;
 using TuCredito.Security;
-using TuCredito.Services;
 using TuCredito.Services.Implementations;
 using TuCredito.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var jwtSection = builder.Configuration.GetSection("Jwt");
+if (!jwtSection.Exists())
+    throw new InvalidOperationException("La sección Jwt no está configurada en appsettings.json");
 
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-if (!jwtSettings.Exists())
-    throw new InvalidOperationException("Configuración JWT no encontrada en appsettings.json");
+var jwtKey = jwtSection["Key"];
+var jwtIssuer = jwtSection["Issuer"];
+var jwtAudience = jwtSection["Audience"];
 
-var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
+if (string.IsNullOrWhiteSpace(jwtKey) ||
+    string.IsNullOrWhiteSpace(jwtIssuer) ||
+    string.IsNullOrWhiteSpace(jwtAudience))
+{
+    throw new InvalidOperationException("La configuración JWT es inválida o incompleta.");
+}
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+var keyBytes = Encoding.UTF8.GetBytes(jwtKey);
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -32,28 +39,33 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-
-            ValidIssuer = jwtSettings["Issuer"],
-            ValidAudience = jwtSettings["Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
+            IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
             ClockSkew = TimeSpan.Zero
         };
     });
 
 builder.Services.AddAuthorization();
 
-
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        }
+        else
+        {
+            policy.WithOrigins("https://tudominio.com")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        }
     });
 });
-
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -66,7 +78,7 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Ingrese el token JWT"
+        Description = "Bearer {token}"
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -85,31 +97,25 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-
 builder.Services.AddDbContext<TuCreditoContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("CamilaConnection")
     )
 );
 
-
-// Repositories
 builder.Services.AddScoped<IPrestamoRepository, PrestamoRepository>();
 builder.Services.AddScoped<IPrestatarioRepository, PrestatarioRepository>();
+builder.Services.AddScoped<IPrestamistaRepository, PrestamistaRepository>();
 
-// Services
 builder.Services.AddScoped<IPrestamoService, PrestamoService>();
 builder.Services.AddScoped<IPrestatarioService, PrestatarioService>();
+builder.Services.AddScoped<IPrestamistaRepository, PrestamistaRepository>();
 
-// Seguridad
 builder.Services.AddScoped<JwtTokenGenerator>();
-
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-
 var app = builder.Build();
-
 
 if (app.Environment.IsDevelopment())
 {
@@ -118,13 +124,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseCors("AllowFrontend");
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
 
 app.Run();
