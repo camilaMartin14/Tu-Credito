@@ -17,9 +17,9 @@ namespace TuCredito.Services.Implementations
         }
 
         //Lo tengo que corregir, se inicia sesion con usuario
-        public async Task<Prestamista?> LoginAsync(string email, string contrasenia)
+        public async Task<Prestamista?> LoginAsync(string usuario, string contrasenia)
         {
-            var prestamista = await _repository.ObtenerPrestamistaPorEmail(email);
+            var prestamista = await _repository.ObtenerPrestamistaPorUsuario(usuario);
 
             if (prestamista == null)
                 return null;
@@ -29,6 +29,7 @@ namespace TuCredito.Services.Implementations
 
             return prestamista;
         }
+
 
         public async Task<Prestamista?> ObtenerPrestamistaPorEmailAsync(string email)
         {

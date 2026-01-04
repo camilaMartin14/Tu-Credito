@@ -23,6 +23,13 @@ namespace TuCredito.Repositories.Implementations
                 .FirstOrDefaultAsync(p => p.Id == idPrestamista);
         }
 
+        public async Task<Prestamista?> ObtenerPrestamistaPorUsuario(string usuario)
+        {
+            return await _context.Prestamistas
+                .FirstOrDefaultAsync(p => p.Usuario == usuario);
+        }
+
+
         public async Task<int> RegistrarPrestamista(Prestamista p)
         {
             _context.Prestamistas.Add(p);

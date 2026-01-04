@@ -7,5 +7,7 @@ namespace TuCredito.Repositories.Interfaces
         Task<int> RegistrarPrestamista(Prestamista p);
         Task<Prestamista?> ObtenerPrestamistaPorId(int idPrestamista);
         Task<Prestamista?> ObtenerPrestamistaPorEmail(string email);
+        Task<Prestamista?> ObtenerPrestamistaPorUsuario(string usuario);
+
     }
 }
