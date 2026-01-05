@@ -1,17 +1,15 @@
-
-
-CREATE DATABASE TuCredito;
+CREATE DATABASE TuCredito6;
 GO
 
-USE TuCredito;
+USE TuCredito6;
 GO
 
-CREATE TABLE Estado_Prestamo (
+CREATE TABLE Estados_Prestamos (
     idEstado INT IDENTITY(1,1) PRIMARY KEY,
     descripcion VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE Estado_Cuota (
+CREATE TABLE Estados_Cuotas (
     idEstado INT IDENTITY(1,1) PRIMARY KEY,
     descripcion VARCHAR(50) NOT NULL
 );
@@ -28,17 +26,17 @@ CREATE TABLE SistAmortizacion (
 );
 
 
-CREATE TABLE Prestamista (
+CREATE TABLE Prestamistas (
     id INT IDENTITY(1,1) PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
     apellido VARCHAR(50) NOT NULL,
     esActivo BIT NOT NULL,
     correo VARCHAR(100),
     usuario VARCHAR(50) NOT NULL,
-    contraseñaHash VARCHAR(255) NOT NULL
+    contraseniaHash VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE Garante (
+CREATE TABLE Garantes (
     idGarante INT IDENTITY(1,1) PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
     apellido VARCHAR(50) NOT NULL,
@@ -48,7 +46,7 @@ CREATE TABLE Garante (
     esActivo BIT NOT NULL
 );
 
-CREATE TABLE Prestatario (
+CREATE TABLE Prestatarios (
     DNI INT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
     apellido VARCHAR(50) NOT NULL,
@@ -58,7 +56,7 @@ CREATE TABLE Prestatario (
     esActivo BIT NOT NULL,
     idGarante INT NULL,
     CONSTRAINT FK_Prestatario_Garante
-        FOREIGN KEY (idGarante) REFERENCES Garante(idGarante)
+        FOREIGN KEY (idGarante) REFERENCES Garantes(idGarante)
 );
 
 
@@ -75,11 +73,11 @@ CREATE TABLE Prestamos (
     Fec_1erVto DATE NOT NULL,
     idSistAmortizacion INT NOT NULL,
     CONSTRAINT FK_Prestamos_Prestamista
-        FOREIGN KEY (idPrestamista) REFERENCES Prestamista(id),
+        FOREIGN KEY (idPrestamista) REFERENCES Prestamistas(id),
     CONSTRAINT FK_Prestamos_Prestatario
-        FOREIGN KEY (DNI_Prestatario) REFERENCES Prestatario(DNI),
+        FOREIGN KEY (DNI_Prestatario) REFERENCES Prestatarios(DNI),
     CONSTRAINT FK_Prestamos_Estado
-        FOREIGN KEY (idEstado) REFERENCES Estado_Prestamo(idEstado),
+        FOREIGN KEY (idEstado) REFERENCES Estados_Prestamos(idEstado),
     CONSTRAINT FK_Prestamos_SistAmort
         FOREIGN KEY (idSistAmortizacion) REFERENCES SistAmortizacion(idSistAmortizacion)
 );
@@ -97,7 +95,7 @@ CREATE TABLE Cuotas (
     CONSTRAINT FK_Cuotas_Prestamo
         FOREIGN KEY (idPrestamo) REFERENCES Prestamos(idPrestamo),
     CONSTRAINT FK_Cuotas_Estado
-        FOREIGN KEY (idEstado) REFERENCES Estado_Cuota(idEstado)
+        FOREIGN KEY (idEstado) REFERENCES Estados_Cuotas(idEstado)
 );
 
 
@@ -116,12 +114,12 @@ CREATE TABLE Pagos (
 );
 
 
-INSERT INTO Estado_Cuota (descripcion) VALUES
+INSERT INTO Estados_Cuotas (descripcion) VALUES
 ('Pendiente'),
 ('Al día'),
 ('Saldada');
 
-INSERT INTO Estado_Prestamo (descripcion) VALUES
+INSERT INTO Estados_Prestamos (descripcion) VALUES
 ('Activo'),
 ('Finalizado');
 
@@ -129,4 +127,4 @@ INSERT INTO MediosDePago (descripcion, moneda) VALUES
 ('Transferencia', 'ARS'),
 ('Efectivo', 'ARS'),
 ('Efectivo', 'USD');
-lyjgh
+

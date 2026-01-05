@@ -20,15 +20,15 @@
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[Estado_Cuota]",
+         "Name": "[dbo].[Estados_Cuotas]",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[Estado_Prestamo]",
+         "Name": "[dbo].[Estados_Prestamos]",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[Garante]",
+         "Name": "[dbo].[Garantes]",
          "ObjectType": 0
       },
       {
@@ -40,7 +40,7 @@
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[Prestamista]",
+         "Name": "[dbo].[Prestamistas]",
          "ObjectType": 0
       },
       {
@@ -48,7 +48,7 @@
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[Prestatario]",
+         "Name": "[dbo].[Prestatarios]",
          "ObjectType": 0
       },
       {
