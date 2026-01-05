@@ -100,7 +100,8 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddDbContext<TuCreditoContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("AylenConnection")
+        //builder.Configuration.GetConnectionString("AylenConnection")
+        builder.Configuration.GetConnectionString("CamilaConnection")
     )
 );
 

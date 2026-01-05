@@ -236,7 +236,7 @@ public partial class TuCreditoContext : DbContext
         {
             entity.HasKey(e => e.Dni).HasName("PK__Prestata__C035B8DCA35E3F8C");
 
-            entity.ToTable("Prestatario");
+            entity.ToTable("Prestatarios");
 
             entity.Property(e => e.Dni)
                 .ValueGeneratedNever()
