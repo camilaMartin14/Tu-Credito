@@ -17,18 +17,19 @@ namespace TuCredito.Services.Implementations
         }
 
         //Lo tengo que corregir, se inicia sesion con usuario
-        public async Task<Prestamista?> LoginAsync(string email, string contrasenia)
+        public async Task<Prestamista?> LoginAsync(string usuario, string contrasenia)
         {
-            var prestamista = await _repository.ObtenerPrestamistaPorEmail(email);
+            var prestamista = await _repository.ObtenerPrestamistaPorUsuario(usuario);
 
             if (prestamista == null)
                 return null;
 
-            if (!PasswordHasher.Verify(contrasenia, prestamista.ContraseñaHash))
+            if (!PasswordHasher.Verify(contrasenia, prestamista.ContraseniaHash))
                 return null;
 
             return prestamista;
         }
+
 
         public async Task<Prestamista?> ObtenerPrestamistaPorEmailAsync(string email)
         {
@@ -43,7 +44,7 @@ namespace TuCredito.Services.Implementations
                 Correo = prestamista.Correo,
                 EsActivo = prestamista.EsActivo,
                 Usuario = prestamista.Usuario,
-                ContraseñaHash = prestamista.ContraseñaHash
+                ContraseniaHash = prestamista.ContraseniaHash
             };
 
         }
@@ -61,7 +62,7 @@ namespace TuCredito.Services.Implementations
                 Correo = usuario.Correo,
                 EsActivo = usuario.EsActivo,
                 Usuario = usuario.Usuario,
-                ContraseñaHash = usuario.ContraseñaHash
+                ContraseniaHash = usuario.ContraseniaHash
             };
         }
 
@@ -78,7 +79,7 @@ namespace TuCredito.Services.Implementations
                 Correo = dto.Correo,
                 EsActivo = true,
                 Usuario = dto.Usuario,
-                ContraseñaHash = PasswordHasher.Hash(dto.Contrasenia)
+                ContraseniaHash = PasswordHasher.Hash(dto.Contrasenia)
             };
 
             return await _repository.RegistrarPrestamista(prestamista);

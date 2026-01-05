@@ -19,7 +19,7 @@ public partial class Prestamista
 
     public string Usuario { get; set; }
 
-    public string ContraseñaHash { get; set; }
+    public string ContraseniaHash { get; set; }
 
     public virtual ICollection<Prestamo> Prestamos { get; set; } = new List<Prestamo>();
 }

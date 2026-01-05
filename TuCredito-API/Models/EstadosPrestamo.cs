@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace TuCredito.Models;
 
-public partial class EstadoPrestamo
+public partial class EstadosPrestamo
 {
     public int IdEstado { get; set; }
 
