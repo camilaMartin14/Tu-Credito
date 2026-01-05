@@ -10,5 +10,6 @@ namespace TuCredito.Repositories.Interfaces
         Task<PrestamoDTO> GetPrestamoById(int id); 
         Task<List<PrestamoDTO>> GetAllPrestamo();
         Task<List<PrestamoDTO>> GetPrestamoConFiltro(string? nombre, int? estado, int? mesVto, int? anio);
+        Task<bool> TienePagosPendientes(int idPrestamo);
     }
 }

@@ -21,11 +21,11 @@ public partial class Prestamo
 
     public decimal TasaInteres { get; set; }
 
-    public DateOnly? FechaFinEstimada { get; set; }
+    public DateTime? FechaFinEstimada { get; set; }
 
-    public DateOnly FechaOtorgamiento { get; set; }
+    public DateTime FechaOtorgamiento { get; set; }
 
-    public DateOnly Fec1erVto { get; set; }
+    public DateTime Fec1erVto { get; set; }
 
     public int IdSistAmortizacion { get; set; }
 

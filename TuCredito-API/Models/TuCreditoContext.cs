@@ -234,7 +234,12 @@ public partial class TuCreditoContext : DbContext
 
         modelBuilder.Entity<Prestatario>(entity =>
         {
-            entity.HasKey(e => e.Dni).HasName("PK__Prestata__C035B8DC99C9F1D5");
+
+            entity.HasKey(e => e.Dni).HasName("PK__Prestata__C035B8DCA35E3F8C");
+
+            entity.ToTable("Prestatarios");
+
+           
 
             entity.Property(e => e.Dni)
                 .ValueGeneratedNever()

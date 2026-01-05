@@ -70,9 +70,18 @@ namespace TuCredito.Repositories.Implementations
             var prestamo = await _prestamo.FindAsync(id); 
             if (prestamo == null) return false;
             if (prestamo.IdEstado == 1) return false;
-            prestamo.IdEstado = 2; // Cambio de estado ---> 1 activo, 2 finalizado
+            prestamo.IdEstado = 2; // Cambio de estado ---> 1 activo, 2 finalizado, 3 eliminado
             _prestamo.Update(prestamo); await _context.SaveChangesAsync(); 
             return true;
+        }
+
+        public async Task<bool> TienePagosPendientes(int idPrestamo) 
+        { 
+            
+            return await _context.Cuotas.Where(c => c.IdPrestamo == idPrestamo)
+                                        .AnyAsync(c => _context.Pagos
+                                        .Where(p => p.IdCuota == c.IdCuota)
+                                        .Sum(p => p.Monto) < c.Monto); 
         }
     }
 }

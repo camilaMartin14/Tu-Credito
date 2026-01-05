@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using TuCredito.Mappings;
 using TuCredito.Models;
 using TuCredito.Repositories.Implementations;
 using TuCredito.Repositories.Interfaces;
@@ -99,6 +100,7 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddDbContext<TuCreditoContext>(options =>
     options.UseSqlServer(
+        //builder.Configuration.GetConnectionString("AylenConnection")
         builder.Configuration.GetConnectionString("CamilaConnection")
     )
 );
@@ -113,7 +115,8 @@ builder.Services.AddScoped<IPrestamistaService, PrestamistaService>();
 
 builder.Services.AddScoped<JwtTokenGenerator>();
 
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+//builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 
