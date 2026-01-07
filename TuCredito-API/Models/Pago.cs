@@ -11,7 +11,7 @@ public partial class Pago
 
     public int IdCuota { get; set; }
 
-    public DateOnly FecPago { get; set; }
+    public DateTime FecPago { get; set; }
 
     public int IdMedioPago { get; set; }
 

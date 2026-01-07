@@ -15,7 +15,7 @@ public partial class Cuota
 
     public decimal Monto { get; set; }
 
-    public DateOnly FecVto { get; set; }
+    public DateTime FecVto { get; set; }
 
     public int IdEstado { get; set; }
 
