@@ -71,7 +71,8 @@ namespace TuCredito.Repositories.Implementations
             if (prestamo == null) return false;
             if (prestamo.IdEstado == 1) return false;
             prestamo.IdEstado = 2; // Cambio de estado ---> 1 activo, 2 finalizado, 3 eliminado
-            _prestamo.Update(prestamo); await _context.SaveChangesAsync(); 
+            _prestamo.Update(prestamo); 
+            await _context.SaveChangesAsync(); 
             return true;
         }
 
@@ -83,5 +84,7 @@ namespace TuCredito.Repositories.Implementations
                                         .Where(p => p.IdCuota == c.IdCuota)
                                         .Sum(p => p.Monto) < c.Monto); 
         }
+
+
     }
 }

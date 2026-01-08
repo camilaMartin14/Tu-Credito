@@ -108,6 +108,7 @@ builder.Services.AddDbContext<TuCreditoContext>(options =>
 builder.Services.AddScoped<IPrestamoRepository, PrestamoRepository>();
 builder.Services.AddScoped<IPrestatarioRepository, PrestatarioRepository>();
 builder.Services.AddScoped<IPrestamistaRepository, PrestamistaRepository>();
+builder.Services.AddScoped<ICuotaRepository, CuotaRepository>();
 
 builder.Services.AddScoped<IPrestamoService, PrestamoService>();
 builder.Services.AddScoped<IPrestatarioService, PrestatarioService>();

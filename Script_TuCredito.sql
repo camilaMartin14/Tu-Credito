@@ -127,4 +127,10 @@ INSERT INTO MediosDePago (descripcion, moneda) VALUES
 ('Transferencia', 'ARS'),
 ('Efectivo', 'ARS'),
 ('Efectivo', 'USD');
+go
+
+-- nvos inserts
+
+insert into estado_cuota (descripcion)
+values ('Vencida'), ('Reprogramada')
 
