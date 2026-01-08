@@ -34,35 +34,5 @@ namespace TuCredito.Controllers
             }
         }
 
-        /// Simula un pago anticipado sobre una simulación ya calculada.
-        [HttpPost("simular-pago-anticipado")]
-        public ActionResult<SimulacionPrestamoOutputDTO> SimularPagoAnticipado(
-            [FromBody] SimulacionPagoAnticipadoDTO request)
-        {
-            try
-            {
-                _calculadoraService.SimularPagoAnticipado(
-                    request.Simulacion,
-                    request.MontoAnticipado);
-
-                return Ok(request.Simulacion);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            
-              //          "simulacion": {
-              //                    "montoCuota": 12000,
-              //                    "totalAPagar": 120000,
-              //                    "detalleCuotas": [
-              //                    { "numeroCuota": 1, "monto": 12000 },
-              //                    { "numeroCuota": 2, "monto": 12000 }
-              //                    ]
-              //                        },
-              //                    "montoAnticipado": 20000
-            
-        }
-
     }
 }

@@ -50,21 +50,5 @@ namespace TuCredito.Services.Implementations
 
             return resultado;
         }
-
-        /// Simula un pago anticipado de un monto determinado
-        /// y calcula el nuevo total y el ahorro generado.
-        public void SimularPagoAnticipado(
-            SimulacionPrestamoOutputDTO simulacion,
-            decimal montoAnticipado)
-        {
-            if (montoAnticipado <= 0)
-                throw new ArgumentException("El monto anticipado debe ser mayor a cero");
-
-            if (montoAnticipado >= simulacion.TotalAPagar)
-                throw new ArgumentException("El monto anticipado no puede cubrir todo el préstamo");
-
-            simulacion.NuevoTotalAPagar = simulacion.TotalAPagar - montoAnticipado;
-            simulacion.AhorroPorPagoAnticipado = montoAnticipado;
-        }
     }
 }
