@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using TuCredito.DTOs;
 
@@ -7,10 +8,9 @@ using TuCredito.Models;
 using TuCredito.Services.Implementations;
 using TuCredito.Services.Interfaces;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace TuCredito.Controllers
 {
+    [Authorize] //Se agrega auth para que solo los usuarios autenticados puedan crear o acceder a los prestamos
     [Route("api/[controller]")]
     [ApiController]
     public class PrestamoController : ControllerBase
@@ -21,13 +21,16 @@ namespace TuCredito.Controllers
             _service = service;
         }
         // GET: api/<PrestamoController>
+
+        //AGREGO PAGINACIÓN CADA 10 REGISTROS
         [HttpGet]
-        public async Task<ActionResult<List<PrestamoDTO>>> GetAll()
+        [HttpGet]
+        public async Task<ActionResult<List<PrestamoDTO>>> GetAll(int page = 1, int pageSize = 10)
         {
-            
-            var lista = await _service.GetAllPrestamo();
-            return lista;
+            var lista = await _service.GetAll(page, pageSize);
+            return Ok(lista);
         }
+
 
         // GET api/<PrestamoController>/5
         [HttpGet("{id}")]
@@ -37,7 +40,7 @@ namespace TuCredito.Controllers
             return prestamo;
         }
 
-        [HttpGet("Get con filtro")]
+        [HttpGet("Get-con-filtro")] //Cmabio de nombre, endpoints no pueden tener espacios pues URL
         public async Task<ActionResult<List<PrestamoDTO>>> GetConFiltro(string? nombre, int? estado, int? mesVto, int? anio)
         {
 
@@ -63,10 +66,12 @@ namespace TuCredito.Controllers
             return BadRequest("No se pudo finalizar el préstamo.");
         }
 
-        // DELETE api/<PrestamoController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        //// DELETE api/<PrestamoController>/5
+        ///Se comenta para que no queden endpoints sin uso
+        ///
+        //[HttpDelete("{id}")]
+        //public void Delete(int id)
+        //{
+        //}
     }
 }
