@@ -114,6 +114,7 @@ builder.Services.AddScoped<IPrestamoService, PrestamoService>();
 builder.Services.AddScoped<IPrestatarioService, PrestatarioService>();
 builder.Services.AddScoped<IPrestamistaService, PrestamistaService>();
 builder.Services.AddScoped<ICuotaService, CuotaService>();
+builder.Services.AddScoped<ICalculadoraService, CalculadoraService>();
 
 builder.Services.AddScoped<JwtTokenGenerator>();
 
