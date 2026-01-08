@@ -53,7 +53,7 @@ namespace TuCredito.Controllers
         public async Task<IActionResult> PostPrestamo([FromBody] PrestamoDTO prestamo)
         {
             var resultado = await _service.PostPrestamo(prestamo); 
-            if (!resultado) return BadRequest("No se pudo registrar el préstamo. Verifique los datos ingresados."); 
+            if (!resultado) return Badentry("No se pudo registrar el préstamo. Verifique los datos ingresados."); 
             return Ok("Préstamo registrado correctamente.");
         }
 
@@ -63,7 +63,7 @@ namespace TuCredito.Controllers
         {
             var resultado = await _service.SoftDelete(id); 
             if (resultado) return Ok("Préstamo finalizado correctamente."); 
-            return BadRequest("No se pudo finalizar el préstamo.");
+            return Badentry("No se pudo finalizar el préstamo.");
         }
 
         //// DELETE api/<PrestamoController>/5

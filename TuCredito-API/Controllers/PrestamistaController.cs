@@ -29,7 +29,7 @@ namespace TuCredito.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return Badentry(ex.Message);
             }
         }
 

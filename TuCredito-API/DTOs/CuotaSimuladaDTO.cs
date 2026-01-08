@@ -1,4 +1,4 @@
-﻿namespace TuCredito.Controllers
+﻿namespace TuCredito.DTOs
 {
     public class CuotaSimuladaDTO
     {

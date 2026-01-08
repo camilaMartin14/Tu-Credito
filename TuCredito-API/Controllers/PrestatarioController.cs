@@ -46,7 +46,7 @@ namespace TuCredito.Controllers
         public async Task<IActionResult> Actualizar(int dni, [FromBody] Prestatario prestatario)
         {
             if (dni != prestatario.Dni)
-                return BadRequest("El dni de la URL no coincdnie con el del body.");
+                return Badentry("El dni de la URL no coincdnie con el del body.");
 
             var actualizado = await _service.ActualizarAsync(prestatario);
 
