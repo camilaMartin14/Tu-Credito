@@ -111,8 +111,8 @@ namespace TuCredito.Services.Implementations
             var estado = cuota.IdEstado;
             if (cuota == null) throw new Exception("Cuota no encontrada");
             cuota.Pagos.Add(new Pago { Monto = montoPagado, FecPago = DateTime.Now });
-            if (cuota.Pagos.Sum(p => p.Monto) >= cuota.Monto) cuota.IdEstado = 3; await _cuota.UpdateCuota(IdCuota, estado); // 3 = saldada
-            if (cuota.Pagos.Sum(p => p.Monto) < cuota.Monto) cuota.IdEstado = 1; await _cuota.UpdateCuota(IdCuota, estado); // pendiente - deberiamos manejar el cuanto.
+            if (cuota.Pagos.Sum(p => p.Monto) >= cuota.Monto) cuota.IdEstado = 3; await _cuota.UpdateCuota(cuota); // 3 = saldada
+            if (cuota.Pagos.Sum(p => p.Monto) < cuota.Monto) cuota.IdEstado = 1; await _cuota.UpdateCuota(cuota); // pendiente - deberiamos manejar el cuanto.
         }
 
         public async Task RegistrarPagoAnticipado(int prestamoId, int cuotaId, decimal monto)
@@ -143,7 +143,7 @@ namespace TuCredito.Services.Implementations
             else
                 cuota.IdEstado = 1; // Parcial
 
-            await _cuota.UpdateCuota(cuota.IdCuota, cuota.IdEstado);
+            await _cuota.UpdateCuota(cuota);
         }
     }
 }
