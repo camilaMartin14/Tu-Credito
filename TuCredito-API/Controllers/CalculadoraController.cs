@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TuCredito.DTOs;
 using TuCredito.Models;
 using TuCredito.Services.Implementations;
+using TuCredito.Services.Interfaces;
 
 namespace TuCredito.Controllers
 {
@@ -10,18 +11,21 @@ namespace TuCredito.Controllers
     [Route("api/calculadora")]
     public class CalculadoraController : ControllerBase
     {
-        private readonly CalculadoraService _calculadoraService;
+        private readonly ICalculadoraService _calculadoraService;
 
-        public CalculadoraController(CalculadoraService calculadoraService)
+        public CalculadoraController(ICalculadoraService calculadoraService)
         {
             _calculadoraService = calculadoraService;
         }
 
-        /// Calcula una simulación de préstamo sin persistir datos.
+
         [HttpPost("simular")]
         public ActionResult<SimulacionPrestamoOutputDTO> SimularPrestamo(
             [FromBody] SimulacionPrestamoEntryDTO entry)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 var resultado = _calculadoraService.CalcularSimulacion(entry);
@@ -29,10 +33,10 @@ namespace TuCredito.Controllers
             }
             catch (ArgumentException ex)
             {
-                // Errores de validación → 400
                 return BadRequest(ex.Message);
             }
         }
+
 
     }
 }

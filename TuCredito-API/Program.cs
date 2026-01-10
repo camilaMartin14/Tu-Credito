@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
 if (!jwtSection.Exists())
-    throw new InvalidOperationException("La sección Jwt no está configurada en appsettings.json");
+    throw new InvalidOperationException("La secciï¿½n Jwt no estï¿½ configurada en appsettings.json");
 
 var jwtKey = jwtSection["Key"];
 var jwtIssuer = jwtSection["Issuer"];
@@ -25,7 +25,7 @@ if (string.IsNullOrWhiteSpace(jwtKey) ||
     string.IsNullOrWhiteSpace(jwtIssuer) ||
     string.IsNullOrWhiteSpace(jwtAudience))
 {
-    throw new InvalidOperationException("La configuración JWT es inválida o incompleta.");
+    throw new InvalidOperationException("La configuraciï¿½n JWT es invï¿½lida o incompleta.");
 }
 
 var keyBytes = Encoding.UTF8.GetBytes(jwtKey);
@@ -114,6 +114,8 @@ builder.Services.AddScoped<IPrestamoService, PrestamoService>();
 builder.Services.AddScoped<IPrestatarioService, PrestatarioService>();
 builder.Services.AddScoped<IPrestamistaService, PrestamistaService>();
 builder.Services.AddScoped<ICuotaService, CuotaService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+
 
 builder.Services.AddScoped<JwtTokenGenerator>();
 

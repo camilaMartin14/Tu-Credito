@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TuCredito.DTOs;
@@ -29,7 +29,7 @@ namespace TuCredito.Controllers
             }
             catch (Exception ex)
             {
-                return Badentry(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 
