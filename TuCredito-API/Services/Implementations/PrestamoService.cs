@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
+using TuCredito.Controllers;
 using TuCredito.DTOs;
 using TuCredito.Models;
 using TuCredito.Repositories.Interfaces;
@@ -12,15 +13,15 @@ namespace TuCredito.Services.Implementations
     {
         private readonly IPrestamoRepository _prestamo;
         private readonly IPrestatarioRepository _prestatario;
-        private readonly ICuotaRepository _cuota;
+        private readonly ICalculadoraService _calculadora;
         private readonly IMapper _mapper;
         private readonly TuCreditoContext _context;
-        public PrestamoService(IPrestamoRepository prestamo, IMapper mapper, IPrestatarioRepository prestatario, ICuotaRepository cuota, TuCreditoContext context)
+        public PrestamoService(IPrestamoRepository prestamo, IMapper mapper, ICalculadoraService calculadora, IPrestatarioRepository prestatario, TuCreditoContext context)
         {
             _prestamo = prestamo;
             _prestatario = prestatario;
             _mapper = mapper;
-            _cuota = cuota;
+            _calculadora = calculadora;
             _context = context;
         }
         public async Task<IEnumerable<Prestamo>> GetAll(int page, int pageSize)
@@ -92,58 +93,28 @@ namespace TuCredito.Services.Implementations
 
         public void GenerarCuotas(Prestamo prestamo)
         {
-            decimal montoCuotaDecimal = prestamo.MontoOtorgado / prestamo.CantidadCtas;
-            int montoCuotaEntero = (int)Math.Ceiling(montoCuotaDecimal); // desfasaje maximo 1xcuota
-            for (int i = 1; i <= prestamo.CantidadCtas; i++)
+            var simulacion = _calculadora.CalcularSimulacion(new SimulacionPrestamoEntryDTO
             {
+                MontoPrestamo = prestamo.MontoOtorgado,
+                CantidadCuotas = prestamo.CantidadCtas,
+                InteresMensual = prestamo.TasaInteres,
+                FechaInicio = prestamo.FechaOtorgamiento
+            });
+
+            for (int i = 0; i < simulacion.DetalleCuotas.Count; i++)
+            {
+                var cuotaSimulada = simulacion.DetalleCuotas[i];
+
                 prestamo.Cuota.Add(new Cuota
                 {
-                    NroCuota = i,
-                    Monto = montoCuotaEntero,
-                    FecVto = prestamo.Fec1erVto.AddMonths(i)
+                    NroCuota = cuotaSimulada.NumeroCuota,
+                    Monto = cuotaSimulada.Monto,
+                    FecVto = (DateTime)cuotaSimulada.FechaVencimiento
                 });
             }
         }
+    }
 
-        public async void RegistrarPago(int IdCuota, int montoPagado)
-        {
-            var cuota = await _cuota.GetById(IdCuota); // de donde vendria el dato? deberia navegar el prestamo 
-            var estado = cuota.IdEstado;
-            if (cuota == null) throw new Exception("Cuota no encontrada");
-            cuota.Pagos.Add(new Pago { Monto = montoPagado, FecPago = DateTime.Now });
-            if (cuota.Pagos.Sum(p => p.Monto) >= cuota.Monto) cuota.IdEstado = 3; await _cuota.UpdateCuota(IdCuota, estado); // 3 = saldada
-            if (cuota.Pagos.Sum(p => p.Monto) < cuota.Monto) cuota.IdEstado = 1; await _cuota.UpdateCuota(IdCuota, estado); // pendiente - deberiamos manejar el cuanto.
-        }
-
-        public async Task RegistrarPagoAnticipado(int prestamoId, int cuotaId, decimal monto)
-        {
-            var prestamo = await _prestamo.GetPrestamoById(prestamoId);
-            if (prestamo == null)
-                throw new Exception("Préstamo no encontrado");
-
-            var cuota = await _cuota.GetById(cuotaId);
-            if (cuota == null)
-                throw new Exception("Cuota no encontrada");
-
-            var ultimaPendiente = _cuota.GetUltimaPendiente(prestamoId);
-            if (ultimaPendiente == null)
-                throw new Exception("No hay cuotas pendientes para cancelar anticipadamente");
-
-            if (cuota.IdCuota != ultimaPendiente.Id)
-                throw new Exception("Solo se permite pagar anticipadamente la última cuota pendiente");
-
-            cuota.Pagos.Add(new Pago
-            {
-                Monto = monto,
-                FecPago = DateTime.Now
-            });
-
-            if (cuota.Pagos.Sum(p => p.Monto) >= cuota.Monto)
-                cuota.IdEstado = 3; // Pagada
-            else
-                cuota.IdEstado = 1; // Parcial
-
-            await _cuota.UpdateCuota(cuota.IdCuota, cuota.IdEstado);
-        }
+       
     }
 }
