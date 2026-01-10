@@ -4,7 +4,7 @@ using TuCredito.Services.Interfaces;
 
 namespace TuCredito.Services.Implementations
 {
-    public class CalculadoraService 
+    public class CalculadoraService : ICalculadoraService
     {
         public SimulacionPrestamoOutputDTO CalcularSimulacion(SimulacionPrestamoEntryDTO entry)
         {
@@ -28,9 +28,7 @@ namespace TuCredito.Services.Implementations
                 0, //Redondeo para que no queden centavos y todos los precios a pagar sean .00
                 MidpointRounding.AwayFromZero);
 
-            totalAPagar = montoCuota * entry.CantidadCuotas; //Lo calculo ya Redondeado!! asi no se guarda inconsistente en bd
-                                                             // Preguntar si este redondeo esta bien o lo quiere redondear siempre a la decena o centena
-                                                             // ejemplo si es 1032 redondear a 1040 o 1100
+            totalAPagar = montoCuota * entry.CantidadCuotas; 
 
             var resultado = new SimulacionPrestamoOutputDTO
             {
@@ -50,5 +48,7 @@ namespace TuCredito.Services.Implementations
 
             return resultado;
         }
+
+       
     }
 }

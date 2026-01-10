@@ -76,5 +76,46 @@ namespace TuCredito.Services.Implementations
             return true;
     
         }
+
+        public async void RegistrarPago(int IdCuota, int montoPagado)
+        {
+            var cuota = await _cuota.GetById(IdCuota); // de donde vendria el dato? deberia navegar el prestamo 
+            var estado = cuota.IdEstado;
+            if (cuota == null) throw new Exception("Cuota no encontrada");
+            cuota.Pagos.Add(new Pago { Monto = montoPagado, FecPago = DateTime.Now });
+            if (cuota.Pagos.Sum(p => p.Monto) >= cuota.Monto) cuota.IdEstado = 3; await _cuota.UpdateCuota(cuota); // 3 = saldada
+            if (cuota.Pagos.Sum(p => p.Monto) < cuota.Monto) cuota.IdEstado = 1; await _cuota.UpdateCuota(cuota); // pendiente - deberiamos manejar el cuanto.
+        }
+
+        public async Task RegistrarPagoAnticipado(int prestamoId, int cuotaId, decimal monto)
+        {
+            var prestamo = await _prestamo.GetPrestamoById(prestamoId);
+            if (prestamo == null)
+                throw new Exception("Préstamo no encontrado");
+
+            var cuota = await _cuota.GetById(cuotaId);
+            if (cuota == null)
+                throw new Exception("Cuota no encontrada");
+
+            var ultimaPendiente = _cuota.GetUltimaPendiente(prestamoId);
+            if (ultimaPendiente == null)
+                throw new Exception("No hay cuotas pendientes para cancelar anticipadamente");
+
+            if (cuota.IdCuota != ultimaPendiente.Id)
+                throw new Exception("Solo se permite pagar anticipadamente la última cuota pendiente");
+
+            cuota.Pagos.Add(new Pago
+            {
+                Monto = monto,
+                FecPago = DateTime.Now
+            });
+
+            if (cuota.Pagos.Sum(p => p.Monto) >= cuota.Monto)
+                cuota.IdEstado = 3; // Pagada
+            else
+                cuota.IdEstado = 1; // Parcial
+
+            await _cuota.UpdateCuota(cuota);
+        }
     }
 }
