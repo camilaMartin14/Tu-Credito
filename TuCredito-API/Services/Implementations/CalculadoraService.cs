@@ -8,6 +8,32 @@ namespace TuCredito.Services.Implementations
     {
         public SimulacionPrestamoOutputDTO CalcularSimulacion(SimulacionPrestamoEntryDTO entry)
         {
+            ValidarEntry(entry);
+
+            var interesTotal = CalcularInteresTotal(entry);
+
+            var totalAPagar = entry.MontoPrestamo + interesTotal;
+
+            var montoCuota = CalcularMontoCuota(totalAPagar, entry.CantidadCuotas);
+
+            totalAPagar = montoCuota * entry.CantidadCuotas;
+
+            var resultado = new SimulacionPrestamoOutputDTO
+            {
+                MontoCuota = montoCuota,
+                TotalAPagar = totalAPagar
+            };
+
+            GenerarDetalleCuotas(resultado, entry, montoCuota);
+
+            return resultado;
+        }
+
+        #region Métodos privados auxiliares
+
+        /// Valida los datos de entrada de la simulación.
+        private void ValidarEntry(SimulacionPrestamoEntryDTO entry)
+        {
             if (entry.MontoPrestamo <= 0)
                 throw new ArgumentException("El monto del préstamo debe ser mayor a cero");
 
@@ -16,25 +42,32 @@ namespace TuCredito.Services.Implementations
 
             if (entry.InteresMensual < 0)
                 throw new ArgumentException("El interés no puede ser negativo");
+        }
 
-            // Interés simple fijo:
-            // Total = Capital + (Capital * interés * cuotas)
-            var interesTotal = entry.MontoPrestamo * entry.InteresMensual * entry.CantidadCuotas;
-            var totalAPagar = entry.MontoPrestamo + interesTotal;
+        /// Capital * interés mensual * cantidad de cuotas
+        private decimal CalcularInteresTotal(SimulacionPrestamoEntryDTO entry)
+        {
+            return entry.MontoPrestamo
+                   * entry.InteresMensual
+                   * entry.CantidadCuotas;
+        }
 
-            // Cálculo de cuota
-            var montoCuota = Math.Round(
-                totalAPagar / entry.CantidadCuotas,
-                0, //Redondeo para que no queden centavos y todos los precios a pagar sean .00
+        private decimal CalcularMontoCuota(decimal totalAPagar, int cantidadCuotas) //Ya redondeado
+        {
+            return Math.Round(
+                totalAPagar / cantidadCuotas,
+                0,
                 MidpointRounding.AwayFromZero);
+        }
 
-            totalAPagar = montoCuota * entry.CantidadCuotas; 
-
-            var resultado = new SimulacionPrestamoOutputDTO
-            {
-                MontoCuota = montoCuota,
-                TotalAPagar = totalAPagar
-            };
+        /// Cuota completa y su respectivo capital e interés.
+        private void GenerarDetalleCuotas(
+            SimulacionPrestamoOutputDTO resultado,
+            SimulacionPrestamoEntryDTO entry,
+            decimal montoCuota)
+        {
+            var capitalPorCuota = entry.MontoPrestamo / entry.CantidadCuotas;
+            var interesPorCuota = entry.MontoPrestamo * entry.InteresMensual;
 
             for (int i = 1; i <= entry.CantidadCuotas; i++)
             {
@@ -42,13 +75,12 @@ namespace TuCredito.Services.Implementations
                 {
                     NumeroCuota = i,
                     Monto = montoCuota,
+                    Capital = Math.Round(capitalPorCuota, 0, MidpointRounding.AwayFromZero),
+                    Interes = Math.Round(interesPorCuota, 0, MidpointRounding.AwayFromZero),
                     FechaVencimiento = entry.FechaInicio?.AddMonths(i)
                 });
             }
-
-            return resultado;
         }
 
-       
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using TuCredito.DTOs;
@@ -53,7 +53,7 @@ namespace TuCredito.Controllers
         public async Task<IActionResult> PostPrestamo([FromBody] PrestamoDTO prestamo)
         {
             var resultado = await _service.PostPrestamo(prestamo); 
-            if (!resultado) return Badentry("No se pudo registrar el préstamo. Verifique los datos ingresados."); 
+            if (!resultado) return BadRequest("No se pudo registrar el préstamo. Verifique los datos ingresados."); 
             return Ok("Préstamo registrado correctamente.");
         }
 
@@ -63,7 +63,7 @@ namespace TuCredito.Controllers
         {
             var resultado = await _service.SoftDelete(id); 
             if (resultado) return Ok("Préstamo finalizado correctamente."); 
-            return Badentry("No se pudo finalizar el préstamo.");
+            return BadRequest("No se pudo finalizar el préstamo.");
         }
 
         //// DELETE api/<PrestamoController>/5

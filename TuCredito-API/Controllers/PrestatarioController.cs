@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TuCredito.DTOs;
 using TuCredito.Models;
@@ -46,7 +46,7 @@ namespace TuCredito.Controllers
         public async Task<IActionResult> Actualizar(int dni, [FromBody] Prestatario prestatario)
         {
             if (dni != prestatario.Dni)
-                return Badentry("El dni de la URL no coincdnie con el del body.");
+                return BadRequest("El dni de la URL no coincdnie con el del body.");
 
             var actualizado = await _service.ActualizarAsync(prestatario);
 
