@@ -8,11 +8,15 @@ namespace TuCredito.Services.Implementations
 
     {
         private readonly IPagoRepository _pago;
-        private readonly ICuotaRepository _cuota;
-        public PagoService(IPagoRepository pago, ICuotaRepository cuota)
+        private readonly ICuotaRepository _cuotaRepo;
+        private readonly IPrestamoRepository _prestamo;
+        private readonly ICuotaService _cuotaService;
+        public PagoService(IPagoRepository pago, ICuotaRepository cuotaRepo, IPrestamoRepository prestamo, ICuotaService cuotaService)
         {
             _pago = pago;
-            _cuota = cuota;
+            _cuotaRepo = cuotaRepo;
+            _prestamo = prestamo;
+            _cuotaService = cuotaService;
         }
         public Task<List<Pago>> GetAllPagos() // AllActivos. 
         {
@@ -40,7 +44,7 @@ namespace TuCredito.Services.Implementations
 
             if (pago.Monto <= 0) { throw new ArgumentException("El monto del pago debe ser mayor a cero"); }
                 
-            var cuota = await _cuota.GetById(pago.IdCuota);
+            var cuota = await _cuotaRepo.GetById(pago.IdCuota);
 
             if (cuota == null) { throw new ArgumentException("Nro de cuota incorrecto"); }
 
@@ -59,7 +63,7 @@ namespace TuCredito.Services.Implementations
                 cuota.IdEstado = 3; //cambia el estado si quedo saldada
             }
 
-            await _cuota.UpdateCuota(cuota);
+            await _cuotaRepo.UpdateCuota(cuota);
 
             return true;
         }
@@ -77,45 +81,40 @@ namespace TuCredito.Services.Implementations
     
         }
 
-        public async void RegistrarPago(int IdCuota, int montoPagado)
+        public async Task RegistrarPago(int IdCuota, int montoPagado)
         {
-            var cuota = await _cuota.GetById(IdCuota); // de donde vendria el dato? deberia navegar el prestamo 
+            var cuota = await _cuotaRepo.GetById(IdCuota); // de donde vendria el dato? deberia navegar el prestamo 
             var estado = cuota.IdEstado;
             if (cuota == null) throw new Exception("Cuota no encontrada");
             cuota.Pagos.Add(new Pago { Monto = montoPagado, FecPago = DateTime.Now });
-            if (cuota.Pagos.Sum(p => p.Monto) >= cuota.Monto) cuota.IdEstado = 3; await _cuota.UpdateCuota(cuota); // 3 = saldada
-            if (cuota.Pagos.Sum(p => p.Monto) < cuota.Monto) cuota.IdEstado = 1; await _cuota.UpdateCuota(cuota); // pendiente - deberiamos manejar el cuanto.
+            await _cuotaRepo.UpdateCuota(cuota);
+            await _cuotaService.RecalcularEstado(cuota);
+            //if (cuota.Pagos.Sum(p => p.Monto) >= cuota.Monto) cuota.IdEstado = 3; await _cuota.UpdateCuota(cuota); // 3 = saldada
+            //if (cuota.Pagos.Sum(p => p.Monto) < cuota.Monto) cuota.IdEstado = 1; await _cuota.UpdateCuota(cuota); // pendiente - deberiamos manejar el cuanto.
         }
 
-        public async Task RegistrarPagoAnticipado(int prestamoId, int cuotaId, decimal monto)
+        public async Task<bool> RegistrarPagoAnticipadoAsync(int prestamoId, int cuotaId, int monto)
         {
             var prestamo = await _prestamo.GetPrestamoById(prestamoId);
-            if (prestamo == null)
-                throw new Exception("Préstamo no encontrado");
+            if (prestamo == null) throw new Exception("Préstamo no encontrado");
 
-            var cuota = await _cuota.GetById(cuotaId);
-            if (cuota == null)
-                throw new Exception("Cuota no encontrada");
+            var cuota = await _cuotaRepo.GetById(cuotaId);
+            if (cuota == null) throw new Exception("Cuota no encontrada");
 
-            var ultimaPendiente = _cuota.GetUltimaPendiente(prestamoId);
-            if (ultimaPendiente == null)
-                throw new Exception("No hay cuotas pendientes para cancelar anticipadamente");
+            var ultimaPendiente = _cuotaRepo.GetUltimaPendiente(prestamoId);
+            if (ultimaPendiente == null)throw new Exception("No hay cuotas pendientes para cancelar anticipadamente");
 
-            if (cuota.IdCuota != ultimaPendiente.Id)
-                throw new Exception("Solo se permite pagar anticipadamente la última cuota pendiente");
+            if (cuota.IdCuota != ultimaPendiente.Id) throw new Exception("Solo se permite pagar anticipadamente la última cuota pendiente");
 
-            cuota.Pagos.Add(new Pago
-            {
-                Monto = monto,
-                FecPago = DateTime.Now
-            });
+            await RegistrarPago(cuotaId, monto);
+            return true;
 
-            if (cuota.Pagos.Sum(p => p.Monto) >= cuota.Monto)
+           /* if (cuota.Pagos.Sum(p => p.Monto) >= cuota.Monto)
                 cuota.IdEstado = 3; // Pagada
             else
                 cuota.IdEstado = 1; // Parcial
 
-            await _cuota.UpdateCuota(cuota);
+            await _cuotaRepo.UpdateCuota(cuota); */
         }
     }
 }

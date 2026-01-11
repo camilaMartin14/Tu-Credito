@@ -29,15 +29,17 @@ namespace TuCredito.Repositories.Implementations
 
         public async Task<bool> UpdateCuota(Cuota cuota) // 5 reprogramada, 3 saldada, nvo monto p pap parcial 
         {
-            var cuotaEdit = await _context.Cuotas.FindAsync(cuota.IdCuota);
-            if (cuotaEdit == null) { return false; }
+            _context.Cuotas.Update(cuota);
+            return await _context.SaveChangesAsync() >0 ;
+              /*var cuotaEdit = await _context.Cuotas.FindAsync(cuota.IdCuota);
+              if (cuotaEdit == null) { return false; }
             
-            { 
-                cuotaEdit.IdEstado = cuota.IdEstado; 
-                cuotaEdit.Monto = cuota.Monto;
-            }
-            await _context.SaveChangesAsync();
-            return true;
+              { 
+                  cuotaEdit.IdEstado = cuota.IdEstado; 
+                  cuotaEdit.Monto = cuota.Monto;
+              }
+              await _context.SaveChangesAsync();
+              return true; */
         }
 
         public async Task<int> AddCuota(Cuota cuota)
