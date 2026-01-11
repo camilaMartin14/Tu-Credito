@@ -1,4 +1,4 @@
-﻿using TuCredito.Controllers;
+using TuCredito.Controllers;
 using TuCredito.DTOs;
 using TuCredito.Services.Interfaces;
 
@@ -28,6 +28,18 @@ namespace TuCredito.Services.Implementations
             GenerarDetalleCuotas(resultado, entry, montoCuota);
 
             return resultado;
+        }
+
+        public decimal CalcularInteresMoratorio(decimal montoCuotaOriginal, DateTime fechaVencimiento, DateTime fechaPago)
+        {
+            if (fechaPago <= fechaVencimiento) return 0;
+
+            var diasAtraso = (fechaPago - fechaVencimiento).Days;
+            
+            // 1% diario (0.01) sobre el monto original de la cuota
+            var interes = montoCuotaOriginal * 0.01m * diasAtraso;
+
+            return Math.Round(interes, 2);
         }
 
         /// Valida los datos de entrada de la simulación.

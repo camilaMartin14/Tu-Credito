@@ -118,6 +118,7 @@ builder.Services.AddScoped<ICuotaService, CuotaService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IPagoService, PagoService>();
 builder.Services.AddScoped<ICalculadoraService, CalculadoraService>();
+builder.Services.AddScoped<IDolarService, DolarService>();
 
 
 builder.Services.AddScoped<JwtTokenGenerator>();
