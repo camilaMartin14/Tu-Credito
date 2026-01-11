@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 using TuCredito.Controllers;
@@ -47,7 +47,7 @@ namespace TuCredito.Services.Implementations
                 throw new ArgumentException("El nombre solo puede contener letras");
             //el estado lo manejaria con un cboBox desde el front
             if (mesVto > 12 || mesVto < 1) throw new ArgumentException("El mes debe estar contenido entre 1 y 12");
-            if (estado.Value == 2 && mesVto.HasValue && anio.HasValue)
+            if (estado == 2 && mesVto.HasValue && anio.HasValue)
             {
                 var fechaFiltro = new DateTime(anio.Value, mesVto.Value, 1); // constuyo una fecha
                 if (fechaFiltro > DateTime.Today) // y la compara con el dia de hoy
@@ -109,7 +109,7 @@ namespace TuCredito.Services.Implementations
                 {
                     NroCuota = cuotaSimulada.NumeroCuota,
                     Monto = cuotaSimulada.Monto,
-                    FecVto = (DateTime)cuotaSimulada.FechaVencimiento
+                    FecVto = cuotaSimulada.FechaVencimiento ?? throw new InvalidOperationException("Fecha de vencimiento no calculada")
                 });
             }
         }

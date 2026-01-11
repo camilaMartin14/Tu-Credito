@@ -1,4 +1,4 @@
-﻿using TuCredito.Models;
+using TuCredito.Models;
 using TuCredito.Repositories.Implementations;
 using TuCredito.Repositories.Interfaces;
 using TuCredito.Services.Interfaces; 
@@ -26,7 +26,6 @@ namespace TuCredito.Services.Implementations
         public Task<Pago> GetPagoById(int id)
         {
             if (id <= 0) { throw new ArgumentException("Ingrese un identificador valido"); }
-            if (id == null) { throw new ArgumentException("Ingrese un identificador valido"); }
             return _pago.GetPagoById(id);
         }
 
@@ -84,8 +83,9 @@ namespace TuCredito.Services.Implementations
         public async Task RegistrarPago(int IdCuota, int montoPagado)
         {
             var cuota = await _cuotaRepo.GetById(IdCuota); // de donde vendria el dato? deberia navegar el prestamo 
-            var estado = cuota.IdEstado;
             if (cuota == null) throw new Exception("Cuota no encontrada");
+            
+            var estado = cuota.IdEstado;
             cuota.Pagos.Add(new Pago { Monto = montoPagado, FecPago = DateTime.Now });
             await _cuotaRepo.UpdateCuota(cuota);
             await _cuotaService.RecalcularEstado(cuota);
