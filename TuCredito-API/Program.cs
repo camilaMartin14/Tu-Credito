@@ -103,8 +103,8 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddDbContext<TuCreditoContext>(options =>
     options.UseSqlServer(
-        //builder.Configuration.GetConnectionString("AylenConnection")
-        builder.Configuration.GetConnectionString("CamilaConnection")
+        builder.Configuration.GetConnectionString("AylenConnection")
+        //builder.Configuration.GetConnectionString("CamilaConnection")
     )
 );
 
@@ -113,7 +113,6 @@ builder.Services.AddScoped<IPrestatarioRepository, PrestatarioRepository>();
 builder.Services.AddScoped<IPrestamistaRepository, PrestamistaRepository>();
 builder.Services.AddScoped<ICuotaRepository, CuotaRepository>();
 builder.Services.AddScoped<IPagoRepository, PagoRepository>();
-
 builder.Services.AddScoped<IPrestamoService, PrestamoService>();
 builder.Services.AddScoped<IPrestatarioService, PrestatarioService>();
 builder.Services.AddScoped<IPrestamistaService, PrestamistaService>();

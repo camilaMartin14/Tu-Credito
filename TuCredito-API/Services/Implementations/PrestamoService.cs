@@ -58,7 +58,7 @@ namespace TuCredito.Services.Implementations
 
         public async Task<bool> PostPrestamo(PrestamoDTO NvoPrestamo)
         {
-            var existe = await _prestatario.ObtenerPorDniAsync(NvoPrestamo.DniPrestatario);
+            var existe = await _prestatario.ObtenerPorDniAsync(NvoPrestamo.DniPrestatario); // solo se podra asignar a ctes dados de alta
             if (existe == null) throw new ArgumentException("El DNI ingresado no esta registrado");
             if (NvoPrestamo.MontoOtorgado <= 0) throw new ArgumentException("El monto debe ser mayor que cero");
             if (string.IsNullOrWhiteSpace(NvoPrestamo.NombrePrestatario)) throw new ArgumentException("Ingrese un nombre de prestatario"); // el nombre podria venir por defecto al poner el dni 
@@ -77,7 +77,9 @@ namespace TuCredito.Services.Implementations
             if (prestamo.TasaInteres <= 0) throw new ArgumentException("Ingrese una tasa de interes"); // opciones o vamos a permitir escribir?? 
 
             await _prestamo.PostPrestamo(NvoPrestamo);
+            GenerarCuotas(prestamo);
             return true;
+            
         }
         public async Task<bool> SoftDelete(int id)
         {
