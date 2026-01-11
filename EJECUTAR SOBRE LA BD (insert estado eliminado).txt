@@ -1,5 +1,0 @@
-select * from Estado_Prestamo 
-
-
-insert into Estado_Prestamo (descripcion)
-values ('Eliminado')

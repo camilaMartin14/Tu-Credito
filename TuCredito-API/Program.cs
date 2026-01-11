@@ -109,12 +109,15 @@ builder.Services.AddScoped<IPrestamoRepository, PrestamoRepository>();
 builder.Services.AddScoped<IPrestatarioRepository, PrestatarioRepository>();
 builder.Services.AddScoped<IPrestamistaRepository, PrestamistaRepository>();
 builder.Services.AddScoped<ICuotaRepository, CuotaRepository>();
+builder.Services.AddScoped<IPagoRepository, PagoRepository>();
 
 builder.Services.AddScoped<IPrestamoService, PrestamoService>();
 builder.Services.AddScoped<IPrestatarioService, PrestatarioService>();
 builder.Services.AddScoped<IPrestamistaService, PrestamistaService>();
 builder.Services.AddScoped<ICuotaService, CuotaService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IPagoService, PagoService>();
+builder.Services.AddScoped<ICalculadoraService, CalculadoraService>();
 
 
 builder.Services.AddScoped<JwtTokenGenerator>();
