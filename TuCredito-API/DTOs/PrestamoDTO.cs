@@ -1,4 +1,4 @@
-﻿using TuCredito.Models;
+using TuCredito.Models;
 
 namespace TuCredito.DTOs
 {
@@ -12,7 +12,5 @@ namespace TuCredito.DTOs
         public int CantidadCtas { get; set; } 
 
         public int IdEstado { get; set; }    
-       
-
     }
 }

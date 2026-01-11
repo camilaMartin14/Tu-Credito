@@ -31,10 +31,19 @@ public partial class TuCreditoContext : DbContext
 
     public virtual DbSet<Prestatario> Prestatarios { get; set; }
 
+    public virtual DbSet<AuditLog> AuditLogs { get; set; }
+
     public virtual DbSet<SistAmortizacion> SistAmortizacions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<AuditLog>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("AuditLogs");
+            entity.Property(e => e.Timestamp).HasDefaultValueSql("GETDATE()");
+        });
+
         modelBuilder.Entity<Cuota>(entity =>
         {
             entity.HasKey(e => e.IdCuota).HasName("PK__Cuotas__9BE53C1831FFE543");

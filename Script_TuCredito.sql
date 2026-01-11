@@ -116,7 +116,7 @@ CREATE TABLE Pagos (
 
 INSERT INTO Estados_Cuotas (descripcion) VALUES
 ('Pendiente'),
-('Al día'),
+('Al dï¿½a'),
 ('Saldada');
 
 INSERT INTO Estados_Prestamos (descripcion) VALUES
@@ -145,16 +145,16 @@ values ('Eliminado')
 -------------------------- Datos de prueba --------------------------
 -- Cliente responsable
 INSERT INTO SistAmortizacion (descripcion)
-VALUES ('Personal'),('Francés'), ('Alemán');
+VALUES ('Personal'),('Francï¿½s'), ('Alemï¿½n');
 
 INSERT INTO Prestamistas (nombre, apellido, esActivo, correo, usuario, contraseniaHash)
-VALUES ('Juan', 'Pérez', 1, 'juan.perez@mail.com', 'jperez', 'HASH_FAKE_123');
+VALUES ('Juan', 'Pï¿½rez', 1, 'juan.perez@mail.com', 'jperez', 'HASH_FAKE_123');
 
 INSERT INTO Garantes (nombre, apellido, telefono, domicilio, correo, esActivo)
-VALUES ('Carlos', 'Gómez', '3511234567', 'Av. Siempre Viva 123', 'cgomez@mail.com', 1);
+VALUES ('Carlos', 'Gï¿½mez', '3511234567', 'Av. Siempre Viva 123', 'cgomez@mail.com', 1);
 
 INSERT INTO Prestatarios (DNI, nombre, apellido, telefono, domicilio, correo, esActivo, idGarante)
-VALUES (30123456, 'María', 'López', '3517654321', 'Córdoba 456', 'mlopez@mail.com', 1, 1);
+VALUES (30123456, 'Marï¿½a', 'Lï¿½pez', '3517654321', 'Cï¿½rdoba 456', 'mlopez@mail.com', 1, 1);
 
 -- prest finalizado
 
@@ -176,7 +176,7 @@ VALUES (
     100000.00,           -- monto
     3,                   -- cuotas
     2,                   -- Finalizado
-    20.00,               -- interés
+    20.00,               -- interï¿½s
     '2024-06-10',
     '2024-03-10',
     '2024-04-10',
@@ -193,14 +193,14 @@ INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, Monto, Observaciones)
 VALUES
 (1, '2024-04-09', 1, 40000.00, 'Pago anticipado'),
 (2, '2024-05-10', 2, 35000.00, 'Pago en efectivo'),
-(3, '2024-06-10', 1, 30000.00, 'Pago final del préstamo');
+(3, '2024-06-10', 1, 30000.00, 'Pago final del prï¿½stamo');
 
 -- Cliente irresponsable
 INSERT INTO Garantes (nombre, apellido, telefono, domicilio, correo, esActivo)
-VALUES ('Laura', 'Martínez', '3519988776', 'San Martín 890', 'lmartinez@mail.com', 1);
+VALUES ('Laura', 'Martï¿½nez', '3519988776', 'San Martï¿½n 890', 'lmartinez@mail.com', 1);
 
 INSERT INTO Prestatarios (DNI, nombre, apellido, telefono, domicilio, correo, esActivo, idGarante)
-VALUES (28999888, 'Diego', 'Fernández', '3514455667', 'Bv. Illia 1200', 'dfernandez@mail.com', 1, 2);
+VALUES (28999888, 'Diego', 'Fernï¿½ndez', '3514455667', 'Bv. Illia 1200', 'dfernandez@mail.com', 1, 2);
 
 INSERT INTO Prestamos (
     idPrestamista,
@@ -262,9 +262,21 @@ VALUES
 -- cuota vencida (morosa)
 (2, 2, 50000.00, '2024-07-15', 4, 6000.00),
 
--- cuota aún no vencida
+-- cuota aï¿½n no vencida
 (2, 3, 45000.00, '2024-08-15', 1, 5000.00);
 
 INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, Monto, Observaciones)
 VALUES
-(4, '2024-06-14', 1, 55000.00, 'Pago en término');
+(4, '2024-06-14', 1, 55000.00, 'Pago en termino');
+
+-- Tabla de auditorÃ­a (Agregada recientemente)
+CREATE TABLE AuditLogs (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    EntityName NVARCHAR(100) NOT NULL,
+    Action NVARCHAR(20) NOT NULL,
+    Timestamp DATETIME2 NOT NULL DEFAULT GETDATE(),
+    UserId NVARCHAR(100),
+    Changes NVARCHAR(MAX),
+    EntityId NVARCHAR(100)
+);
+GO

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace TuCredito.Models
+namespace TuCredito.Models.EntidadesApisTerceros
 {
     public class DolarOficialModel
     {

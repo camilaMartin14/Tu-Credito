@@ -1,7 +1,7 @@
-using TuCredito.Models;
-using TuCredito.Services.Interfaces;
+using TuCredito.Models.EntidadesApisTerceros;
+using TuCredito.Services.Interfaces.Clients;
 
-namespace TuCredito.Services.Implementations
+namespace TuCredito.Services.Implementations.Clients
 {
     public class DolarService : IDolarService
     {
