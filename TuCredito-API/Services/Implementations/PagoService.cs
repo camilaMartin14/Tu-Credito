@@ -1,4 +1,4 @@
-﻿using TuCredito.Models;
+using TuCredito.Models;
 using TuCredito.Repositories.Implementations;
 using TuCredito.Repositories.Interfaces;
 using TuCredito.Services.Interfaces; 
@@ -82,20 +82,16 @@ namespace TuCredito.Services.Implementations
 
         public async Task<bool> RegistrarPagoAnticipadoAsync(Pago pago)
         {
-            var prestamo = await _prestamo.GetPrestamoById(pago.IdCuotaNavigation.IdPrestamo);
-            if (prestamo == null) throw new Exception("Préstamo no encontrado");
-            if (prestamo.IdEstado != 1) throw new Exception("El prestamo no esta activo");
+        var prestamo = await _prestamo.GetPrestamoById(pago.IdCuotaNavigation.IdPrestamo); 
+        if (prestamo == null) throw new Exception("Préstamo no encontrado"); 
+        if (prestamo.IdEstado != 1) throw new Exception("El préstamo no está activo"); 
+        var cuota = await _cuotaRepo.GetById(pago.IdCuota); 
+        if (cuota == null) throw new Exception("Cuota no encontrada"); 
+        cuota.Pagos.Add(new Pago { Monto = pago.Monto, FecPago = DateTime.Now }); 
+        await _cuotaRepo.UpdateCuota(cuota); 
+        await _cuotaService.RecalcularEstado(cuota); 
+        return true;
 
-            var cuota = await _cuotaRepo.GetById(pago.IdCuota);
-            if (cuota == null) throw new Exception("Cuota no encontrada");
-
-            var ultimaPendiente = _cuotaRepo.GetUltimaPendiente(pago.IdCuotaNavigation.IdPrestamo);
-            if (ultimaPendiente == null)throw new Exception("No hay cuotas pendientes para cancelar anticipadamente");
-
-            if (cuota.IdCuota != ultimaPendiente.Id) throw new Exception("Solo se permite pagar anticipadamente la última cuota pendiente");
-
-            await NewPago(pago);
-            return true;
-        }
+       
     }
 }

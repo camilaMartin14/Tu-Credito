@@ -1,4 +1,4 @@
-﻿using TuCredito.Models;
+using TuCredito.Models;
 using TuCredito.Services.Interfaces;
 using TuCredito.DTOs;
 using TuCredito.Repositories.Interfaces;
@@ -27,7 +27,7 @@ namespace TuCredito.Services.Implementations
             if (prestamo.IdEstado == 3) throw new ArgumentException("No se pueden agregar cuotas a un préstamo inactivo"); // eliminado
             if (cuota.IdEstado != 1) throw new ArgumentException("Solo se pueden dar de alta cuotas en estado 'Pendiente'");
             if (cuota.FecVto < DateTime.Now) throw new ArgumentException("La fecha de vencimiento de una nueva cuota no puede ser anterior a hoy");
-            if (cuota.FecVto == null) throw new ArgumentException("Establezca una fecha de vencimiento"); // esto vendria del metodo GenerarCtas
+            // Lo comento por como es nuestro model, no puede ser null se pone una fecha ficticia 0001-01-01 if (cuota.FecVto == null) throw new ArgumentException("Establezca una fecha de vencimiento"); // esto vendria del metodo GenerarCtas
             if (cuota.Interes <= 0) throw new ArgumentException("Revise el interes de la cuota"); 
             if (cuota.Monto <= 0) throw new ArgumentException("El valor de la cuota no puede ser cero");
             return await _cuota.AddCuota(cuota) > 0;
@@ -45,13 +45,13 @@ namespace TuCredito.Services.Implementations
         public async Task<Cuota> GetById(int id)
         {
             if (id <= 0) throw new ArgumentException("Ingrese un identificador valido");
-            if (id == null) throw new ArgumentException("Ingrese un identificador");
             return await _cuota.GetById(id);
         }
 
         public async Task<bool> UpdateCuota(Cuota cuota)
         {
             var nvaCuota = await _cuota.GetById(cuota.IdCuota);
+            if (nvaCuota == null) throw new ArgumentException("La cuota no existe");
 
             if (nvaCuota.IdEstado == 3) throw new ArgumentException("La cuota ya está saldada");
 

@@ -9,7 +9,10 @@ using TuCredito.Repositories.Implementations;
 using TuCredito.Repositories.Interfaces;
 using TuCredito.Security;
 using TuCredito.Services.Implementations;
+using TuCredito.Services.Implementations.Clients;
 using TuCredito.Services.Interfaces;
+using TuCredito.Services.Interfaces.Clients;
+using TuCredito.Interceptors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -117,6 +120,8 @@ builder.Services.AddScoped<ICuotaService, CuotaService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IPagoService, PagoService>();
 builder.Services.AddScoped<ICalculadoraService, CalculadoraService>();
+builder.Services.AddScoped<IDolarService, DolarService>();
+builder.Services.AddHttpClient<BcraDeudoresService>();
 
 
 builder.Services.AddScoped<JwtTokenGenerator>();
