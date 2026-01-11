@@ -1,7 +1,7 @@
-CREATE DATABASE TuCredito7;
+CREATE DATABASE TuCredito9;
 GO
 
-USE TuCredito7;
+USE TuCredito9;
 GO
 
 CREATE TABLE Estados_Prestamos (
@@ -105,6 +105,8 @@ CREATE TABLE Pagos (
     idCuota INT NOT NULL,
     Fec_Pago DATE NOT NULL,
     idMedioPago INT NOT NULL,
+    saldo decimal NOT NULL,
+    Estado varchar(20) NOT NULL,
     Monto DECIMAL(12,2) NOT NULL,
     Observaciones VARCHAR(255),
     CONSTRAINT FK_Pagos_Cuota
@@ -116,7 +118,6 @@ CREATE TABLE Pagos (
 
 INSERT INTO Estados_Cuotas (descripcion) VALUES
 ('Pendiente'),
-('Al d�a'),
 ('Saldada');
 
 INSERT INTO Estados_Prestamos (descripcion) VALUES
@@ -142,132 +143,132 @@ insert into Estados_Prestamos (descripcion)
 values ('Eliminado')
 
 
--------------------------- Datos de prueba --------------------------
--- Cliente responsable
-INSERT INTO SistAmortizacion (descripcion)
-VALUES ('Personal'),('Franc�s'), ('Alem�n');
+---------------------------- Datos de prueba --------------------------
+---- Cliente responsable
+--INSERT INTO SistAmortizacion (descripcion)
+--VALUES ('Personal'),('Franc�s'), ('Alem�n');
 
-INSERT INTO Prestamistas (nombre, apellido, esActivo, correo, usuario, contraseniaHash)
-VALUES ('Juan', 'P�rez', 1, 'juan.perez@mail.com', 'jperez', 'HASH_FAKE_123');
+--INSERT INTO Prestamistas (nombre, apellido, esActivo, correo, usuario, contraseniaHash)
+--VALUES ('Juan', 'P�rez', 1, 'juan.perez@mail.com', 'jperez', 'HASH_FAKE_123');
 
-INSERT INTO Garantes (nombre, apellido, telefono, domicilio, correo, esActivo)
-VALUES ('Carlos', 'G�mez', '3511234567', 'Av. Siempre Viva 123', 'cgomez@mail.com', 1);
+--INSERT INTO Garantes (nombre, apellido, telefono, domicilio, correo, esActivo)
+--VALUES ('Carlos', 'G�mez', '3511234567', 'Av. Siempre Viva 123', 'cgomez@mail.com', 1);
 
-INSERT INTO Prestatarios (DNI, nombre, apellido, telefono, domicilio, correo, esActivo, idGarante)
-VALUES (30123456, 'Mar�a', 'L�pez', '3517654321', 'C�rdoba 456', 'mlopez@mail.com', 1, 1);
+--INSERT INTO Prestatarios (DNI, nombre, apellido, telefono, domicilio, correo, esActivo, idGarante)
+--VALUES (30123456, 'Mar�a', 'L�pez', '3517654321', 'C�rdoba 456', 'mlopez@mail.com', 1, 1);
 
--- prest finalizado
+---- prest finalizado
 
-INSERT INTO Prestamos (
-    idPrestamista,
-    DNI_Prestatario,
-    MontoOtorgado,
-    Cantidad_ctas,
-    idEstado,
-    tasaInteres,
-    fechaFinEstimada,
-    fechaOtorgamiento,
-    Fec_1erVto,
-    idSistAmortizacion
-)
-VALUES (
-    1,                  -- prestamista
-    30123456,            -- prestatario
-    100000.00,           -- monto
-    3,                   -- cuotas
-    2,                   -- Finalizado
-    20.00,               -- inter�s
-    '2024-06-10',
-    '2024-03-10',
-    '2024-04-10',
-    1                    -- Personal
-);
+--INSERT INTO Prestamos (
+--    idPrestamista,
+--    DNI_Prestatario,
+--    MontoOtorgado,
+--    Cantidad_ctas,
+--    idEstado,
+--    tasaInteres,
+--    fechaFinEstimada,
+--    fechaOtorgamiento,
+--    Fec_1erVto,
+--    idSistAmortizacion
+--)
+--VALUES (
+--    1,                  -- prestamista
+--    30123456,            -- prestatario
+--    100000.00,           -- monto
+--    3,                   -- cuotas
+--    2,                   -- Finalizado
+--    20.00,               -- inter�s
+--    '2024-06-10',
+--    '2024-03-10',
+--    '2024-04-10',
+--    1                    -- Personal
+--);
 
-INSERT INTO Cuotas (idPrestamo, nroCuota, Monto, Fec_Vto, idEstado, Interes)
-VALUES
-(1, 1, 40000.00, '2024-04-10', 3, 5000.00),
-(1, 2, 35000.00, '2024-05-10', 3, 4000.00),
-(1, 3, 30000.00, '2024-06-10', 3, 3000.00);
+--INSERT INTO Cuotas (idPrestamo, nroCuota, Monto, Fec_Vto, idEstado, Interes)
+--VALUES
+--(1, 1, 40000.00, '2024-04-10', 3, 5000.00),
+--(1, 2, 35000.00, '2024-05-10', 3, 4000.00),
+--(1, 3, 30000.00, '2024-06-10', 3, 3000.00);
 
-INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, Monto, Observaciones)
-VALUES
-(1, '2024-04-09', 1, 40000.00, 'Pago anticipado'),
-(2, '2024-05-10', 2, 35000.00, 'Pago en efectivo'),
-(3, '2024-06-10', 1, 30000.00, 'Pago final del pr�stamo');
+--INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, Monto, Observaciones)
+--VALUES
+--(1, '2024-04-09', 1, 40000.00, 'Pago anticipado'),
+--(2, '2024-05-10', 2, 35000.00, 'Pago en efectivo'),
+--(3, '2024-06-10', 1, 30000.00, 'Pago final del pr�stamo');
 
--- Cliente irresponsable
-INSERT INTO Garantes (nombre, apellido, telefono, domicilio, correo, esActivo)
-VALUES ('Laura', 'Mart�nez', '3519988776', 'San Mart�n 890', 'lmartinez@mail.com', 1);
+---- Cliente irresponsable
+--INSERT INTO Garantes (nombre, apellido, telefono, domicilio, correo, esActivo)
+--VALUES ('Laura', 'Mart�nez', '3519988776', 'San Mart�n 890', 'lmartinez@mail.com', 1);
 
-INSERT INTO Prestatarios (DNI, nombre, apellido, telefono, domicilio, correo, esActivo, idGarante)
-VALUES (28999888, 'Diego', 'Fern�ndez', '3514455667', 'Bv. Illia 1200', 'dfernandez@mail.com', 1, 2);
+--INSERT INTO Prestatarios (DNI, nombre, apellido, telefono, domicilio, correo, esActivo, idGarante)
+--VALUES (28999888, 'Diego', 'Fern�ndez', '3514455667', 'Bv. Illia 1200', 'dfernandez@mail.com', 1, 2);
 
-INSERT INTO Prestamos (
-    idPrestamista,
-    DNI_Prestatario,
-    MontoOtorgado,
-    Cantidad_ctas,
-    idEstado,
-    tasaInteres,
-    fechaFinEstimada,
-    fechaOtorgamiento,
-    Fec_1erVto,
-    idSistAmortizacion
-)
-VALUES (
-    1,                -- prestamista
-    28999888,         -- prestatario
-    150000.00,
-    3,
-    1,                -- Activo
-    25.00,
-    '2024-08-15',
-    '2024-05-15',
-    '2024-06-15',
-    1                 -- Personal
-);
+--INSERT INTO Prestamos (
+--    idPrestamista,
+--    DNI_Prestatario,
+--    MontoOtorgado,
+--    Cantidad_ctas,
+--    idEstado,
+--    tasaInteres,
+--    fechaFinEstimada,
+--    fechaOtorgamiento,
+--    Fec_1erVto,
+--    idSistAmortizacion
+--)
+--VALUES (
+--    1,                -- prestamista
+--    28999888,         -- prestatario
+--    150000.00,
+--    3,
+--    1,                -- Activo
+--    25.00,
+--    '2024-08-15',
+--    '2024-05-15',
+--    '2024-06-15',
+--    1                 -- Personal
+--);
 
--- Prestamo activo
+---- Prestamo activo
 
-INSERT INTO Prestamos (
-    idPrestamista,
-    DNI_Prestatario,
-    MontoOtorgado,
-    Cantidad_ctas,
-    idEstado,
-    tasaInteres,
-    fechaFinEstimada,
-    fechaOtorgamiento,
-    Fec_1erVto,
-    idSistAmortizacion
-)
-VALUES (
-    1,                -- prestamista
-    28999888,         -- prestatario
-    150000.00,
-    3,
-    1,                -- Activo
-    25.00,
-    '2024-08-15',
-    '2024-05-15',
-    '2024-06-15',
-    1                 -- Personal
-);
+--INSERT INTO Prestamos (
+--    idPrestamista,
+--    DNI_Prestatario,
+--    MontoOtorgado,
+--    Cantidad_ctas,
+--    idEstado,
+--    tasaInteres,
+--    fechaFinEstimada,
+--    fechaOtorgamiento,
+--    Fec_1erVto,
+--    idSistAmortizacion
+--)
+--VALUES (
+--    1,                -- prestamista
+--    28999888,         -- prestatario
+--    150000.00,
+--    3,
+--    1,                -- Activo
+--    25.00,
+--    '2024-08-15',
+--    '2024-05-15',
+--    '2024-06-15',
+--    1                 -- Personal
+--);
 
-INSERT INTO Cuotas (idPrestamo, nroCuota, Monto, Fec_Vto, idEstado, Interes)
-VALUES
--- cuota pagada
-(2, 1, 55000.00, '2024-06-15', 3, 7000.00),
+--INSERT INTO Cuotas (idPrestamo, nroCuota, Monto, Fec_Vto, idEstado, Interes)
+--VALUES
+---- cuota pagada
+--(2, 1, 55000.00, '2024-06-15', 3, 7000.00),
 
--- cuota vencida (morosa)
-(2, 2, 50000.00, '2024-07-15', 4, 6000.00),
+---- cuota vencida (morosa)
+--(2, 2, 50000.00, '2024-07-15', 4, 6000.00),
 
--- cuota a�n no vencida
-(2, 3, 45000.00, '2024-08-15', 1, 5000.00);
+---- cuota a�n no vencida
+--(2, 3, 45000.00, '2024-08-15', 1, 5000.00);
 
-INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, Monto, Observaciones)
-VALUES
-(4, '2024-06-14', 1, 55000.00, 'Pago en termino');
+--INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, Monto, Observaciones)
+--VALUES
+--(4, '2024-06-14', 1, 55000.00, 'Pago en termino');
 
 -- Tabla de auditoría (Agregada recientemente)
 CREATE TABLE AuditLogs (
