@@ -6,6 +6,7 @@ namespace TuCredito.Services.Implementations
 {
     public class CalculadoraService : ICalculadoraService
     {
+
         public SimulacionPrestamoOutputDTO CalcularSimulacion(SimulacionPrestamoEntryDTO entry)
         {
             ValidarEntry(entry);
@@ -28,8 +29,6 @@ namespace TuCredito.Services.Implementations
 
             return resultado;
         }
-
-        #region Métodos privados auxiliares
 
         /// Valida los datos de entrada de la simulación.
         private void ValidarEntry(SimulacionPrestamoEntryDTO entry)

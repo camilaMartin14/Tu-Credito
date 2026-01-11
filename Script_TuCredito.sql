@@ -1,7 +1,7 @@
-CREATE DATABASE TuCredito6;
+CREATE DATABASE TuCredito7;
 GO
 
-USE TuCredito6;
+USE TuCredito7;
 GO
 
 CREATE TABLE Estados_Prestamos (
@@ -131,6 +131,140 @@ go
 
 -- nvos inserts
 
-insert into estado_cuota (descripcion)
+insert into estados_cuotas (descripcion)
 values ('Vencida'), ('Reprogramada')
 
+
+select * from Estados_Prestamos 
+
+
+insert into Estados_Prestamos (descripcion)
+values ('Eliminado')
+
+
+-------------------------- Datos de prueba --------------------------
+-- Cliente responsable
+INSERT INTO SistAmortizacion (descripcion)
+VALUES ('Personal'),('Francés'), ('Alemán');
+
+INSERT INTO Prestamistas (nombre, apellido, esActivo, correo, usuario, contraseniaHash)
+VALUES ('Juan', 'Pérez', 1, 'juan.perez@mail.com', 'jperez', 'HASH_FAKE_123');
+
+INSERT INTO Garantes (nombre, apellido, telefono, domicilio, correo, esActivo)
+VALUES ('Carlos', 'Gómez', '3511234567', 'Av. Siempre Viva 123', 'cgomez@mail.com', 1);
+
+INSERT INTO Prestatarios (DNI, nombre, apellido, telefono, domicilio, correo, esActivo, idGarante)
+VALUES (30123456, 'María', 'López', '3517654321', 'Córdoba 456', 'mlopez@mail.com', 1, 1);
+
+-- prest finalizado
+
+INSERT INTO Prestamos (
+    idPrestamista,
+    DNI_Prestatario,
+    MontoOtorgado,
+    Cantidad_ctas,
+    idEstado,
+    tasaInteres,
+    fechaFinEstimada,
+    fechaOtorgamiento,
+    Fec_1erVto,
+    idSistAmortizacion
+)
+VALUES (
+    1,                  -- prestamista
+    30123456,            -- prestatario
+    100000.00,           -- monto
+    3,                   -- cuotas
+    2,                   -- Finalizado
+    20.00,               -- interés
+    '2024-06-10',
+    '2024-03-10',
+    '2024-04-10',
+    1                    -- Personal
+);
+
+INSERT INTO Cuotas (idPrestamo, nroCuota, Monto, Fec_Vto, idEstado, Interes)
+VALUES
+(1, 1, 40000.00, '2024-04-10', 3, 5000.00),
+(1, 2, 35000.00, '2024-05-10', 3, 4000.00),
+(1, 3, 30000.00, '2024-06-10', 3, 3000.00);
+
+INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, Monto, Observaciones)
+VALUES
+(1, '2024-04-09', 1, 40000.00, 'Pago anticipado'),
+(2, '2024-05-10', 2, 35000.00, 'Pago en efectivo'),
+(3, '2024-06-10', 1, 30000.00, 'Pago final del préstamo');
+
+-- Cliente irresponsable
+INSERT INTO Garantes (nombre, apellido, telefono, domicilio, correo, esActivo)
+VALUES ('Laura', 'Martínez', '3519988776', 'San Martín 890', 'lmartinez@mail.com', 1);
+
+INSERT INTO Prestatarios (DNI, nombre, apellido, telefono, domicilio, correo, esActivo, idGarante)
+VALUES (28999888, 'Diego', 'Fernández', '3514455667', 'Bv. Illia 1200', 'dfernandez@mail.com', 1, 2);
+
+INSERT INTO Prestamos (
+    idPrestamista,
+    DNI_Prestatario,
+    MontoOtorgado,
+    Cantidad_ctas,
+    idEstado,
+    tasaInteres,
+    fechaFinEstimada,
+    fechaOtorgamiento,
+    Fec_1erVto,
+    idSistAmortizacion
+)
+VALUES (
+    1,                -- prestamista
+    28999888,         -- prestatario
+    150000.00,
+    3,
+    1,                -- Activo
+    25.00,
+    '2024-08-15',
+    '2024-05-15',
+    '2024-06-15',
+    1                 -- Personal
+);
+
+-- Prestamo activo
+
+INSERT INTO Prestamos (
+    idPrestamista,
+    DNI_Prestatario,
+    MontoOtorgado,
+    Cantidad_ctas,
+    idEstado,
+    tasaInteres,
+    fechaFinEstimada,
+    fechaOtorgamiento,
+    Fec_1erVto,
+    idSistAmortizacion
+)
+VALUES (
+    1,                -- prestamista
+    28999888,         -- prestatario
+    150000.00,
+    3,
+    1,                -- Activo
+    25.00,
+    '2024-08-15',
+    '2024-05-15',
+    '2024-06-15',
+    1                 -- Personal
+);
+
+INSERT INTO Cuotas (idPrestamo, nroCuota, Monto, Fec_Vto, idEstado, Interes)
+VALUES
+-- cuota pagada
+(2, 1, 55000.00, '2024-06-15', 3, 7000.00),
+
+-- cuota vencida (morosa)
+(2, 2, 50000.00, '2024-07-15', 4, 6000.00),
+
+-- cuota aún no vencida
+(2, 3, 45000.00, '2024-08-15', 1, 5000.00);
+
+INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, Monto, Observaciones)
+VALUES
+(4, '2024-06-14', 1, 55000.00, 'Pago en término');
