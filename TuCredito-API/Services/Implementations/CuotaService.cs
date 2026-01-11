@@ -49,7 +49,7 @@ namespace TuCredito.Services.Implementations
             return await _cuota.GetById(id);
         }
 
-        public async Task<bool> RecalcularEstado(Cuota cuota)
+        public async Task<bool> UpdateCuota(Cuota cuota)
         {
             var nvaCuota = await _cuota.GetById(cuota.IdCuota);
 

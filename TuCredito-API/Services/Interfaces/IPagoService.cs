@@ -9,5 +9,6 @@ namespace TuCredito.Services.Interfaces
         Task<List<Pago>> GetPagoConFiltro(string? nombre, int? mes);
         Task<bool> NewPago(Pago pago);
         Task<bool> UpdatePago(int id, string estado);
+        Task<bool> RegistrarPagoAnticipadoAsync(Pago pago);
     }
 }

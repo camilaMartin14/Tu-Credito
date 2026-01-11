@@ -26,15 +26,14 @@ namespace TuCredito.Services.Implementations
         public Task<Pago> GetPagoById(int id)
         {
             if (id <= 0) { throw new ArgumentException("Ingrese un identificador valido"); }
-            if (id == null) { throw new ArgumentException("Ingrese un identificador valido"); }
             return _pago.GetPagoById(id);
         }
 
         public Task<List<Pago>> GetPagoConFiltro(string? nombre, int? mes)
         {
-            if (string.IsNullOrWhiteSpace(nombre) || nombre.Any(char.IsDigit)) { throw new ArgumentException("El nombre solo puede contener letras"); }
+            if (nombre != null && nombre.Any(char.IsDigit)) throw new ArgumentException("El nombre solo puede contener letras");
 
-            if (mes > 12 || mes < 1) { throw new ArgumentException("El mes debe estar contenido entre 1 y 12"); }
+            if (mes.HasValue && (mes < 1 || mes > 12)) throw new ArgumentException("El mes debe estar entre 1 y 12");
 
             return _pago.GetPagoConFiltro(nombre, mes);
         }
@@ -56,12 +55,12 @@ namespace TuCredito.Services.Implementations
             await _pago.NewPago(pago);
 
             
-            cuota.Monto -= pago.Monto; //actualiza el monto 
+            var totalPagado = cuota.Pagos.Sum(p => p.Monto) + pago.Monto;
 
-            if (cuota.Monto == 0)
-            {
-                cuota.IdEstado = 3; //cambia el estado si quedo saldada
-            }
+            if (totalPagado > cuota.Monto)
+                throw new Exception("Excede el monto");
+
+            cuota.IdEstado = totalPagado == cuota.Monto ? 3 : 1;
 
             await _cuotaRepo.UpdateCuota(cuota);
 
@@ -81,40 +80,22 @@ namespace TuCredito.Services.Implementations
     
         }
 
-        public async Task RegistrarPago(int IdCuota, int montoPagado)
+        public async Task<bool> RegistrarPagoAnticipadoAsync(Pago pago)
         {
-            var cuota = await _cuotaRepo.GetById(IdCuota); // de donde vendria el dato? deberia navegar el prestamo 
-            var estado = cuota.IdEstado;
-            if (cuota == null) throw new Exception("Cuota no encontrada");
-            cuota.Pagos.Add(new Pago { Monto = montoPagado, FecPago = DateTime.Now });
-            await _cuotaRepo.UpdateCuota(cuota);
-            await _cuotaService.RecalcularEstado(cuota);
-            //if (cuota.Pagos.Sum(p => p.Monto) >= cuota.Monto) cuota.IdEstado = 3; await _cuota.UpdateCuota(cuota); // 3 = saldada
-            //if (cuota.Pagos.Sum(p => p.Monto) < cuota.Monto) cuota.IdEstado = 1; await _cuota.UpdateCuota(cuota); // pendiente - deberiamos manejar el cuanto.
-        }
-
-        public async Task<bool> RegistrarPagoAnticipadoAsync(int prestamoId, int cuotaId, int monto)
-        {
-            var prestamo = await _prestamo.GetPrestamoById(prestamoId);
+            var prestamo = await _prestamo.GetPrestamoById(pago.IdCuotaNavigation.IdPrestamo);
             if (prestamo == null) throw new Exception("Préstamo no encontrado");
+            if (prestamo.IdEstado != 1) throw new Exception("El prestamo no esta activo");
 
-            var cuota = await _cuotaRepo.GetById(cuotaId);
+            var cuota = await _cuotaRepo.GetById(pago.IdCuota);
             if (cuota == null) throw new Exception("Cuota no encontrada");
 
-            var ultimaPendiente = _cuotaRepo.GetUltimaPendiente(prestamoId);
+            var ultimaPendiente = _cuotaRepo.GetUltimaPendiente(pago.IdCuotaNavigation.IdPrestamo);
             if (ultimaPendiente == null)throw new Exception("No hay cuotas pendientes para cancelar anticipadamente");
 
             if (cuota.IdCuota != ultimaPendiente.Id) throw new Exception("Solo se permite pagar anticipadamente la última cuota pendiente");
 
-            await RegistrarPago(cuotaId, monto);
+            await NewPago(pago);
             return true;
-
-           /* if (cuota.Pagos.Sum(p => p.Monto) >= cuota.Monto)
-                cuota.IdEstado = 3; // Pagada
-            else
-                cuota.IdEstado = 1; // Parcial
-
-            await _cuotaRepo.UpdateCuota(cuota); */
         }
     }
 }
