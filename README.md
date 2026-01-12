@@ -76,7 +76,7 @@ El backend ha sido construido siguiendo las mejores prácticas de la industria, 
 
 ### Backend
 - **Lenguaje**: C#
-- **Framework**: .NET 6 / 7 Web API
+- **Framework**: .NET 8 Web API
 - **ORM**: Entity Framework Core
 - **Base de Datos**: SQL Server
 - **Autenticación**: JWT Bearer
