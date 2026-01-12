@@ -89,9 +89,11 @@ namespace TuCredito.Services.Implementations
         if (cuota == null) throw new Exception("Cuota no encontrada"); 
         cuota.Pagos.Add(new Pago { Monto = pago.Monto, FecPago = DateTime.Now }); 
         await _cuotaRepo.UpdateCuota(cuota); 
-        await _cuotaService.RecalcularEstado(cuota); 
+        await _cuotaService.UpdateCuota(cuota); 
         return true;
 
        
+        }
     }
 }
+
