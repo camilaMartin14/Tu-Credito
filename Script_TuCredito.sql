@@ -281,3 +281,17 @@ CREATE TABLE AuditLogs (
     EntityId NVARCHAR(100)
 );
 GO
+
+-- Tabla para carga de docs (Agregada recientemente)
+CREATE TABLE Documentos (
+    IdDocumento INT IDENTITY PRIMARY KEY,
+    EntidadTipo VARCHAR(50) NOT NULL,      -- 'Prestamo', 'Cliente'
+    EntidadId INT NOT NULL,
+    TipoDocumento VARCHAR(50) NOT NULL,    -- 'Pagare', 'ReciboSueldo'
+    NombreOriginal VARCHAR(255) NOT NULL,
+    RutaStorage VARCHAR(500) NOT NULL,
+    ContentType VARCHAR(100) NOT NULL,
+    FechaSubida DATETIME NOT NULL DEFAULT GETDATE(),
+    SubidoPor INT NOT NULL,
+    Activo BIT NOT NULL DEFAULT 1
+);
