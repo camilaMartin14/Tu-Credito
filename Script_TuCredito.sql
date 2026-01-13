@@ -1,7 +1,7 @@
-CREATE DATABASE TuCredito11;
+CREATE DATABASE TuCredito14;
 GO
 
-USE TuCredito11;
+USE TuCredito14;
 GO
 
 CREATE TABLE Estados_Prestamos (
@@ -65,6 +65,7 @@ CREATE TABLE Prestamos (
     idPrestamista INT NOT NULL,
     DNI_Prestatario INT NOT NULL,
     MontoOtorgado DECIMAL(12,2) NOT NULL,
+    SaldoRestante DECIMAL(12,2) NOT NULL,
     Cantidad_ctas INT NOT NULL,
     idEstado INT NOT NULL,
     tasaInteres DECIMAL(5,2) NOT NULL,
@@ -90,6 +91,7 @@ CREATE TABLE Cuotas (
     Fec_Vto DATE NOT NULL,
     idEstado INT NOT NULL,
     Interes DECIMAL(12,2),
+    SaldoPendiente DECIMAL(12,2),
     CONSTRAINT FK_Cuotas_Prestamo
         FOREIGN KEY (idPrestamo) REFERENCES Prestamos(idPrestamo),
     CONSTRAINT FK_Cuotas_Estado
@@ -101,7 +103,7 @@ CREATE TABLE Pagos (
     idCuota INT NOT NULL,
     Fec_Pago DATE NOT NULL,
     idMedioPago INT NOT NULL,
-    saldo decimal NOT NULL,
+    saldo DECIMAL(12,2) NOT NULL,
     Estado varchar(20) NOT NULL,
     Monto DECIMAL(12,2) NOT NULL,
     Observaciones VARCHAR(255),
@@ -110,8 +112,6 @@ CREATE TABLE Pagos (
     CONSTRAINT FK_Pagos_MedioPago
         FOREIGN KEY (idMedioPago) REFERENCES MediosDePago(idMedio_Pago)
 );
-
-alter table Cuotas add SaldoPendiente decimal (12, 2)
 
 -- Tabla para carga de docs (Agregada recientemente)
 CREATE TABLE Documentos (
@@ -138,125 +138,134 @@ CREATE TABLE AuditLogs (
     EntityId NVARCHAR(100)
 );
 
----- Estados de cuotas
---INSERT INTO Estados_Cuotas (descripcion) VALUES
---('Pendiente'),
---('Saldada'),
---('Vencida'),
---('Reprogramada');
+-- Estados de cuotas
+INSERT INTO Estados_Cuotas (descripcion) VALUES
+('Pendiente'),
+('Saldada'),
+('Vencida'),
+('Reprogramada');
 
----- Estados de préstamos
---INSERT INTO Estados_Prestamos (descripcion) VALUES
---('Activo'),
---('Finalizado'),
---('Eliminado');
+-- Estados de préstamos
+INSERT INTO Estados_Prestamos (descripcion) VALUES
+('Activo'),
+('Finalizado'),
+('Eliminado');
 
----- Medios de pago
---INSERT INTO MediosDePago (descripcion, moneda) VALUES
---('Transferencia', 'ARS'),
---('Efectivo', 'ARS'),
---('Efectivo', 'USD'),
---('Transferencia', 'USD');
+-- Medios de pago
+INSERT INTO MediosDePago (descripcion, moneda) VALUES
+('Transferencia', 'ARS'),
+('Efectivo', 'ARS'),
+('Efectivo', 'USD'),
+('Transferencia', 'USD');
 
----- Sistemas de amortización
---INSERT INTO SistAmortizacion (descripcion) VALUES
---('Personal'),
---('Francés'),
---('Alemán');
---GO
+-- Sistemas de amortización
+INSERT INTO SistAmortizacion (descripcion) VALUES
+('Personal'),
+('Francés'),
+('Alemán');
+GO
 
----- Garante
---INSERT INTO Garantes (nombre, apellido, telefono, domicilio, correo, esActivo)
---VALUES
---('Laura', 'Martínez', '3519988776', 'San Martín 890', 'lmartinez@mail.com', 1);
+-- Prestamista (FALTANTE)
+INSERT INTO Prestamistas (nombre, apellido, esActivo, correo, usuario, contraseniaHash)
+VALUES
+('Juan', 'Pérez', 1, 'jperez@mail.com', 'admin', 'hash1234');
 
----- Prestatario
---INSERT INTO Prestatarios (
---    DNI, nombre, apellido, telefono, domicilio, correo, esActivo, idGarante
---)
---VALUES
---(28999888, 'Diego', 'Fernández', '3514455667', 'Bv. Illia 1200', 'dfernandez@mail.com', 1, 1);
+-- Garante
+INSERT INTO Garantes (nombre, apellido, telefono, domicilio, correo, esActivo)
+VALUES
+('Laura', 'Martínez', '3519988776', 'San Martín 890', 'lmartinez@mail.com', 1);
 
----- Préstamo 1
---INSERT INTO Prestamos (
---    idPrestamista,
---    DNI_Prestatario,
---    MontoOtorgado,
---    Cantidad_ctas,
---    idEstado,
---    tasaInteres,
---    fechaFinEstimada,
---    fechaOtorgamiento,
---    Fec_1erVto,
---    idSistAmortizacion
---)
---VALUES (
---    1,
---    28999888,
---    150000.00,
---    3,
---    1,              -- Activo
---    25.00,
---    '2024-08-15',
---    '2024-05-15',
---    '2024-06-15',
---    1               -- Personal
---);
+-- Prestatario
+INSERT INTO Prestatarios (
+    DNI, nombre, apellido, telefono, domicilio, correo, esActivo, idGarante
+)
+VALUES
+(28999888, 'Diego', 'Fernández', '3514455667', 'Bv. Illia 1200', 'dfernandez@mail.com', 1, 1);
 
----- Préstamo 2 (activo)
---INSERT INTO Prestamos (
---    idPrestamista,
---    DNI_Prestatario,
---    MontoOtorgado,
---    Cantidad_ctas,
---    idEstado,
---    tasaInteres,
---    fechaFinEstimada,
---    fechaOtorgamiento,
---    Fec_1erVto,
---    idSistAmortizacion
---)
---VALUES (
---    1,
---    28999888,
---    150000.00,
---    3,
---    1,              -- Activo
---    25.00,
---    '2024-08-15',
---    '2024-05-15',
---    '2024-06-15',
---    1               -- Personal
---);
+-- Préstamo 1
+INSERT INTO Prestamos (
+    idPrestamista,
+    DNI_Prestatario,
+    MontoOtorgado,
+    SaldoRestante,
+    Cantidad_ctas,
+    idEstado,
+    tasaInteres,
+    fechaFinEstimada,
+    fechaOtorgamiento,
+    Fec_1erVto,
+    idSistAmortizacion
+)
+VALUES (
+    1,
+    28999888,
+    150000.00,
+    45000.00,  -- SaldoRestante simulado
+    3,
+    1,              -- Activo
+    25.00,
+    '2024-08-15',
+    '2024-05-15',
+    '2024-06-15',
+    1               -- Personal
+);
 
----- Cuotas del préstamo 1
---INSERT INTO Cuotas (idPrestamo, nroCuota, Monto, Fec_Vto, idEstado, Interes)
---VALUES
---(1, 1, 40000.00, '2024-04-10', 3, 5000.00),
---(1, 2, 35000.00, '2024-05-10', 3, 4000.00),
---(1, 3, 30000.00, '2024-06-10', 3, 3000.00);
+-- Préstamo 2 (activo)
+INSERT INTO Prestamos (
+    idPrestamista,
+    DNI_Prestatario,
+    MontoOtorgado,
+    SaldoRestante,
+    Cantidad_ctas,
+    idEstado,
+    tasaInteres,
+    fechaFinEstimada,
+    fechaOtorgamiento,
+    Fec_1erVto,
+    idSistAmortizacion
+)
+VALUES (
+    1,
+    28999888,
+    150000.00,
+    95000.00,  -- SaldoRestante simulado
+    3,
+    1,              -- Activo
+    25.00,
+    '2024-08-15',
+    '2024-05-15',
+    '2024-06-15',
+    1               -- Personal
+);
 
----- Cuotas del préstamo 2
---INSERT INTO Cuotas (idPrestamo, nroCuota, Monto, Fec_Vto, idEstado, Interes)
---VALUES
----- cuota pagada
---(2, 1, 55000.00, '2024-06-15', 3, 7000.00),
+-- Cuotas del préstamo 1
+INSERT INTO Cuotas (idPrestamo, nroCuota, Monto, Fec_Vto, idEstado, Interes, SaldoPendiente)
+VALUES
+(1, 1, 40000.00, '2024-04-10', 3, 5000.00, 0),
+(1, 2, 35000.00, '2024-05-10', 3, 4000.00, 0),
+(1, 3, 30000.00, '2024-06-10', 3, 3000.00, 0);
 
----- cuota vencida
---(2, 2, 50000.00, '2024-07-15', 4, 6000.00),
+-- Cuotas del préstamo 2
+INSERT INTO Cuotas (idPrestamo, nroCuota, Monto, Fec_Vto, idEstado, Interes, SaldoPendiente)
+VALUES
+-- cuota pagada
+(2, 1, 55000.00, '2024-06-15', 3, 7000.00, 0),
 
----- cuota pendiente
---(2, 3, 45000.00, '2024-08-15', 1, 5000.00);
+-- cuota vencida
+(2, 2, 50000.00, '2024-07-15', 4, 6000.00, 50000.00),
 
----- Pagos del préstamo 1
---INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, Monto, Observaciones)
---VALUES
---(1, '2024-04-09', 1, 40000.00, 'Pago anticipado'),
---(2, '2024-05-10', 2, 35000.00, 'Pago en efectivo'),
---(3, '2024-06-10', 1, 30000.00, 'Pago final del préstamo');
+-- cuota pendiente
+(2, 3, 45000.00, '2024-08-15', 1, 5000.00, 45000.00);
 
----- Pago del préstamo 2
---INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, Monto, Observaciones)
---VALUES
---(4, '2024-06-14', 1, 55000.00, 'Pago en término');
---GO
+-- Pagos del préstamo 1
+INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, saldo, Estado, Monto, Observaciones)
+VALUES
+(1, '2024-04-09', 1, 0, 'Registrado', 40000.00, 'Pago anticipado'),
+(2, '2024-05-10', 2, 0, 'Registrado', 35000.00, 'Pago en efectivo'),
+(3, '2024-06-10', 1, 0, 'Registrado', 30000.00, 'Pago final del préstamo');
+
+-- Pago del préstamo 2
+INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, saldo, Estado, Monto, Observaciones)
+VALUES
+(4, '2024-06-14', 1, 0, 'Registrado', 55000.00, 'Pago en término');
+GO
