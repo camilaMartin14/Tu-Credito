@@ -15,10 +15,17 @@ public partial class Pago
 
     public int IdMedioPago { get; set; }
 
+    public decimal Saldo { get; set; }
+
+    public string Estado { get; set; }
+
     public decimal Monto { get; set; }
 
     public string Observaciones { get; set; }
+<<<<<<< HEAD
     public string Estado { get; set; } // registrado - eliminado 
+=======
+>>>>>>> 6019ec3a5a100a570682392315ff7b5220de3047
 
     public virtual Cuota IdCuotaNavigation { get; set; }
 

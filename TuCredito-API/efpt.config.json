@@ -16,6 +16,10 @@
    "T4TemplatePath": null,
    "Tables": [
       {
+         "Name": "[dbo].[AuditLogs]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[Cuotas]",
          "ObjectType": 0
       },
@@ -62,7 +66,7 @@
    "UseBoolPropertiesWithoutDefaultSql": false,
    "UseDatabaseNames": false,
    "UseDatabaseNamesForRoutines": true,
-   "UseDateOnlyTimeOnly": true,
+   "UseDateOnlyTimeOnly": false,
    "UseDbContextSplitting": false,
    "UseDecimalDataAnnotationForSprocResult": true,
    "UseFluentApiOnly": true,
