@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TuCredito.DTOs.Documentos;
 using TuCredito.MinIO;
+using TuCredito.Services.Implementations;
 
 namespace TuCredito.Controllers
 {

@@ -1,4 +1,4 @@
-using TuCredito.Models.Documentos;
+using TuCredito.Models;
 
 namespace TuCredito.Repositories.Interfaces
 {
