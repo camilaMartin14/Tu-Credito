@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using TuCredito.DTOs;
 using TuCredito.Models;
 using TuCredito.Repositories.Interfaces;
 
@@ -7,9 +9,11 @@ namespace TuCredito.Repositories.Implementations
     public class PagoRepository : IPagoRepository
     {
         private readonly TuCreditoContext _context;
-        public PagoRepository(TuCreditoContext context)
+        private readonly IMapper _mapper;
+        public PagoRepository(TuCreditoContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         public async Task<List<Pago>> GetAllPagos()
         {
@@ -22,23 +26,29 @@ namespace TuCredito.Repositories.Implementations
             return await _context.Pagos.FindAsync(id);
         }
 
-        public async Task<List<Pago>> GetPagoConFiltro(string? nombre, int? mes)
+        public async Task<List<PagoOutputDTO>> GetPagoConFiltro(string? nombre, int? mes)
         {
-            var lista = _context.Pagos.Include(p => p.IdCuotaNavigation)
-                                      .ThenInclude(c => c.IdPrestamoNavigation).AsQueryable();
+            var query = _context.Pagos .AsNoTracking()
+                        .Include(p => p.IdCuotaNavigation)
+                        .ThenInclude(c => c.IdPrestamoNavigation)
+                        .ThenInclude(pr => pr.DniPrestatarioNavigation)
+                        .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(nombre))
             {
-                lista = lista.Where(p =>p.IdCuotaNavigation.IdPrestamoNavigation.DniPrestatarioNavigation.Nombre
-                             .Contains(nombre));
+                query = query.Where(p =>
+                    p.IdCuotaNavigation.IdPrestamoNavigation.DniPrestatarioNavigation.Nombre
+                    .Contains(nombre));
             }
 
             if (mes.HasValue)
             {
-                lista = lista.Where(p =>p.FecPago.Month == mes.Value);
+                query = query.Where(p => p.FecPago.Month == mes.Value);
             }
 
-            return await lista.ToListAsync();
+            var pagos = await query.ToListAsync();
+
+            return _mapper.Map<List<PagoOutputDTO>>(pagos); 
         }
 
         public async Task<bool> NewPago(Pago pago)

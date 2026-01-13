@@ -116,31 +116,20 @@ CREATE TABLE Pagos (
 
 INSERT INTO Estados_Cuotas (descripcion) VALUES
 ('Pendiente'),
-('Al día'),
-('Saldada');
+('Saldada'), ('Vencida'), ('Reprogramada');
 
 INSERT INTO Estados_Prestamos (descripcion) VALUES
 ('Activo'),
-('Finalizado');
+('Finalizado'), ('Eliminado');
 
 INSERT INTO MediosDePago (descripcion, moneda) VALUES
 ('Transferencia', 'ARS'),
 ('Efectivo', 'ARS'),
-('Efectivo', 'USD');
+('Efectivo', 'USD'),
+('Transferencia', 'USD');
 go
 
 -- nvos inserts
-
-insert into estados_cuotas (descripcion)
-values ('Vencida'), ('Reprogramada')
-
-
-select * from Estados_Prestamos 
-
-
-insert into Estados_Prestamos (descripcion)
-values ('Eliminado')
-
 
 -------------------------- Datos de prueba --------------------------
 -- Cliente responsable
@@ -268,3 +257,7 @@ VALUES
 INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, Monto, Observaciones)
 VALUES
 (4, '2024-06-14', 1, 55000.00, 'Pago en término');
+go
+
+alter table Cuotas add SaldoPendiente decimal (12, 2)
+alter table Pagos add Estado varchar(20)

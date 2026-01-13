@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TuCredito.Models;
 using TuCredito.Services.Implementations;
+using TuCredito.DTOs;
 using TuCredito.Services.Interfaces;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -26,6 +27,7 @@ namespace TuCredito.Controllers
             try
             {
                 var cuota = await _service.GetById(id);
+                if (cuota == null) return NotFound(new { message = "La cuota no existe" });
                 return Ok(cuota);
             }
             catch (ArgumentException ex)
@@ -50,7 +52,7 @@ namespace TuCredito.Controllers
 
         // POST api/<CuotaController>
         [HttpPost]
-        public async Task<IActionResult> AddCuota([FromBody] Cuota nvaCuota)
+        public async Task<IActionResult> AddCuota([FromBody] CuotaInputDTO nvaCuota)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -58,8 +60,9 @@ namespace TuCredito.Controllers
             {
                 IdPrestamo = nvaCuota.IdPrestamo,
                 Monto = nvaCuota.Monto,
-                Interes = nvaCuota.Interes,
+                NroCuota = nvaCuota.NroCuota,
                 FecVto = nvaCuota.FecVto,
+                Interes = nvaCuota.Interes,
                 IdEstado = 1 // Pendiente
             };
 
@@ -73,23 +76,6 @@ namespace TuCredito.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
-        // PUT api/<CuotaController>/5
-        [HttpPut]
-        public async Task<IActionResult> UpdateCuota([FromBody] Cuota cuota)
-        {
-            try
-            {
-                await _service.UpdateCuota(cuota);
-                return Ok("Cuota actualizada correctamente");
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
        
     }
 }

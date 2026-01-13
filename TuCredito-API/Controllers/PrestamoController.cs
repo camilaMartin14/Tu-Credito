@@ -10,7 +10,7 @@ using TuCredito.Services.Interfaces;
 
 namespace TuCredito.Controllers
 {
-    [Authorize] //Se agrega auth para que solo los usuarios autenticados puedan crear o acceder a los prestamos
+    //[Authorize] //Se agrega auth para que solo los usuarios autenticados puedan crear o acceder a los prestamos
     [Route("api/[controller]")]
     [ApiController]
     public class PrestamoController : ControllerBase
@@ -20,17 +20,13 @@ namespace TuCredito.Controllers
         {
             _service = service;
         }
-        // GET: api/<PrestamoController>
-
-        //AGREGO PAGINACIÓN CADA 10 REGISTROS
         [HttpGet]
-        [HttpGet]
-        public async Task<ActionResult<List<PrestamoDTO>>> GetAll(int page = 1, int pageSize = 10)
+        public async Task<ActionResult<List<PrestamoDTO>>> GetAll()
         {
-            var lista = await _service.GetAll(page, pageSize);
+            var lista = await _service.GetAll();
             return Ok(lista);
-        }
 
+        }
 
         // GET api/<PrestamoController>/5
         [HttpGet("{id}")]
@@ -40,7 +36,7 @@ namespace TuCredito.Controllers
             return prestamo;
         }
 
-        [HttpGet("Get-con-filtro")] //Cmabio de nombre, endpoints no pueden tener espacios pues URL
+        [HttpGet("Get-con-filtro")] 
         public async Task<ActionResult<List<PrestamoDTO>>> GetConFiltro(string? nombre, int? estado, int? mesVto, int? anio)
         {
 
@@ -52,8 +48,8 @@ namespace TuCredito.Controllers
         [HttpPost]
         public async Task<IActionResult> PostPrestamo([FromBody] PrestamoDTO prestamo)
         {
-            var resultado = await _service.PostPrestamo(prestamo); 
-            if (!resultado) return BadRequest("No se pudo registrar el préstamo. Verifique los datos ingresados."); 
+            var resultado = await _service.PostPrestamo(prestamo);
+            if (!resultado) return BadRequest("No se pudo registrar el préstamo. Verifique los datos ingresados.");
             return Ok("Préstamo registrado correctamente.");
         }
 
@@ -61,17 +57,11 @@ namespace TuCredito.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> CambioDeEstado(int id, [FromBody] string value)
         {
-            var resultado = await _service.SoftDelete(id); 
-            if (resultado) return Ok("Préstamo finalizado correctamente."); 
+            var resultado = await _service.SoftDelete(id);
+            if (resultado) return Ok("Préstamo finalizado correctamente.");
             return BadRequest("No se pudo finalizar el préstamo.");
         }
 
-        //// DELETE api/<PrestamoController>/5
-        ///Se comenta para que no queden endpoints sin uso
-        ///
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
+
     }
 }

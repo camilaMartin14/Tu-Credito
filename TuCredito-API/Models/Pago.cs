@@ -18,7 +18,7 @@ public partial class Pago
     public decimal Monto { get; set; }
 
     public string Observaciones { get; set; }
-    public string Estado { get; set; }
+    public string Estado { get; set; } // registrado - eliminado 
 
     public virtual Cuota IdCuotaNavigation { get; set; }
 

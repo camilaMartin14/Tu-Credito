@@ -12,6 +12,8 @@ namespace TuCredito.Mappings
             CreateMap<PrestamoDTO, Prestamo>();
             CreateMap<Prestatario, PrestatarioDTO>();
             CreateMap<PrestatarioDTO, Prestatario>();
+            CreateMap<Pago, PagoOutputDTO>();
+            CreateMap<PagoOutputDTO, Pago>();
         }
 
     }
