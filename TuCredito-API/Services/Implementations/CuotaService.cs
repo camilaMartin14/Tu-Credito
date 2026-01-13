@@ -3,6 +3,7 @@ using TuCredito.Services.Interfaces;
 using TuCredito.DTOs;
 using TuCredito.Repositories.Interfaces;
 using System.Globalization;
+using Microsoft.EntityFrameworkCore;
 
 namespace TuCredito.Services.Implementations
 
@@ -11,10 +12,13 @@ namespace TuCredito.Services.Implementations
     {
         private readonly IPrestamoService _prestamo;
         private readonly ICuotaRepository _cuota;
-        public CuotaService(IPrestamoService prestamo, ICuotaRepository cuota)
+        private readonly TuCreditoContext _context;
+
+        public CuotaService(IPrestamoService prestamo, ICuotaRepository cuota, TuCreditoContext context)
         {
             _prestamo = prestamo;
             _cuota = cuota;
+            _context = context;
         }
         public async Task<bool> AddCuota(Cuota cuota)
         {
@@ -31,6 +35,10 @@ namespace TuCredito.Services.Implementations
             if (cuota.Interes <= 0) throw new ArgumentException("Revise el interes de la cuota"); 
             if (cuota.Monto <= 0) throw new ArgumentException("El valor de la cuota no puede ser cero");
             if (cuota.NroCuota <= 0) throw new ArgumentException("Ingrese un numero de cuota valido");
+
+            // CORRECCION: Inicializar SaldoPendiente
+            cuota.SaldoPendiente = cuota.Monto;
+
             return await _cuota.AddCuota(cuota) > 0;
         }
 
@@ -64,6 +72,38 @@ namespace TuCredito.Services.Implementations
 
             await _cuota.UpdateCuota(cuota);
             return true;
+        }
+
+        // CORRECCION: Método automático para detectar y actualizar cuotas en mora
+        public async Task<int> ActualizarCuotasVencidas()
+        {
+            // Buscar el ID del estado "Vencida"
+            var estadoVencida = await _context.EstadosCuotas
+                .Where(e => e.Descripcion == "Vencida")
+                .Select(e => e.IdEstado)
+                .FirstOrDefaultAsync();
+
+            if (estadoVencida == 0)
+            {
+                // Fallback si no existe el estado, aunque debería
+                // Asumimos que no podemos actualizar si no sabemos el ID
+                return 0;
+            }
+
+            // Buscar cuotas pendientes (IdEstado == 1) cuya fecha de vencimiento ya pasó
+            var cuotasVencidas = await _context.Cuotas
+                .Where(c => c.IdEstado == 1 
+                         && c.FecVto < DateTime.Today)
+                .ToListAsync();
+
+            if (!cuotasVencidas.Any()) return 0;
+
+            foreach (var cuota in cuotasVencidas)
+            {
+                cuota.IdEstado = estadoVencida;
+            }
+
+            return await _context.SaveChangesAsync();
         }
     }
 }

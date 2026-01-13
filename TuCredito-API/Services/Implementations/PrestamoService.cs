@@ -59,6 +59,7 @@ namespace TuCredito.Services.Implementations
             return _prestamo.GetPrestamoConFiltro(nombre, estado, mesVto, anio);
         }
 
+        // CORRECCION: Se reorganizó el flujo para generar las cuotas en la entidad antes de persistir todo junto
         public async Task<bool> PostPrestamo(PrestamoDTO NvoPrestamo)
         {
             // Validaciones sobre el DTO
@@ -68,9 +69,14 @@ namespace TuCredito.Services.Implementations
             // Validaciones de negocio que requieren datos externos
             var existe = await _prestatario.ObtenerPorDniAsync(NvoPrestamo.DniPrestatario); 
             if (existe == null) throw new ArgumentException("El DNI ingresado no está registrado"); 
+            
             // Ahora sí: mapear
             var entidad = _mapper.Map<Prestamo>(NvoPrestamo); // Validaciones sobre la entidad
             entidad.IdPrestamista = await _prestamista.ObtenerIdUsuarioLogueado();
+            
+            // Inicializar SaldoRestante con el monto otorgado
+            entidad.SaldoRestante = entidad.MontoOtorgado;
+
             if (entidad.FechaOtorgamiento > DateTime.Now) throw new ArgumentException("La fecha de otorgamiento no puede ser futura"); 
             if (entidad.IdEstado != 1) throw new ArgumentException("El estado debe ser 'Activo'"); // etc... await _prestatarlo.PostPrestamo(dto); GenerarCuotas(entidad); return true;
             if (entidad.FechaOtorgamiento < DateTime.Now.AddMonths(-24)) throw new ArgumentException("La fecha de otorgamiento puede ser de hasta 24 meses anteriores");
@@ -82,8 +88,11 @@ namespace TuCredito.Services.Implementations
             if (entidad.IdSistAmortizacion <= 0) throw new ArgumentException("Seleccione un sistema de amortizacion");
             if (entidad.TasaInteres <= 0) throw new ArgumentException("Ingrese una tasa de interes"); // opciones o vamos a permitir escribir?? 
 
-            await _prestamo.PostPrestamo(NvoPrestamo);
+            // Generamos las cuotas ANTES de guardar
             GenerarCuotas(entidad);
+
+            // Guardamos la entidad completa con sus cuotas
+            await _prestamo.PostPrestamo(entidad);
             return true;
             
         }
@@ -116,6 +125,8 @@ namespace TuCredito.Services.Implementations
                 {
                     NroCuota = cuotaSimulada.NumeroCuota,
                     Monto = cuotaSimulada.Monto,
+                    SaldoPendiente = cuotaSimulada.Monto, // CORRECCION: Inicializar SaldoPendiente igual al Monto
+                    IdEstado = 1, // 1 = Pendiente
                     FecVto = cuotaSimulada.FechaVencimiento ?? throw new InvalidOperationException("Fecha de vencimiento no calculada")
                 });
             }
@@ -124,4 +135,3 @@ namespace TuCredito.Services.Implementations
 
        
     }
-

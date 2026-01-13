@@ -3,6 +3,8 @@ using TuCredito.Repositories.Implementations;
 using TuCredito.Repositories.Interfaces;
 using TuCredito.Services.Interfaces;
 using TuCredito.DTOs;
+using Microsoft.EntityFrameworkCore;
+
 namespace TuCredito.Services.Implementations
 {
     public class PagoService : IPagoService
@@ -12,12 +14,15 @@ namespace TuCredito.Services.Implementations
         private readonly ICuotaRepository _cuotaRepo;
         private readonly IPrestamoRepository _prestamo;
         private readonly ICuotaService _cuotaService;
-        public PagoService(IPagoRepository pago, ICuotaRepository cuotaRepo, IPrestamoRepository prestamo, ICuotaService cuotaService)
+        private readonly TuCreditoContext _context;
+
+        public PagoService(IPagoRepository pago, ICuotaRepository cuotaRepo, IPrestamoRepository prestamo, ICuotaService cuotaService, TuCreditoContext context)
         {
             _pago = pago;
             _cuotaRepo = cuotaRepo;
             _prestamo = prestamo;
             _cuotaService = cuotaService;
+            _context = context;
         }
         public Task<List<Pago>> GetAllPagos() // AllActivos. 
         {
@@ -39,33 +44,83 @@ namespace TuCredito.Services.Implementations
             return _pago.GetPagoConFiltro(nombre, mes);
         }
 
+        // CORRECCION: Se implementó una transacción completa para asegurar la integridad de datos entre Pago, Cuota y Préstamo
         public async Task<bool> NewPago(Pago pago)
         {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                if (pago.Monto <= 0) throw new ArgumentException("El monto del pago debe ser mayor a cero");
 
-            if (pago.Monto <= 0) { throw new ArgumentException("El monto del pago debe ser mayor a cero"); }
+                // Cargar Cuota y Préstamo asociados (Include para tener el grafo completo)
+                var cuota = await _context.Cuotas
+                    .Include(c => c.IdPrestamoNavigation)
+                    .FirstOrDefaultAsync(c => c.IdCuota == pago.IdCuota);
+
+                if (cuota == null) throw new ArgumentException("Nro de cuota incorrecto");
+
+                var prestamo = cuota.IdPrestamoNavigation;
+
+                // Validaciones
+                decimal saldoActualCuota = cuota.SaldoPendiente ?? cuota.Monto;
+
+                if (cuota.IdEstado == 3 || saldoActualCuota <= 0)
+                    throw new ArgumentException("La cuota ya se encuentra saldada");
+
+                // Validar contra el SaldoPendiente de la cuota
+                if (pago.Monto > saldoActualCuota)
+                    throw new InvalidOperationException($"El monto del pago supera el saldo pendiente de la cuota ({saldoActualCuota})");
+
+                // Validar contra el total del préstamo (Requisito explícito)
+                if (pago.Monto > prestamo.SaldoRestante)
+                    throw new InvalidOperationException("El pago excede el saldo restante total del préstamo.");
+
+                // Actualizar Cuota
+                cuota.SaldoPendiente = saldoActualCuota - pago.Monto;
                 
-            var cuota = await _cuotaRepo.GetById(pago.IdCuota);
+                // Actualizar estado de la cuota
+                if (cuota.SaldoPendiente <= 0)
+                {
+                    cuota.IdEstado = 3; // Saldada
+                    cuota.SaldoPendiente = 0; // Evitar negativos
+                }
+                else
+                {
+                    cuota.IdEstado = 1; // Sigue Pendiente
+                }
 
-            if (cuota == null) { throw new ArgumentException("Nro de cuota incorrecto"); }
+                // Actualizar Préstamo: Reducir deuda global
+                prestamo.SaldoRestante -= pago.Monto;
+                if (prestamo.SaldoRestante < 0) prestamo.SaldoRestante = 0;
 
-            if (cuota.IdEstado == 3) { throw new ArgumentException("La cuota ya se encuentra saldada"); }
+                // Verificar cancelación total del préstamo
+                if (prestamo.SaldoRestante == 0)
+                {
+                    // Doble check: que no queden cuotas activas (por si hubo desajustes previos)
+                    var quedanCuotas = await _context.Cuotas.AnyAsync(c => c.IdPrestamo == prestamo.IdPrestamo && c.IdEstado != 3 && c.IdCuota != cuota.IdCuota);
+                    if (!quedanCuotas)
+                    {
+                        prestamo.IdEstado = 2; // Finalizado/Cancelado
+                    }
+                }
 
-            if (pago.Monto > cuota.Monto) { throw new InvalidOperationException("El monto del pago supera el saldo pendiente de la cuota"); }
+                // Registrar el pago
+                pago.Estado = "Registrado";
+                pago.Saldo = cuota.SaldoPendiente.Value; // Guardamos el saldo remanente de la cuota en el histórico del pago
+                
+                _context.Pagos.Add(pago);
 
-            
-            await _pago.NewPago(pago);
+                // Guardar todo atómicamente
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
 
-            
-            var totalPagado = cuota.Pagos.Sum(p => p.Monto) + pago.Monto;
-
-            if (totalPagado > cuota.Monto)
-                throw new Exception("Excede el monto");
-
-            cuota.IdEstado = totalPagado == cuota.Monto ? 3 : 1;
-
-            await _cuotaRepo.UpdateCuota(cuota);
-
-            return true;
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task<bool> UpdatePago(int id, string estado)
@@ -109,4 +164,3 @@ namespace TuCredito.Services.Implementations
 
     }
 }
-
