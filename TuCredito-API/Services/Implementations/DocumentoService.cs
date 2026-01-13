@@ -2,7 +2,6 @@ using TuCredito.DTOs.Documentos;
 using TuCredito.MinIO;
 using TuCredito.Models.Documentos;
 using TuCredito.Repositories.Interfaces;
-
 public class DocumentoService
 {
     private readonly IDocumentoRepository _documentoRepo;

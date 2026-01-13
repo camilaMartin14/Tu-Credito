@@ -48,13 +48,9 @@ namespace TuCredito.Services.Implementations
             if (!string.IsNullOrWhiteSpace(nombre) && nombre.Any(char.IsDigit))
                 throw new ArgumentException("El nombre solo puede contener letras");
             //el estado lo manejaria con un cboBox desde el front
-<<<<<<< HEAD
             if (mesVto.HasValue && (mesVto > 12 || mesVto < 1)) throw new ArgumentException("El mes debe estar contenido entre 1 y 12");
             if (estado.HasValue && estado.Value == 2 && mesVto.HasValue && anio.HasValue)
-=======
-            if (mesVto > 12 || mesVto < 1) throw new ArgumentException("El mes debe estar contenido entre 1 y 12");
-            if (estado == 2 && mesVto.HasValue && anio.HasValue)
->>>>>>> 6019ec3a5a100a570682392315ff7b5220de3047
+
             {
                 var fechaFiltro = new DateTime(anio.Value, mesVto.Value, 1); // constuyo una fecha
                 if (fechaFiltro > DateTime.Today) // y la compara con el dia de hoy
