@@ -83,7 +83,7 @@ namespace TuCredito.Services.Implementations
 
         public async Task<bool> RegistrarPagoAnticipadoAsync(Pago pago)
         {
-<<<<<<< HEAD
+
              var cuota = await _cuotaRepo.GetById(pago.IdCuota);
             if (cuota == null)
                 throw new ArgumentException("Cuota no encontrada");
@@ -105,19 +105,8 @@ namespace TuCredito.Services.Implementations
             await NewPago(pago);
             return true;
         }
-    
-=======
-        var prestamo = await _prestamo.GetPrestamoById(pago.IdCuotaNavigation.IdPrestamo); 
-        if (prestamo == null) throw new Exception("Préstamo no encontrado"); 
-        if (prestamo.IdEstado != 1) throw new Exception("El préstamo no está activo"); 
-        var cuota = await _cuotaRepo.GetById(pago.IdCuota); 
-        if (cuota == null) throw new Exception("Cuota no encontrada"); 
-        cuota.Pagos.Add(new Pago { Monto = pago.Monto, FecPago = DateTime.Now }); 
-        await _cuotaRepo.UpdateCuota(cuota); 
-        await _cuotaService.RecalcularEstado(cuota); 
-        return true;
 
-       
->>>>>>> 6019ec3a5a100a570682392315ff7b5220de3047
+
     }
 }
+
