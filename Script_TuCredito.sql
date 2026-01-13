@@ -1,7 +1,7 @@
-CREATE DATABASE TuCredito9;
+CREATE DATABASE TuCredito11;
 GO
 
-USE TuCredito9;
+USE TuCredito11;
 GO
 
 CREATE TABLE Estados_Prestamos (
@@ -138,125 +138,125 @@ CREATE TABLE AuditLogs (
     EntityId NVARCHAR(100)
 );
 
--- Estados de cuotas
-INSERT INTO Estados_Cuotas (descripcion) VALUES
-('Pendiente'),
-('Saldada'),
-('Vencida'),
-('Reprogramada');
+---- Estados de cuotas
+--INSERT INTO Estados_Cuotas (descripcion) VALUES
+--('Pendiente'),
+--('Saldada'),
+--('Vencida'),
+--('Reprogramada');
 
--- Estados de préstamos
-INSERT INTO Estados_Prestamos (descripcion) VALUES
-('Activo'),
-('Finalizado'),
-('Eliminado');
+---- Estados de préstamos
+--INSERT INTO Estados_Prestamos (descripcion) VALUES
+--('Activo'),
+--('Finalizado'),
+--('Eliminado');
 
--- Medios de pago
-INSERT INTO MediosDePago (descripcion, moneda) VALUES
-('Transferencia', 'ARS'),
-('Efectivo', 'ARS'),
-('Efectivo', 'USD'),
-('Transferencia', 'USD');
+---- Medios de pago
+--INSERT INTO MediosDePago (descripcion, moneda) VALUES
+--('Transferencia', 'ARS'),
+--('Efectivo', 'ARS'),
+--('Efectivo', 'USD'),
+--('Transferencia', 'USD');
 
--- Sistemas de amortización
-INSERT INTO SistAmortizacion (descripcion) VALUES
-('Personal'),
-('Francés'),
-('Alemán');
-GO
+---- Sistemas de amortización
+--INSERT INTO SistAmortizacion (descripcion) VALUES
+--('Personal'),
+--('Francés'),
+--('Alemán');
+--GO
 
--- Garante
-INSERT INTO Garantes (nombre, apellido, telefono, domicilio, correo, esActivo)
-VALUES
-('Laura', 'Martínez', '3519988776', 'San Martín 890', 'lmartinez@mail.com', 1);
+---- Garante
+--INSERT INTO Garantes (nombre, apellido, telefono, domicilio, correo, esActivo)
+--VALUES
+--('Laura', 'Martínez', '3519988776', 'San Martín 890', 'lmartinez@mail.com', 1);
 
--- Prestatario
-INSERT INTO Prestatarios (
-    DNI, nombre, apellido, telefono, domicilio, correo, esActivo, idGarante
-)
-VALUES
-(28999888, 'Diego', 'Fernández', '3514455667', 'Bv. Illia 1200', 'dfernandez@mail.com', 1, 1);
+---- Prestatario
+--INSERT INTO Prestatarios (
+--    DNI, nombre, apellido, telefono, domicilio, correo, esActivo, idGarante
+--)
+--VALUES
+--(28999888, 'Diego', 'Fernández', '3514455667', 'Bv. Illia 1200', 'dfernandez@mail.com', 1, 1);
 
--- Préstamo 1
-INSERT INTO Prestamos (
-    idPrestamista,
-    DNI_Prestatario,
-    MontoOtorgado,
-    Cantidad_ctas,
-    idEstado,
-    tasaInteres,
-    fechaFinEstimada,
-    fechaOtorgamiento,
-    Fec_1erVto,
-    idSistAmortizacion
-)
-VALUES (
-    1,
-    28999888,
-    150000.00,
-    3,
-    1,              -- Activo
-    25.00,
-    '2024-08-15',
-    '2024-05-15',
-    '2024-06-15',
-    1               -- Personal
-);
+---- Préstamo 1
+--INSERT INTO Prestamos (
+--    idPrestamista,
+--    DNI_Prestatario,
+--    MontoOtorgado,
+--    Cantidad_ctas,
+--    idEstado,
+--    tasaInteres,
+--    fechaFinEstimada,
+--    fechaOtorgamiento,
+--    Fec_1erVto,
+--    idSistAmortizacion
+--)
+--VALUES (
+--    1,
+--    28999888,
+--    150000.00,
+--    3,
+--    1,              -- Activo
+--    25.00,
+--    '2024-08-15',
+--    '2024-05-15',
+--    '2024-06-15',
+--    1               -- Personal
+--);
 
--- Préstamo 2 (activo)
-INSERT INTO Prestamos (
-    idPrestamista,
-    DNI_Prestatario,
-    MontoOtorgado,
-    Cantidad_ctas,
-    idEstado,
-    tasaInteres,
-    fechaFinEstimada,
-    fechaOtorgamiento,
-    Fec_1erVto,
-    idSistAmortizacion
-)
-VALUES (
-    1,
-    28999888,
-    150000.00,
-    3,
-    1,              -- Activo
-    25.00,
-    '2024-08-15',
-    '2024-05-15',
-    '2024-06-15',
-    1               -- Personal
-);
+---- Préstamo 2 (activo)
+--INSERT INTO Prestamos (
+--    idPrestamista,
+--    DNI_Prestatario,
+--    MontoOtorgado,
+--    Cantidad_ctas,
+--    idEstado,
+--    tasaInteres,
+--    fechaFinEstimada,
+--    fechaOtorgamiento,
+--    Fec_1erVto,
+--    idSistAmortizacion
+--)
+--VALUES (
+--    1,
+--    28999888,
+--    150000.00,
+--    3,
+--    1,              -- Activo
+--    25.00,
+--    '2024-08-15',
+--    '2024-05-15',
+--    '2024-06-15',
+--    1               -- Personal
+--);
 
--- Cuotas del préstamo 1
-INSERT INTO Cuotas (idPrestamo, nroCuota, Monto, Fec_Vto, idEstado, Interes)
-VALUES
-(1, 1, 40000.00, '2024-04-10', 3, 5000.00),
-(1, 2, 35000.00, '2024-05-10', 3, 4000.00),
-(1, 3, 30000.00, '2024-06-10', 3, 3000.00);
+---- Cuotas del préstamo 1
+--INSERT INTO Cuotas (idPrestamo, nroCuota, Monto, Fec_Vto, idEstado, Interes)
+--VALUES
+--(1, 1, 40000.00, '2024-04-10', 3, 5000.00),
+--(1, 2, 35000.00, '2024-05-10', 3, 4000.00),
+--(1, 3, 30000.00, '2024-06-10', 3, 3000.00);
 
--- Cuotas del préstamo 2
-INSERT INTO Cuotas (idPrestamo, nroCuota, Monto, Fec_Vto, idEstado, Interes)
-VALUES
--- cuota pagada
-(2, 1, 55000.00, '2024-06-15', 3, 7000.00),
+---- Cuotas del préstamo 2
+--INSERT INTO Cuotas (idPrestamo, nroCuota, Monto, Fec_Vto, idEstado, Interes)
+--VALUES
+---- cuota pagada
+--(2, 1, 55000.00, '2024-06-15', 3, 7000.00),
 
--- cuota vencida
-(2, 2, 50000.00, '2024-07-15', 4, 6000.00),
+---- cuota vencida
+--(2, 2, 50000.00, '2024-07-15', 4, 6000.00),
 
--- cuota pendiente
-(2, 3, 45000.00, '2024-08-15', 1, 5000.00);
+---- cuota pendiente
+--(2, 3, 45000.00, '2024-08-15', 1, 5000.00);
 
--- Pagos del préstamo 1
-INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, Monto, Observaciones)
-VALUES
-(1, '2024-04-09', 1, 40000.00, 'Pago anticipado'),
-(2, '2024-05-10', 2, 35000.00, 'Pago en efectivo'),
-(3, '2024-06-10', 1, 30000.00, 'Pago final del préstamo');
+---- Pagos del préstamo 1
+--INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, Monto, Observaciones)
+--VALUES
+--(1, '2024-04-09', 1, 40000.00, 'Pago anticipado'),
+--(2, '2024-05-10', 2, 35000.00, 'Pago en efectivo'),
+--(3, '2024-06-10', 1, 30000.00, 'Pago final del préstamo');
 
--- Pago del préstamo 2
-INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, Monto, Observaciones)
-VALUES
-(4, '2024-06-14', 1, 55000.00, 'Pago en término');
-GO
+---- Pago del préstamo 2
+--INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, Monto, Observaciones)
+--VALUES
+--(4, '2024-06-14', 1, 55000.00, 'Pago en término');
+--GO
