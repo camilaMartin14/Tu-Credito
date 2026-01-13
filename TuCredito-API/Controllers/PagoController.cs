@@ -32,6 +32,7 @@ namespace TuCredito.Controllers
             try
             {
                 var pago = await _service.GetPagoById(id);
+                if (pago == null) return NotFound(new { message = "El pago indicado no existe" });
                 return Ok(pago);
             }
             catch (ArgumentException ex)
@@ -46,6 +47,11 @@ namespace TuCredito.Controllers
             try
             {
                 var pagos = await _service.GetPagoConFiltro(nombre, mes);
+                if (pagos == null) return NotFound(new { message = "No se encontraron pagos con los filtros indicados" });
+                if ((!string.IsNullOrWhiteSpace(nombre) || mes.HasValue) && !pagos.Any())
+                {
+                    return NotFound(new{message = "No se encontraron pagos con los filtros ingresados"});
+                }
                 return Ok(pagos);
             }
             catch (ArgumentException ex)
@@ -56,7 +62,7 @@ namespace TuCredito.Controllers
 
         // POST api/<PagosController>
         [HttpPost]
-        public async Task<IActionResult> RegistrarPago([FromBody] Pago nvoPago)
+        public async Task<IActionResult> RegistrarPago([FromBody] PagoInputDTO nvoPago)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -65,7 +71,9 @@ namespace TuCredito.Controllers
             {
                 IdCuota = nvoPago.IdCuota,
                 Monto = nvoPago.Monto,
-                FecPago = DateTime.Now
+                FecPago = DateTime.Now,
+                IdMedioPago = nvoPago.IdMedioPago
+                
             };
 
             try
@@ -84,7 +92,7 @@ namespace TuCredito.Controllers
         }
 
         [HttpPost("anticipado")]
-        public async Task<IActionResult> RegistrarPagoAnticipado([FromBody] Pago nvoPago)
+        public async Task<IActionResult> RegistrarPagoAnticipado([FromBody] PagoInputDTO nvoPago)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -105,10 +113,7 @@ namespace TuCredito.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(ex.Message);
-            }
+           
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);

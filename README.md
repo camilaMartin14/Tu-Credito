@@ -47,6 +47,8 @@ El backend ha sido construido siguiendo las mejores prácticas de la industria, 
 - **Paginación y Filtrado**: Endpoints optimizados con soporte para paginación y filtros dinámicos (por nombre, estado, fecha), mejorando el rendimiento en grandes volúmenes de datos.
 - **Swagger / OpenAPI**: Documentación interactiva de la API generada automáticamente, facilitando la exploración y prueba de los endpoints durante el desarrollo.
 - **Manejo de Errores**: Estructura consistente para el manejo de excepciones y respuestas HTTP.
+- **Gestión de Documentación con MinIO**: Integración con almacenamiento de multimedia mediante MinIO, permitiendo la carga, descarga y persistencia segura de documentación asociada a los clientes y préstamos (pagarés, recibos de sueldo, documentación identificatoria).
+Los archivos se almacenan de forma desacoplada de la base de datos, conservando únicamente las referencias necesarias, lo que mejora la escalabilidad, seguridad y mantenibilidad del sistema.
 
 ---
 

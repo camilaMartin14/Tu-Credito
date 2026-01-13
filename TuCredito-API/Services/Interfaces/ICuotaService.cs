@@ -1,4 +1,5 @@
 ﻿using TuCredito.Models;
+using TuCredito.DTOs;
 
 namespace TuCredito.Services.Interfaces
 {

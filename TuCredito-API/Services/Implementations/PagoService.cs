@@ -1,7 +1,8 @@
 using TuCredito.Models;
 using TuCredito.Repositories.Implementations;
 using TuCredito.Repositories.Interfaces;
-using TuCredito.Services.Interfaces; 
+using TuCredito.Services.Interfaces;
+using TuCredito.DTOs;
 namespace TuCredito.Services.Implementations
 {
     public class PagoService : IPagoService
@@ -29,7 +30,7 @@ namespace TuCredito.Services.Implementations
             return _pago.GetPagoById(id);
         }
 
-        public Task<List<Pago>> GetPagoConFiltro(string? nombre, int? mes)
+        public Task<List<PagoOutputDTO>> GetPagoConFiltro(string? nombre, int? mes)
         {
             if (nombre != null && nombre.Any(char.IsDigit)) throw new ArgumentException("El nombre solo puede contener letras");
 
@@ -82,18 +83,30 @@ namespace TuCredito.Services.Implementations
 
         public async Task<bool> RegistrarPagoAnticipadoAsync(Pago pago)
         {
-        var prestamo = await _prestamo.GetPrestamoById(pago.IdCuotaNavigation.IdPrestamo); 
-        if (prestamo == null) throw new Exception("Préstamo no encontrado"); 
-        if (prestamo.IdEstado != 1) throw new Exception("El préstamo no está activo"); 
-        var cuota = await _cuotaRepo.GetById(pago.IdCuota); 
-        if (cuota == null) throw new Exception("Cuota no encontrada"); 
-        cuota.Pagos.Add(new Pago { Monto = pago.Monto, FecPago = DateTime.Now }); 
-        await _cuotaRepo.UpdateCuota(cuota); 
-        await _cuotaService.UpdateCuota(cuota); 
-        return true;
 
-       
+             var cuota = await _cuotaRepo.GetById(pago.IdCuota);
+            if (cuota == null)
+                throw new ArgumentException("Cuota no encontrada");
+
+            var prestamo = await _prestamo.GetPrestamoById(cuota.IdPrestamo);
+            if (prestamo == null)
+                throw new ArgumentException("Préstamo no encontrado");
+
+            if (prestamo.IdEstado != 1)
+                throw new ArgumentException("El préstamo no está activo");
+
+            var ultimaPendiente = await _cuotaRepo.GetUltimaPendiente(cuota.IdPrestamo);
+            if (ultimaPendiente == null)
+                throw new ArgumentException("No hay cuotas pendientes para cancelar anticipadamente");
+
+            if (cuota.IdCuota != ultimaPendiente.IdCuota)
+                throw new ArgumentException("Solo se permite pagar anticipadamente la última cuota pendiente");
+
+            await NewPago(pago);
+            return true;
         }
+
+
     }
 }
 
