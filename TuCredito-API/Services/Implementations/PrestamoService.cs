@@ -16,19 +16,21 @@ namespace TuCredito.Services.Implementations
         private readonly ICalculadoraService _calculadora;
         private readonly IMapper _mapper;
         private readonly TuCreditoContext _context;
-        public PrestamoService(IPrestamoRepository prestamo, IMapper mapper, ICalculadoraService calculadora, IPrestatarioRepository prestatario, TuCreditoContext context)
+        private readonly IPrestamistaService _prestamista;
+        public PrestamoService(IPrestamoRepository prestamo, IMapper mapper, ICalculadoraService calculadora, IPrestatarioRepository prestatario, TuCreditoContext context, IPrestamistaService prestamista)
         {
             _prestamo = prestamo;
             _prestatario = prestatario;
             _mapper = mapper;
             _calculadora = calculadora;
             _context = context;
+            _prestamista = prestamista;
         }
-        public async Task<IEnumerable<Prestamo>> GetAll(int page, int pageSize)
+        public async Task<List<Prestamo>> GetAll()
         {
             return await _context.Prestamos
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                //.Skip((page - 1) * pageSize)
+                //.Take(pageSize)
                 .ToListAsync();
         }
 
@@ -43,11 +45,16 @@ namespace TuCredito.Services.Implementations
 
         public Task<List<PrestamoDTO>> GetPrestamoConFiltro(string? nombre, int? estado, int? mesVto, int? anio)
         {
-            if (string.IsNullOrWhiteSpace(nombre) || nombre.Any(char.IsDigit))
+            if (!string.IsNullOrWhiteSpace(nombre) && nombre.Any(char.IsDigit))
                 throw new ArgumentException("El nombre solo puede contener letras");
             //el estado lo manejaria con un cboBox desde el front
+<<<<<<< HEAD
+            if (mesVto.HasValue && (mesVto > 12 || mesVto < 1)) throw new ArgumentException("El mes debe estar contenido entre 1 y 12");
+            if (estado.HasValue && estado.Value == 2 && mesVto.HasValue && anio.HasValue)
+=======
             if (mesVto > 12 || mesVto < 1) throw new ArgumentException("El mes debe estar contenido entre 1 y 12");
             if (estado == 2 && mesVto.HasValue && anio.HasValue)
+>>>>>>> 6019ec3a5a100a570682392315ff7b5220de3047
             {
                 var fechaFiltro = new DateTime(anio.Value, mesVto.Value, 1); // constuyo una fecha
                 if (fechaFiltro > DateTime.Today) // y la compara con el dia de hoy
@@ -58,26 +65,29 @@ namespace TuCredito.Services.Implementations
 
         public async Task<bool> PostPrestamo(PrestamoDTO NvoPrestamo)
         {
-            var existe = await _prestatario.ObtenerPorDniAsync(NvoPrestamo.DniPrestatario); // solo se podra asignar a ctes dados de alta
-            if (existe == null) throw new ArgumentException("El DNI ingresado no esta registrado");
-            if (NvoPrestamo.MontoOtorgado <= 0) throw new ArgumentException("El monto debe ser mayor que cero");
-            if (string.IsNullOrWhiteSpace(NvoPrestamo.NombrePrestatario)) throw new ArgumentException("Ingrese un nombre de prestatario"); // el nombre podria venir por defecto al poner el dni 
-            if (NvoPrestamo.CantidadCtas <= 0) throw new ArgumentException("Ingrese un numero de cuotas valido");
-
-            var prestamo = _mapper.Map<Prestamo>(NvoPrestamo);
-
-            if (prestamo.FechaOtorgamiento > DateTime.Now) throw new ArgumentException("La fecha de otorgamiento no puede ser futura");
-            if (prestamo.FechaOtorgamiento < DateTime.Now.AddMonths(-24)) throw new ArgumentException("La fecha de otorgamiento puede ser de hasta 24 meses anteriores");
-            if (prestamo.FechaOtorgamiento > prestamo.FechaFinEstimada) throw new ArgumentException("La fecha estimada de fin no puede ser anterior a la fecha de otrogamiento");
-            if (prestamo.FechaOtorgamiento > prestamo.Fec1erVto) throw new ArgumentException("La fecha del primer vencimiento debe ser posterior a la fecha de otorgamiento");
-            if (prestamo.FechaFinEstimada < DateTime.Today) throw new ArgumentException("Solo se permiten registrar prestamos que aun esten activos"); // RAROOOO, xq la fecha estimada no es necesariamente la fecha de fin
-            if (prestamo.IdEstado != 1) throw new ArgumentException("El estado debe ser 'Activo'"); // por defecto al darlo de alta
-            if (prestamo.IdPrestamista <= 0) throw new ArgumentException("Ingrese un numero de prestamista"); // esto tmb deberia venir por defecto por la sesion 
-            if (prestamo.IdSistAmortizacion <= 0) throw new ArgumentException("Seleccione un sistema de amortizacion");
-            if (prestamo.TasaInteres <= 0) throw new ArgumentException("Ingrese una tasa de interes"); // opciones o vamos a permitir escribir?? 
+            // Validaciones sobre el DTO
+            if (NvoPrestamo.MontoOtorgado <= 0) throw new ArgumentException("El monto debe ser mayor que cero"); 
+            if (string.IsNullOrWhiteSpace(NvoPrestamo.NombrePrestatario)) throw new ArgumentException("Ingrese un nombre de prestatario"); 
+            if (NvoPrestamo.CantidadCtas <= 0) throw new ArgumentException("Ingrese un número de cuotas válido"); 
+            // Validaciones de negocio que requieren datos externos
+            var existe = await _prestatario.ObtenerPorDniAsync(NvoPrestamo.DniPrestatario); 
+            if (existe == null) throw new ArgumentException("El DNI ingresado no está registrado"); 
+            // Ahora sí: mapear
+            var entidad = _mapper.Map<Prestamo>(NvoPrestamo); // Validaciones sobre la entidad
+            entidad.IdPrestamista = await _prestamista.ObtenerIdUsuarioLogueado();
+            if (entidad.FechaOtorgamiento > DateTime.Now) throw new ArgumentException("La fecha de otorgamiento no puede ser futura"); 
+            if (entidad.IdEstado != 1) throw new ArgumentException("El estado debe ser 'Activo'"); // etc... await _prestatarlo.PostPrestamo(dto); GenerarCuotas(entidad); return true;
+            if (entidad.FechaOtorgamiento < DateTime.Now.AddMonths(-24)) throw new ArgumentException("La fecha de otorgamiento puede ser de hasta 24 meses anteriores");
+            if (entidad.FechaOtorgamiento > entidad.FechaFinEstimada) throw new ArgumentException("La fecha estimada de fin no puede ser anterior a la fecha de otrogamiento");
+            if (entidad.FechaOtorgamiento > entidad.Fec1erVto) throw new ArgumentException("La fecha del primer vencimiento debe ser posterior a la fecha de otorgamiento");
+            if (entidad.FechaFinEstimada < DateTime.Today) throw new ArgumentException("Solo se permiten registrar prestamos que aun esten activos"); // RAROOOO, xq la fecha estimada no es necesariamente la fecha de fin
+            if (entidad.IdEstado != 1) throw new ArgumentException("El estado debe ser 'Activo'"); // por defecto al darlo de alta
+            if (entidad.IdPrestamista <= 0) throw new ArgumentException("Ingrese un numero de prestamista"); // esto tmb deberia venir por defecto por la sesion 
+            if (entidad.IdSistAmortizacion <= 0) throw new ArgumentException("Seleccione un sistema de amortizacion");
+            if (entidad.TasaInteres <= 0) throw new ArgumentException("Ingrese una tasa de interes"); // opciones o vamos a permitir escribir?? 
 
             await _prestamo.PostPrestamo(NvoPrestamo);
-            GenerarCuotas(prestamo);
+            GenerarCuotas(entidad);
             return true;
             
         }
@@ -88,7 +98,6 @@ namespace TuCredito.Services.Implementations
             if (prestamo.IdEstado == 2) throw new ArgumentException("El prestamo ya se encuentra finalizado");
             if (prestamo.IdEstado == 3) throw new ArgumentException("El prestamo indicado esta eliminado");
             if (_prestamo.TienePagosPendientes(id).Result == true) throw new ArgumentException("No se pueden finalizar prestamos que aun tengan pagos pendientes");
-            // no se si esta bien planteada la comparacion del resultado. ME HACE RUIDOO
             await _prestamo.SoftDelete(prestamo.IdEstado);
             return true;
         }

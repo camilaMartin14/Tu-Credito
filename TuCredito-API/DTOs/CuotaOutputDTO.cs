@@ -1,6 +1,6 @@
 ﻿namespace TuCredito.DTOs
 {
-    public class CuotaDTO
+    public class CuotaOutputDTO
     {
         public int Monto { get; set; }
         public int NroCta { get; set; }

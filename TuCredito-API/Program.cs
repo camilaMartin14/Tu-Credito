@@ -123,6 +123,7 @@ builder.Services.AddScoped<ICalculadoraService, CalculadoraService>();
 builder.Services.AddScoped<IDolarService, DolarService>();
 builder.Services.AddHttpClient<BcraDeudoresService>();
 
+builder.Services.AddHttpContextAccessor(); // para recuperar el id del usuario
 
 builder.Services.AddScoped<JwtTokenGenerator>();
 

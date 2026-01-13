@@ -19,7 +19,8 @@ namespace TuCredito.Security
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
-                new Claim(ClaimTypes.Name, usuario)
+                new Claim(ClaimTypes.Name, usuario),
+                new Claim("IdPrestamista", userId.ToString())
             };
 
             var secretKey = _configuration["Jwt:Key"];

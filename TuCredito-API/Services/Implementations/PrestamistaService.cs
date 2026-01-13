@@ -11,9 +11,11 @@ namespace TuCredito.Services.Implementations
     public class PrestamistaService : IPrestamistaService
     {
         private readonly IPrestamistaRepository _repository;
-        public PrestamistaService(IPrestamistaRepository repository)
+        private readonly IHttpContextAccessor _httpContext;
+        public PrestamistaService(IPrestamistaRepository repository, IHttpContextAccessor httpContext)
         {
             _repository = repository;
+            _httpContext = httpContext;
         }
 
         //Lo tengo que corregir, se inicia sesion con usuario
@@ -84,5 +86,19 @@ namespace TuCredito.Services.Implementations
 
             return await _repository.RegistrarPrestamista(prestamista);
         }
+
+        public async Task<int> ObtenerIdUsuarioLogueado() 
+        { 
+            var claim = _httpContext.HttpContext?.User?.FindFirst("IdPrestamista");
+            
+            if (claim == null) throw new ArgumentException("No se pudo obtener el IdPrestamista del token");
+            return int.Parse(claim.Value); // ESTA TMB VA CUANDO SE DESCOMENTE EL DE PRUEBA
+            //if (claim == null) { return 1; }// ID de prueba --- el correcto es la linea que quedo comentada arriba
+            //else { return 2; }
+            
+               
+        }
+
+        
     }
 }

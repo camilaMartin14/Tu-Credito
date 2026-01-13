@@ -118,20 +118,31 @@ CREATE TABLE Pagos (
 
 INSERT INTO Estados_Cuotas (descripcion) VALUES
 ('Pendiente'),
+<<<<<<< HEAD
+('Saldada'), ('Vencida'), ('Reprogramada');
+=======
 ('Saldada');
+>>>>>>> 6019ec3a5a100a570682392315ff7b5220de3047
 
 INSERT INTO Estados_Prestamos (descripcion) VALUES
 ('Activo'),
-('Finalizado');
+('Finalizado'), ('Eliminado');
 
 INSERT INTO MediosDePago (descripcion, moneda) VALUES
 ('Transferencia', 'ARS'),
 ('Efectivo', 'ARS'),
-('Efectivo', 'USD');
+('Efectivo', 'USD'),
+('Transferencia', 'USD');
 go
 
 -- nvos inserts
 
+<<<<<<< HEAD
+-------------------------- Datos de prueba --------------------------
+-- Cliente responsable
+INSERT INTO SistAmortizacion (descripcion)
+VALUES ('Personal'),('Francés'), ('Alemán');
+=======
 insert into estados_cuotas (descripcion)
 values ('Vencida'), ('Reprogramada')
 
@@ -147,6 +158,7 @@ values ('Eliminado')
 ---- Cliente responsable
 --INSERT INTO SistAmortizacion (descripcion)
 --VALUES ('Personal'),('Francï¿½s'), ('Alemï¿½n');
+>>>>>>> 6019ec3a5a100a570682392315ff7b5220de3047
 
 --INSERT INTO Prestamistas (nombre, apellido, esActivo, correo, usuario, contraseniaHash)
 --VALUES ('Juan', 'Pï¿½rez', 1, 'juan.perez@mail.com', 'jperez', 'HASH_FAKE_123');
@@ -280,4 +292,97 @@ CREATE TABLE AuditLogs (
     Changes NVARCHAR(MAX),
     EntityId NVARCHAR(100)
 );
+<<<<<<< HEAD
+
+INSERT INTO Cuotas (idPrestamo, nroCuota, Monto, Fec_Vto, idEstado, Interes)
+VALUES
+(1, 1, 40000.00, '2024-04-10', 3, 5000.00),
+(1, 2, 35000.00, '2024-05-10', 3, 4000.00),
+(1, 3, 30000.00, '2024-06-10', 3, 3000.00);
+
+INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, Monto, Observaciones)
+VALUES
+(1, '2024-04-09', 1, 40000.00, 'Pago anticipado'),
+(2, '2024-05-10', 2, 35000.00, 'Pago en efectivo'),
+(3, '2024-06-10', 1, 30000.00, 'Pago final del préstamo');
+
+-- Cliente irresponsable
+INSERT INTO Garantes (nombre, apellido, telefono, domicilio, correo, esActivo)
+VALUES ('Laura', 'Martínez', '3519988776', 'San Martín 890', 'lmartinez@mail.com', 1);
+
+INSERT INTO Prestatarios (DNI, nombre, apellido, telefono, domicilio, correo, esActivo, idGarante)
+VALUES (28999888, 'Diego', 'Fernández', '3514455667', 'Bv. Illia 1200', 'dfernandez@mail.com', 1, 2);
+
+INSERT INTO Prestamos (
+    idPrestamista,
+    DNI_Prestatario,
+    MontoOtorgado,
+    Cantidad_ctas,
+    idEstado,
+    tasaInteres,
+    fechaFinEstimada,
+    fechaOtorgamiento,
+    Fec_1erVto,
+    idSistAmortizacion
+)
+VALUES (
+    1,                -- prestamista
+    28999888,         -- prestatario
+    150000.00,
+    3,
+    1,                -- Activo
+    25.00,
+    '2024-08-15',
+    '2024-05-15',
+    '2024-06-15',
+    1                 -- Personal
+);
+
+-- Prestamo activo
+
+INSERT INTO Prestamos (
+    idPrestamista,
+    DNI_Prestatario,
+    MontoOtorgado,
+    Cantidad_ctas,
+    idEstado,
+    tasaInteres,
+    fechaFinEstimada,
+    fechaOtorgamiento,
+    Fec_1erVto,
+    idSistAmortizacion
+)
+VALUES (
+    1,                -- prestamista
+    28999888,         -- prestatario
+    150000.00,
+    3,
+    1,                -- Activo
+    25.00,
+    '2024-08-15',
+    '2024-05-15',
+    '2024-06-15',
+    1                 -- Personal
+);
+
+INSERT INTO Cuotas (idPrestamo, nroCuota, Monto, Fec_Vto, idEstado, Interes)
+VALUES
+-- cuota pagada
+(2, 1, 55000.00, '2024-06-15', 3, 7000.00),
+
+-- cuota vencida (morosa)
+(2, 2, 50000.00, '2024-07-15', 4, 6000.00),
+
+-- cuota aún no vencida
+(2, 3, 45000.00, '2024-08-15', 1, 5000.00);
+
+INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, Monto, Observaciones)
+VALUES
+(4, '2024-06-14', 1, 55000.00, 'Pago en término');
+go
+
+alter table Cuotas add SaldoPendiente decimal (12, 2)
+alter table Pagos add Estado varchar(20)
+=======
 GO
+>>>>>>> 6019ec3a5a100a570682392315ff7b5220de3047
