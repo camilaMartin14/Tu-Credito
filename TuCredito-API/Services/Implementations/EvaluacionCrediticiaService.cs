@@ -1,15 +1,15 @@
 using TuCredito.DTOs;
 using TuCredito.Services.Interfaces;
-using TuCredito.Services.Implementations.Clients;
+using TuCredito.Services.Interfaces.Clients;
 using TuCredito.Models.Enums;
 
 namespace TuCredito.Services.Implementations
 {
     public class EvaluacionCrediticiaService : IEvaluacionCrediticiaService
     {
-        private readonly BcraDeudoresService _bcraService;
+        private readonly IBcraDeudoresService _bcraService;
 
-        public EvaluacionCrediticiaService(BcraDeudoresService bcraService)
+        public EvaluacionCrediticiaService(IBcraDeudoresService bcraService)
         {
             _bcraService = bcraService;
         }

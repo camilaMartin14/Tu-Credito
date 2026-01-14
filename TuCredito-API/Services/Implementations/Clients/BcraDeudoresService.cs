@@ -5,9 +5,11 @@ using TuCredito.Models.EntidadesApisTerceros;
 using TuCredito.Models.Enums;
 using Microsoft.Extensions.Configuration;
 
+using TuCredito.Services.Interfaces.Clients;
+
 namespace TuCredito.Services.Implementations.Clients
 {
-    public class BcraDeudoresService
+    public class BcraDeudoresService : IBcraDeudoresService
     {
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;

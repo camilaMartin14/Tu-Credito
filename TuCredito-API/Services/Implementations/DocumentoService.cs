@@ -3,9 +3,11 @@ using TuCredito.MinIO;
 using TuCredito.Models;
 using TuCredito.Repositories.Interfaces;
 
+using TuCredito.Services.Interfaces;
+
 namespace TuCredito.Services.Implementations
 {
-    public class DocumentoService
+    public class DocumentoService : IDocumentoService
     {
         private readonly IDocumentoRepository _documentoRepo;
         private readonly IFileStorage _fileStorage;

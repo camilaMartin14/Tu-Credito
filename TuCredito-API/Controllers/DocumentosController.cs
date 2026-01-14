@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TuCredito.DTOs.Documentos;
 using TuCredito.MinIO;
-using TuCredito.Services.Implementations;
+using TuCredito.Services.Interfaces;
 
 namespace TuCredito.Controllers
 {
@@ -10,9 +10,9 @@ namespace TuCredito.Controllers
     [ApiController]
     public class DocumentosController : ControllerBase
     {
-        private readonly DocumentoService _service;
+        private readonly IDocumentoService _service;
 
-        public DocumentosController(DocumentoService service)
+        public DocumentosController(IDocumentoService service)
         {
             _service = service;
         }
