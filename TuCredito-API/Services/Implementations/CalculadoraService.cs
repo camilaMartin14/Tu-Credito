@@ -58,8 +58,9 @@ namespace TuCredito.Services.Implementations
         /// Capital * interés mensual * cantidad de cuotas
         private decimal CalcularInteresTotal(SimulacionPrestamoEntryDTO entry)
         {
+            // CORRECCION: Se divide por 100 para interpretar el interés como porcentaje
             return entry.MontoPrestamo
-                   * entry.InteresMensual
+                   * (entry.InteresMensual / 100)
                    * entry.CantidadCuotas;
         }
 

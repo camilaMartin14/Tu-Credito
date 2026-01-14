@@ -77,12 +77,19 @@ namespace TuCredito.Services.Implementations
             // Inicializar SaldoRestante con el monto otorgado
             entidad.SaldoRestante = entidad.MontoOtorgado;
 
+            // CORRECCION: Calcular FechaFinEstimada automáticamente basada en la cantidad de cuotas
+            entidad.FechaFinEstimada = entidad.FechaOtorgamiento.AddMonths(entidad.CantidadCtas);
+
             if (entidad.FechaOtorgamiento > DateTime.Now) throw new ArgumentException("La fecha de otorgamiento no puede ser futura"); 
             if (entidad.IdEstado != 1) throw new ArgumentException("El estado debe ser 'Activo'"); // etc... await _prestatarlo.PostPrestamo(dto); GenerarCuotas(entidad); return true;
             if (entidad.FechaOtorgamiento < DateTime.Now.AddMonths(-24)) throw new ArgumentException("La fecha de otorgamiento puede ser de hasta 24 meses anteriores");
-            if (entidad.FechaOtorgamiento > entidad.FechaFinEstimada) throw new ArgumentException("La fecha estimada de fin no puede ser anterior a la fecha de otrogamiento");
+            // CORRECCION: Validacion eliminada porque ahora se calcula automaticamente
+            // if (entidad.FechaOtorgamiento > entidad.FechaFinEstimada) throw new ArgumentException("La fecha estimada de fin no puede ser anterior a la fecha de otrogamiento");
             if (entidad.FechaOtorgamiento > entidad.Fec1erVto) throw new ArgumentException("La fecha del primer vencimiento debe ser posterior a la fecha de otorgamiento");
-            if (entidad.FechaFinEstimada < DateTime.Today) throw new ArgumentException("Solo se permiten registrar prestamos que aun esten activos"); // RAROOOO, xq la fecha estimada no es necesariamente la fecha de fin
+            
+            // CORRECCION: Comentado para permitir la migración de datos históricos (préstamos ya finalizados)
+            // if (entidad.FechaFinEstimada < DateTime.Today) throw new ArgumentException("Solo se permiten registrar prestamos que aun esten activos"); 
+
             if (entidad.IdEstado != 1) throw new ArgumentException("El estado debe ser 'Activo'"); // por defecto al darlo de alta
             if (entidad.IdPrestamista <= 0) throw new ArgumentException("Ingrese un numero de prestamista"); // esto tmb deberia venir por defecto por la sesion 
             if (entidad.IdSistAmortizacion <= 0) throw new ArgumentException("Seleccione un sistema de amortizacion");

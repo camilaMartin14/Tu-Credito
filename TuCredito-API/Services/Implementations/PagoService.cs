@@ -44,7 +44,7 @@ namespace TuCredito.Services.Implementations
             return _pago.GetPagoConFiltro(nombre, mes);
         }
 
-        // CORRECCION: Se implementó una transacción completa para asegurar la integridad de datos entre Pago, Cuota y Préstamo
+        // CORRECCION: Se implementó pago en cascada y recálculo de saldo por suma de cuotas
         public async Task<bool> NewPago(Pago pago)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -52,61 +52,87 @@ namespace TuCredito.Services.Implementations
             {
                 if (pago.Monto <= 0) throw new ArgumentException("El monto del pago debe ser mayor a cero");
 
-                // Cargar Cuota y Préstamo asociados (Include para tener el grafo completo)
-                var cuota = await _context.Cuotas
+                // Cargar Cuota objetivo
+                var cuotaObjetivo = await _context.Cuotas
                     .Include(c => c.IdPrestamoNavigation)
                     .FirstOrDefaultAsync(c => c.IdCuota == pago.IdCuota);
 
-                if (cuota == null) throw new ArgumentException("Nro de cuota incorrecto");
+                if (cuotaObjetivo == null) throw new ArgumentException("Nro de cuota incorrecto");
 
-                var prestamo = cuota.IdPrestamoNavigation;
+                var prestamo = cuotaObjetivo.IdPrestamoNavigation;
 
-                // Validaciones
-                decimal saldoActualCuota = cuota.SaldoPendiente ?? cuota.Monto;
+                // 1. Obtener todas las cuotas pendientes (o con saldo) del préstamo para calcular la deuda real total
+                var cuotasPendientes = await _context.Cuotas
+                    .Where(c => c.IdPrestamo == prestamo.IdPrestamo && (c.SaldoPendiente == null || c.SaldoPendiente > 0))
+                    .OrderBy(c => c.FecVto) // Ordenar por fecha de vencimiento
+                    .ToListAsync();
 
-                if (cuota.IdEstado == 3 || saldoActualCuota <= 0)
-                    throw new ArgumentException("La cuota ya se encuentra saldada");
+                // Calcular deuda total real antes del pago
+                decimal deudaTotal = cuotasPendientes.Sum(c => c.SaldoPendiente ?? c.Monto);
 
-                // Validar contra el SaldoPendiente de la cuota
-                if (pago.Monto > saldoActualCuota)
-                    throw new InvalidOperationException($"El monto del pago supera el saldo pendiente de la cuota ({saldoActualCuota})");
+                // Validar contra el total del préstamo
+                if (pago.Monto > deudaTotal)
+                    throw new InvalidOperationException($"El pago excede el saldo restante total del préstamo ({deudaTotal}).");
 
-                // Validar contra el total del préstamo (Requisito explícito)
-                if (pago.Monto > prestamo.SaldoRestante)
-                    throw new InvalidOperationException("El pago excede el saldo restante total del préstamo.");
+                // 2. Lógica de Pago en Cascada
+                decimal montoRestantePago = pago.Monto;
 
-                // Actualizar Cuota
-                cuota.SaldoPendiente = saldoActualCuota - pago.Monto;
-                
-                // Actualizar estado de la cuota
-                if (cuota.SaldoPendiente <= 0)
+                // Priorizar la cuota seleccionada: moverla al principio de la lista si está pendiente
+                var cuotaSeleccionadaEnLista = cuotasPendientes.FirstOrDefault(c => c.IdCuota == pago.IdCuota);
+                if (cuotaSeleccionadaEnLista != null)
                 {
-                    cuota.IdEstado = 3; // Saldada
-                    cuota.SaldoPendiente = 0; // Evitar negativos
+                    cuotasPendientes.Remove(cuotaSeleccionadaEnLista);
+                    cuotasPendientes.Insert(0, cuotaSeleccionadaEnLista);
+                }
+                // Si la cuota seleccionada ya estaba pagada (no está en cuotasPendientes), el pago se aplicará a la siguiente más antigua (por el OrderBy inicial)
+
+                foreach (var cuota in cuotasPendientes)
+                {
+                    if (montoRestantePago <= 0) break;
+
+                    decimal saldoActualCuota = cuota.SaldoPendiente ?? cuota.Monto;
+                    
+                    // Cuanto pagamos de esta cuota: lo que queda del pago o la deuda total de la cuota
+                    decimal montoAplicar = Math.Min(montoRestantePago, saldoActualCuota);
+
+                    cuota.SaldoPendiente = saldoActualCuota - montoAplicar;
+                    montoRestantePago -= montoAplicar;
+
+                    // Actualizar estado de la cuota
+                    if (cuota.SaldoPendiente <= 0)
+                    {
+                        cuota.IdEstado = 3; // Saldada
+                        cuota.SaldoPendiente = 0; // Evitar negativos
+                    }
+                    else
+                    {
+                        cuota.IdEstado = 1; // Sigue Pendiente
+                    }
+                }
+
+                // 3. Actualizar Préstamo: Recalcular SaldoRestante sumando las cuotas pendientes
+                // Como ya modificamos las entidades en memoria (cuotasPendientes), la suma reflejará el nuevo estado
+                prestamo.SaldoRestante = cuotasPendientes.Sum(c => c.SaldoPendiente ?? c.Monto);
+                
+                if (prestamo.SaldoRestante <= 0)
+                {
+                    prestamo.SaldoRestante = 0;
+                    // Verificar si realmente no quedan cuotas (doble check)
+                    bool quedanPendientesBD = await _context.Cuotas.AnyAsync(c => c.IdPrestamo == prestamo.IdPrestamo && c.IdEstado != 3 && !cuotasPendientes.Select(cp => cp.IdCuota).Contains(c.IdCuota));
+                    // Nota: cuotasPendientes tiene todas las que tenían saldo. Si SaldoRestante es 0, todas deberían estar en 0.
+                    
+                    prestamo.IdEstado = 2; // Finalizado/Cancelado
                 }
                 else
                 {
-                    cuota.IdEstado = 1; // Sigue Pendiente
-                }
-
-                // Actualizar Préstamo: Reducir deuda global
-                prestamo.SaldoRestante -= pago.Monto;
-                if (prestamo.SaldoRestante < 0) prestamo.SaldoRestante = 0;
-
-                // Verificar cancelación total del préstamo
-                if (prestamo.SaldoRestante == 0)
-                {
-                    // Doble check: que no queden cuotas activas (por si hubo desajustes previos)
-                    var quedanCuotas = await _context.Cuotas.AnyAsync(c => c.IdPrestamo == prestamo.IdPrestamo && c.IdEstado != 3 && c.IdCuota != cuota.IdCuota);
-                    if (!quedanCuotas)
-                    {
-                        prestamo.IdEstado = 2; // Finalizado/Cancelado
-                    }
+                    // Si el préstamo estaba finalizado pero (raro) se reactiva, o simplemente asegurar estado activo
+                    if (prestamo.IdEstado == 2) prestamo.IdEstado = 1; 
                 }
 
                 // Registrar el pago
                 pago.Estado = "Registrado";
-                pago.Saldo = cuota.SaldoPendiente.Value; // Guardamos el saldo remanente de la cuota en el histórico del pago
+                // Guardamos el saldo de la cuota principal para referencia histórica
+                pago.Saldo = cuotaSeleccionadaEnLista?.SaldoPendiente ?? 0; 
                 
                 _context.Pagos.Add(pago);
 
