@@ -106,12 +106,12 @@ namespace TuCredito.Services.Implementations
             switch (entidadTipo.ToLower())
             {
                 case "prestatario":
-                    var prestatario = await _clienteRepo.ObtenerPorIdAsync(entidadId);
+                    var prestatario = await _clienteRepo.ObtenerPorDniAsync(entidadId);
                     if (prestatario == null)
                         throw new Exception($"Prestatario con ID {entidadId} no encontrado.");
                     break;
                 case "prestamo":
-                    var prestamo = await _prestamoRepo.ObtenerPorIdAsync(entidadId);
+                    var prestamo = await _prestamoRepo.GetPrestamoById(entidadId);
                     if (prestamo == null)
                         throw new Exception($"Prestamo con ID {entidadId} no encontrado.");
                     break;
