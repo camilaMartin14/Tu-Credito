@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
 using TuCredito.DTOs;
 using TuCredito.Models;
 using TuCredito.Services.Implementations;
@@ -13,9 +14,12 @@ namespace TuCredito.Controllers
     public class PagoController : ControllerBase
     {
         private readonly IPagoService _service;
-        public PagoController(IPagoService service)
+        private readonly IMapper _mapper;
+
+        public PagoController(IPagoService service, IMapper mapper)
         {
             _service = service;
+            _mapper = mapper;
         }
         // GET: api/<PagosController>
         [HttpGet]
@@ -67,14 +71,7 @@ namespace TuCredito.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var pago = new Pago
-            {
-                IdCuota = nvoPago.IdCuota,
-                Monto = nvoPago.Monto,
-                FecPago = DateTime.Now,
-                IdMedioPago = nvoPago.IdMedioPago
-                
-            };
+            var pago = _mapper.Map<Pago>(nvoPago);
 
             try
             {
@@ -97,12 +94,7 @@ namespace TuCredito.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var pago = new Pago
-            {
-                IdCuota = nvoPago.IdCuota,
-                Monto = nvoPago.Monto,
-                FecPago = DateTime.Now
-            };
+            var pago = _mapper.Map<Pago>(nvoPago);
 
             try
             {

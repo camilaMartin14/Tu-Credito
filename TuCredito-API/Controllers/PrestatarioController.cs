@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
 using TuCredito.DTOs;
 using TuCredito.Models;
 using TuCredito.Services.Interfaces;
@@ -11,10 +12,12 @@ namespace TuCredito.Controllers
     public class PrestatarioController : ControllerBase
     {
         private readonly IPrestatarioService _service;
+        private readonly IMapper _mapper;
 
-        public PrestatarioController(IPrestatarioService service)
+        public PrestatarioController(IPrestatarioService service, IMapper mapper)
         {
             _service = service;
+            _mapper = mapper;
         }
 
         [HttpPost]
@@ -32,14 +35,16 @@ namespace TuCredito.Controllers
             if (prestatario == null)
                 return NotFound();
 
-            return Ok(prestatario);
+            var dto = _mapper.Map<PrestatarioDTO>(prestatario);
+            return Ok(dto);
         }
 
         [HttpGet]
         public async Task<IActionResult> ObtenerConFiltros([FromQuery] PrestatarioDTO filtro)
         {
             var lista = await _service.ObtenerConFiltrosAsync(filtro);
-            return Ok(lista);
+            var dtos = _mapper.Map<List<PrestatarioDTO>>(lista);
+            return Ok(dtos);
         }
 
         [HttpPut("{dni:int}")]

@@ -57,10 +57,10 @@ namespace TuCredito.Repositories.Implementations
             return _mapper.Map<List<PrestamoDTO>>(resultado);
         }
 
-        // CORRECCION: Se recibe la entidad completa (con cuotas generadas) para asegurar la transaccionalidad
+        // Se recibe la entidad completa (con cuotas generadas) 
         public async Task<bool> PostPrestamo(Prestamo prestamo)
         {
-            // Al agregar el prestamo, EF Core detectara las cuotas en la coleccion y las insertara tambien
+            // Al agregar el prestamo, EF Core detecta las cuotas en la coleccion y las insertara tambien
             _prestamo.Add(prestamo); 
             await _context.SaveChangesAsync(); 
             return true;
@@ -85,7 +85,5 @@ namespace TuCredito.Repositories.Implementations
                                         .Where(p => p.IdCuota == c.IdCuota)
                                         .Sum(p => p.Monto) < c.Monto); 
         }
-
-
     }
 }

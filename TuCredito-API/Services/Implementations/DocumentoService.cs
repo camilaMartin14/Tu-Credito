@@ -3,9 +3,11 @@ using TuCredito.MinIO;
 using TuCredito.Models;
 using TuCredito.Repositories.Interfaces;
 
+using TuCredito.Services.Interfaces;
+
 namespace TuCredito.Services.Implementations
 {
-    public class DocumentoService
+    public class DocumentoService : IDocumentoService
     {
         private readonly IDocumentoRepository _documentoRepo;
         private readonly IFileStorage _fileStorage;
@@ -31,7 +33,7 @@ namespace TuCredito.Services.Implementations
             var ruta = $"{request.EntidadTipo.ToLower()}/" +
                        $"{request.EntidadId}/" +
                        $"{request.TipoDocumento.ToLower()}/" +
-                       $"{Guid.NewGuid()}_{request.Archivo.FileName}"; // Use GUID to avoid collision
+                       $"{Guid.NewGuid()}_{request.Archivo.FileName}"; 
 
             using var stream = request.Archivo.OpenReadStream();
             await _fileStorage.SubirAsync(

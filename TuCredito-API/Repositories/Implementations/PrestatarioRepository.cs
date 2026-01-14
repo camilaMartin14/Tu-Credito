@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using TuCredito.DTOs;
 using TuCredito.Models;
 using TuCredito.Repositories.Interfaces;
@@ -49,7 +49,9 @@ namespace TuCredito.Repositories.Implementations
 
         public async Task<List<Prestatario>> ObtenerConFiltrosAsync(PrestatarioDTO filtro)
         {
-            var query = _context.Prestatarios.AsQueryable();
+            var query = _context.Prestatarios
+                .Include(p => p.IdGaranteNavigation)
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(filtro.Nombre))
                 query = query.Where(p => p.Nombre.Contains(filtro.Nombre));
@@ -66,6 +68,7 @@ namespace TuCredito.Repositories.Implementations
         public async Task<Prestatario?> ObtenerPorDniAsync(int dni)
         {
             return await _context.Prestatarios
+                .Include(p => p.IdGaranteNavigation)
                 .FirstOrDefaultAsync(p => p.Dni == dni);
         }
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
+using AutoMapper;
 using System.Linq.Expressions;
 using TuCredito.DTOs;
 using TuCredito.Models;
@@ -11,11 +12,14 @@ namespace TuCredito.Services.Implementations
     public class PrestamistaService : IPrestamistaService
     {
         private readonly IPrestamistaRepository _repository;
-        private readonly IHttpContextAccessor _httpContext;
-        public PrestamistaService(IPrestamistaRepository repository, IHttpContextAccessor httpContext)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMapper _mapper;
+
+        public PrestamistaService(IPrestamistaRepository repository, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
             _repository = repository;
-            _httpContext = httpContext;
+            _httpContextAccessor = httpContextAccessor;
+            _mapper = mapper;
         }
 
         //Lo tengo que corregir, se inicia sesion con usuario
@@ -35,37 +39,12 @@ namespace TuCredito.Services.Implementations
 
         public async Task<Prestamista?> ObtenerPrestamistaPorEmailAsync(string email)
         {
-            var prestamista = await _repository.ObtenerPrestamistaPorEmail(email);
-            if (prestamista == null) return null;
-
-            return new Prestamista
-            {
-                Id = prestamista.Id,
-                Nombre = prestamista.Nombre,
-                Apellido = prestamista.Apellido,
-                Correo = prestamista.Correo,
-                EsActivo = prestamista.EsActivo,
-                Usuario = prestamista.Usuario,
-                ContraseniaHash = prestamista.ContraseniaHash
-            };
-
+            return await _repository.ObtenerPrestamistaPorEmail(email);
         }
 
         public async Task<Prestamista?> ObtenerPrestamistaPorIdAsync(int idPrestamista)
         {
-            var usuario = await _repository.ObtenerPrestamistaPorId(idPrestamista);
-            if (usuario == null) return null;
-
-            return new Prestamista
-            {
-                Id = usuario.Id,
-                Nombre = usuario.Nombre,
-                Apellido = usuario.Apellido,
-                Correo = usuario.Correo,
-                EsActivo = usuario.EsActivo,
-                Usuario = usuario.Usuario,
-                ContraseniaHash = usuario.ContraseniaHash
-            };
+            return await _repository.ObtenerPrestamistaPorId(idPrestamista);
         }
 
         public async Task<int> RegistrarPrestamistaAsync(PrestamistaRegisterDto dto)
@@ -74,22 +53,15 @@ namespace TuCredito.Services.Implementations
             if (existente != null)
                 throw new Exception("El email ya está registrado");
 
-            var prestamista = new Prestamista
-            {
-                Nombre = dto.Nombre,
-                Apellido = dto.Apellido,
-                Correo = dto.Correo,
-                EsActivo = true,
-                Usuario = dto.Usuario,
-                ContraseniaHash = PasswordHasher.Hash(dto.Contrasenia)
-            };
+            var prestamista = _mapper.Map<Prestamista>(dto);
+            prestamista.ContraseniaHash = PasswordHasher.Hash(dto.Contrasenia);
 
             return await _repository.RegistrarPrestamista(prestamista);
         }
 
         public async Task<int> ObtenerIdUsuarioLogueado() 
         { 
-            var claim = _httpContext.HttpContext?.User?.FindFirst("IdPrestamista");
+            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("IdPrestamista");
             
             if (claim == null) throw new ArgumentException("No se pudo obtener el IdPrestamista del token");
             return int.Parse(claim.Value); // ESTA TMB VA CUANDO SE DESCOMENTE EL DE PRUEBA

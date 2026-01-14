@@ -4,9 +4,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using TuCredito.Interceptors;
-using TuCredito.Mappings;
 using TuCredito.MinIO;
 using TuCredito.Models;
+using TuCredito.Profiles;
 using TuCredito.Repositories.Implementations;
 using TuCredito.Repositories.Interfaces;
 using TuCredito.Security;
@@ -126,15 +126,16 @@ builder.Services.AddScoped<IDolarService, DolarService>();
 builder.Services.AddScoped<IEvaluacionCrediticiaService, EvaluacionCrediticiaService>();
 builder.Services.AddHttpClient<BcraDeudoresService>();
 
-builder.Services.AddHttpContextAccessor(); // para recuperar el id del usuario
+builder.Services.AddHttpContextAccessor(); 
 
 builder.Services.AddScoped<JwtTokenGenerator>();
 
-//builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+//builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<IFileStorage, MinioFileStorage>();
-builder.Services.AddScoped<DocumentoService>();
+builder.Services.AddScoped<IDocumentoService, DocumentoService>();
+builder.Services.AddScoped<AuditInterceptor>();
 
 
 var app = builder.Build();
