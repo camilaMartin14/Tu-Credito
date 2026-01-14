@@ -2,7 +2,7 @@ using AutoMapper;
 using TuCredito.Models;
 using TuCredito.DTOs;
 
-namespace TuCredito.Mappings
+namespace TuCredito.Profiles
 {
     public class MappingProfile : Profile
     {
