@@ -126,7 +126,7 @@ builder.Services.AddScoped<IDolarService, DolarService>();
 builder.Services.AddScoped<IEvaluacionCrediticiaService, EvaluacionCrediticiaService>();
 builder.Services.AddHttpClient<BcraDeudoresService>();
 
-builder.Services.AddHttpContextAccessor(); // para recuperar el id del usuario
+builder.Services.AddHttpContextAccessor(); 
 
 builder.Services.AddScoped<JwtTokenGenerator>();
 

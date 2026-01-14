@@ -25,7 +25,6 @@ namespace TuCredito.Controllers
             }
             catch (Exception ex)
             {
-                // En un entorno real, loguearíamos el error
                 return StatusCode(500, new { mensaje = "Ocurrió un error al procesar la evaluación", detalle = ex.Message });
             }
         }

@@ -1,4 +1,4 @@
-﻿using TuCredito.DTOs;
+using TuCredito.DTOs;
 using TuCredito.Models;
 
 namespace TuCredito.Services.Interfaces
@@ -8,7 +8,7 @@ namespace TuCredito.Services.Interfaces
         Task<bool> SoftDelete(int id);
         Task<bool> PostPrestamo(PrestamoDTO NvoPrestamo);
         Task<PrestamoDTO> GetPrestamoById(int id);
-        Task<List<Prestamo>> GetAll();
+        Task<List<PrestamoDTO>> GetAll();
         Task<List<PrestamoDTO>> GetPrestamoConFiltro(string? nombre, int? estado, int? mesVto, int? anio);
         
     }

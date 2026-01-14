@@ -36,7 +36,5 @@ namespace TuCredito.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
     }
 }

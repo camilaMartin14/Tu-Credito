@@ -31,7 +31,7 @@ namespace TuCredito.Services.Implementations
             var ruta = $"{request.EntidadTipo.ToLower()}/" +
                        $"{request.EntidadId}/" +
                        $"{request.TipoDocumento.ToLower()}/" +
-                       $"{Guid.NewGuid()}_{request.Archivo.FileName}"; // Use GUID to avoid collision
+                       $"{Guid.NewGuid()}_{request.Archivo.FileName}"; 
 
             using var stream = request.Archivo.OpenReadStream();
             await _fileStorage.SubirAsync(

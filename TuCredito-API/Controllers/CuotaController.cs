@@ -17,9 +17,7 @@ namespace TuCredito.Controllers
         {
             _service = service;
         }
-        // GET: api/<CuotaController>
-               //getall?
-
+        
         // GET api/<CuotaController>/5
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)

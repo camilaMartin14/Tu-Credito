@@ -27,7 +27,7 @@ namespace TuCredito.Services.Implementations
                 maxSituacion = deudaResponse.Deudas.Max(d => (int)d.Situacion);
             }
 
-            // 2. Calcular Capacidad de Pago (si hay ingresos)
+            // 2. Calcular Capacidad de Pago (si se informan ingresos)
             bool capacidadPagoComprometida = false;
             if (request.IngresoMensual.HasValue && request.IngresoMensual.Value > 0)
             {
@@ -38,7 +38,6 @@ namespace TuCredito.Services.Implementations
                 }
             }
 
-            // 3. Matriz de Decisión
             var response = new EvaluacionCrediticiaResponseDTO
             {
                 SituacionBcra = $"Situación {maxSituacion}"
@@ -49,16 +48,13 @@ namespace TuCredito.Services.Implementations
             {
                 if (capacidadPagoComprometida)
                 {
-                    response.Estado = "RECHAZADO"; // O AJUSTAR
+                    response.Estado = "RECHAZADO"; 
                     response.Motivo = "La cuota supera el 30% de los ingresos declarados.";
                     response.DetalleRiesgo = "Voluntad de pago ALTA, Capacidad de pago BAJA.";
                     
                     // Sugerencia: Calcular monto para que la cuota sea el 30%
                     if (request.IngresoMensual.HasValue)
                     {
-                         // Regla de tres simple inversa aproximada (asumiendo proporcionalidad lineal para la sugerencia)
-                         // CuotaActual -> MontoSolicitado
-                         // CuotaObjetivo (30% Ingreso) -> X
                          var cuotaObjetivo = request.IngresoMensual.Value * 0.30m;
                          
                          // MontoSugerido = (MontoSolicitado * CuotaObjetivo) / CuotaActual
