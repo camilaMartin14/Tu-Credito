@@ -14,13 +14,14 @@ public partial class Cuota
     public int NroCuota { get; set; }
 
     public decimal Monto { get; set; }
-    public decimal? SaldoPendiente { get; set; }
 
     public DateTime FecVto { get; set; }
 
     public int IdEstado { get; set; }
 
     public decimal? Interes { get; set; }
+
+    public decimal? SaldoPendiente { get; set; }
 
     public virtual EstadosCuota IdEstadoNavigation { get; set; }
 

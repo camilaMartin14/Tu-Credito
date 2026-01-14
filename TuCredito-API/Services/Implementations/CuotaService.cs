@@ -3,6 +3,7 @@ using TuCredito.Services.Interfaces;
 using TuCredito.DTOs;
 using TuCredito.Repositories.Interfaces;
 using System.Globalization;
+using Microsoft.EntityFrameworkCore;
 
 namespace TuCredito.Services.Implementations
 
@@ -11,10 +12,13 @@ namespace TuCredito.Services.Implementations
     {
         private readonly IPrestamoService _prestamo;
         private readonly ICuotaRepository _cuota;
-        public CuotaService(IPrestamoService prestamo, ICuotaRepository cuota)
+        private readonly TuCreditoContext _context;
+
+        public CuotaService(IPrestamoService prestamo, ICuotaRepository cuota, TuCreditoContext context)
         {
             _prestamo = prestamo;
             _cuota = cuota;
+            _context = context;
         }
         public async Task<bool> AddCuota(Cuota cuota)
         {
@@ -26,16 +30,15 @@ namespace TuCredito.Services.Implementations
             if (prestamo.IdEstado == 2) throw new ArgumentException("No se pueden agregar cuotas a un préstamo inactivo"); // finalizado
             if (prestamo.IdEstado == 3) throw new ArgumentException("No se pueden agregar cuotas a un préstamo inactivo"); // eliminado
             if (cuota.IdEstado != 1) throw new ArgumentException("Solo se pueden dar de alta cuotas en estado 'Pendiente'");
-<<<<<<< HEAD
-            if (cuota.FecVto == null) throw new ArgumentException("Establezca una fecha de vencimiento"); // esto vendria del metodo GenerarCtas
-            if (cuota.FecVto < DateTime.Now) throw new ArgumentException("La fecha de vencimiento de una nueva cuota no puede ser anterior a hoy");           
-=======
             if (cuota.FecVto < DateTime.Now) throw new ArgumentException("La fecha de vencimiento de una nueva cuota no puede ser anterior a hoy");
             // Lo comento por como es nuestro model, no puede ser null se pone una fecha ficticia 0001-01-01 if (cuota.FecVto == null) throw new ArgumentException("Establezca una fecha de vencimiento"); // esto vendria del metodo GenerarCtas
->>>>>>> 6019ec3a5a100a570682392315ff7b5220de3047
             if (cuota.Interes <= 0) throw new ArgumentException("Revise el interes de la cuota"); 
             if (cuota.Monto <= 0) throw new ArgumentException("El valor de la cuota no puede ser cero");
             if (cuota.NroCuota <= 0) throw new ArgumentException("Ingrese un numero de cuota valido");
+
+            // CORRECCION: Inicializar SaldoPendiente
+            cuota.SaldoPendiente = cuota.Monto;
+
             return await _cuota.AddCuota(cuota) > 0;
         }
 
@@ -69,6 +72,38 @@ namespace TuCredito.Services.Implementations
 
             await _cuota.UpdateCuota(cuota);
             return true;
+        }
+
+        // CORRECCION: Método automático para detectar y actualizar cuotas en mora
+        public async Task<int> ActualizarCuotasVencidas()
+        {
+            // Buscar el ID del estado "Vencida"
+            var estadoVencida = await _context.EstadosCuotas
+                .Where(e => e.Descripcion == "Vencida")
+                .Select(e => e.IdEstado)
+                .FirstOrDefaultAsync();
+
+            if (estadoVencida == 0)
+            {
+                // Fallback si no existe el estado, aunque debería
+                // Asumimos que no podemos actualizar si no sabemos el ID
+                return 0;
+            }
+
+            // Buscar cuotas pendientes (IdEstado == 1) cuya fecha de vencimiento ya pasó
+            var cuotasVencidas = await _context.Cuotas
+                .Where(c => c.IdEstado == 1 
+                         && c.FecVto < DateTime.Today)
+                .ToListAsync();
+
+            if (!cuotasVencidas.Any()) return 0;
+
+            foreach (var cuota in cuotasVencidas)
+            {
+                cuota.IdEstado = estadoVencida;
+            }
+
+            return await _context.SaveChangesAsync();
         }
     }
 }

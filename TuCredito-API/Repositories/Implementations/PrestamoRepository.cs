@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using TuCredito.DTOs;
 using TuCredito.Models;
@@ -57,9 +57,10 @@ namespace TuCredito.Repositories.Implementations
             return _mapper.Map<List<PrestamoDTO>>(resultado);
         }
 
-        public async Task<bool> PostPrestamo(PrestamoDTO NewPrestamo)
+        // CORRECCION: Se recibe la entidad completa (con cuotas generadas) para asegurar la transaccionalidad
+        public async Task<bool> PostPrestamo(Prestamo prestamo)
         {
-            var prestamo = _mapper.Map<Prestamo>(NewPrestamo); 
+            // Al agregar el prestamo, EF Core detectara las cuotas en la coleccion y las insertara tambien
             _prestamo.Add(prestamo); 
             await _context.SaveChangesAsync(); 
             return true;

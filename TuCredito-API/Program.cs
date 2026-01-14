@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using TuCredito.Interceptors;
 using TuCredito.Mappings;
+using TuCredito.MinIO;
 using TuCredito.Models;
 using TuCredito.Repositories.Implementations;
 using TuCredito.Repositories.Interfaces;
@@ -12,7 +14,6 @@ using TuCredito.Services.Implementations;
 using TuCredito.Services.Implementations.Clients;
 using TuCredito.Services.Interfaces;
 using TuCredito.Services.Interfaces.Clients;
-using TuCredito.Interceptors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -113,6 +114,7 @@ builder.Services.AddScoped<IPrestatarioRepository, PrestatarioRepository>();
 builder.Services.AddScoped<IPrestamistaRepository, PrestamistaRepository>();
 builder.Services.AddScoped<ICuotaRepository, CuotaRepository>();
 builder.Services.AddScoped<IPagoRepository, PagoRepository>();
+builder.Services.AddScoped<IDocumentoRepository, DocumentoRepository>();
 builder.Services.AddScoped<IPrestamoService, PrestamoService>();
 builder.Services.AddScoped<IPrestatarioService, PrestatarioService>();
 builder.Services.AddScoped<IPrestamistaService, PrestamistaService>();
@@ -121,6 +123,7 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IPagoService, PagoService>();
 builder.Services.AddScoped<ICalculadoraService, CalculadoraService>();
 builder.Services.AddScoped<IDolarService, DolarService>();
+builder.Services.AddScoped<IEvaluacionCrediticiaService, EvaluacionCrediticiaService>();
 builder.Services.AddHttpClient<BcraDeudoresService>();
 
 builder.Services.AddHttpContextAccessor(); // para recuperar el id del usuario
@@ -129,6 +132,10 @@ builder.Services.AddScoped<JwtTokenGenerator>();
 
 //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+builder.Services.AddScoped<IFileStorage, MinioFileStorage>();
+builder.Services.AddScoped<DocumentoService>();
+
 
 var app = builder.Build();
 

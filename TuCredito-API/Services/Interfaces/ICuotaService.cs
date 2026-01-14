@@ -1,4 +1,4 @@
-﻿using TuCredito.Models;
+using TuCredito.Models;
 using TuCredito.DTOs;
 
 namespace TuCredito.Services.Interfaces
@@ -9,5 +9,6 @@ namespace TuCredito.Services.Interfaces
         Task<List<Cuota>> GetByFiltro(int? estado, int? mesVto, string? prestatario);
         Task<bool> AddCuota(Cuota cuota); // agregaria la clonada y la q opera como multa 
         Task<bool> UpdateCuota(Cuota cuota); // reprogramada - softdelete
+        Task<int> ActualizarCuotasVencidas();
     }
 }

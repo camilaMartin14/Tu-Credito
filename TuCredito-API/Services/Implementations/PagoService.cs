@@ -3,6 +3,8 @@ using TuCredito.Repositories.Implementations;
 using TuCredito.Repositories.Interfaces;
 using TuCredito.Services.Interfaces;
 using TuCredito.DTOs;
+using Microsoft.EntityFrameworkCore;
+
 namespace TuCredito.Services.Implementations
 {
     public class PagoService : IPagoService
@@ -12,12 +14,15 @@ namespace TuCredito.Services.Implementations
         private readonly ICuotaRepository _cuotaRepo;
         private readonly IPrestamoRepository _prestamo;
         private readonly ICuotaService _cuotaService;
-        public PagoService(IPagoRepository pago, ICuotaRepository cuotaRepo, IPrestamoRepository prestamo, ICuotaService cuotaService)
+        private readonly TuCreditoContext _context;
+
+        public PagoService(IPagoRepository pago, ICuotaRepository cuotaRepo, IPrestamoRepository prestamo, ICuotaService cuotaService, TuCreditoContext context)
         {
             _pago = pago;
             _cuotaRepo = cuotaRepo;
             _prestamo = prestamo;
             _cuotaService = cuotaService;
+            _context = context;
         }
         public Task<List<Pago>> GetAllPagos() // AllActivos. 
         {
@@ -39,33 +44,83 @@ namespace TuCredito.Services.Implementations
             return _pago.GetPagoConFiltro(nombre, mes);
         }
 
+        //  un pago único por cuota.
         public async Task<bool> NewPago(Pago pago)
         {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                if (pago.Monto <= 0) throw new ArgumentException("El monto del pago debe ser mayor a cero");
 
-            if (pago.Monto <= 0) { throw new ArgumentException("El monto del pago debe ser mayor a cero"); }
+                // Cargar Cuota objetivo
+                var cuotaObjetivo = await _context.Cuotas
+                    .Include(c => c.IdPrestamoNavigation)
+                    .FirstOrDefaultAsync(c => c.IdCuota == pago.IdCuota);
+
+                if (cuotaObjetivo == null) throw new ArgumentException("Nro de cuota incorrecto");
                 
-            var cuota = await _cuotaRepo.GetById(pago.IdCuota);
+                if (cuotaObjetivo.IdEstado == 3) throw new ArgumentException("La cuota ya se encuentra saldada");
 
-            if (cuota == null) { throw new ArgumentException("Nro de cuota incorrecto"); }
+                // Validar que el pago no exceda el saldo de la cuota
+                decimal saldoActualCuota = cuotaObjetivo.SaldoPendiente ?? cuotaObjetivo.Monto;
+                
+                if (pago.Monto > saldoActualCuota)
+                    throw new InvalidOperationException($"El pago ({pago.Monto}) excede el saldo pendiente de la cuota ({saldoActualCuota}).");
 
-            if (cuota.IdEstado == 3) { throw new ArgumentException("La cuota ya se encuentra saldada"); }
+                // Aplicar pago a la cuota
+                cuotaObjetivo.SaldoPendiente = saldoActualCuota - pago.Monto;
 
-            if (pago.Monto > cuota.Monto) { throw new InvalidOperationException("El monto del pago supera el saldo pendiente de la cuota"); }
+                // Actualizar estado de la cuota
+                if (cuotaObjetivo.SaldoPendiente <= 0)
+                {
+                    cuotaObjetivo.IdEstado = 3; // Saldada
+                    cuotaObjetivo.SaldoPendiente = 0;
+                }
+                else
+                {
+                    cuotaObjetivo.IdEstado = 1; // Sigue Pendiente (o parcial)
+                }
 
-            
-            await _pago.NewPago(pago);
+                // Actualizar Préstamo: Recalcular SaldoRestante
+                var prestamo = cuotaObjetivo.IdPrestamoNavigation;
+                
+                prestamo.SaldoRestante -= pago.Monto;
 
-            
-            var totalPagado = cuota.Pagos.Sum(p => p.Monto) + pago.Monto;
+                if (prestamo.SaldoRestante <= 0)
+                {
+                    prestamo.SaldoRestante = 0;
+                    
+                    // Verificar si quedan cuotas pendientes en BD que NO sean la actual (por si hubo error de cálculo previo)
+                    bool quedanOtrasPendientes = await _context.Cuotas
+                        .AnyAsync(c => c.IdPrestamo == prestamo.IdPrestamo && c.IdCuota != cuotaObjetivo.IdCuota && c.IdEstado != 3);
+                    
+                    if (!quedanOtrasPendientes && cuotaObjetivo.IdEstado == 3)
+                    {
+                        prestamo.IdEstado = 2; // Finalizado
+                    }
+                }
+                else
+                {
+                    if (prestamo.IdEstado == 2) prestamo.IdEstado = 1; // Reactivar si estaba finalizado erróneamente
+                }
 
-            if (totalPagado > cuota.Monto)
-                throw new Exception("Excede el monto");
+                // Registrar el pago
+                pago.Estado = "Registrado";
+                pago.Saldo = cuotaObjetivo.SaldoPendiente ?? 0; // Saldo remanente de la cuota tras el pago
+                
+                _context.Pagos.Add(pago);
 
-            cuota.IdEstado = totalPagado == cuota.Monto ? 3 : 1;
+                // Guardar todo
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
 
-            await _cuotaRepo.UpdateCuota(cuota);
-
-            return true;
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task<bool> UpdatePago(int id, string estado)
@@ -109,4 +164,3 @@ namespace TuCredito.Services.Implementations
 
     }
 }
-

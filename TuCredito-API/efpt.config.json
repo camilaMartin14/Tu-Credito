@@ -24,6 +24,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "[dbo].[Documentos]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[Estados_Cuotas]",
          "ObjectType": 0
       },
