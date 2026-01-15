@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 
 namespace TuCredito.Security
 {
@@ -8,12 +8,12 @@ namespace TuCredito.Security
 
         public static string Hash(string password)
         {
-            return _hasher.HashPassword(null, password);
+            return _hasher.HashPassword(new object(), password);
         }
 
         public static bool Verify(string password, string hash)
         {
-            var result = _hasher.VerifyHashedPassword(null, hash, password);
+            var result = _hasher.VerifyHashedPassword(new object(), hash, password);
             return result == PasswordVerificationResult.Success;
         }
     }

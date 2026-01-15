@@ -5,7 +5,7 @@ namespace TuCredito.DTOs
     public class PrestamoDTO
     {
         public int DniPrestatario { get; set; }
-        public string NombrePrestatario { get; set; }
+        public required string NombrePrestatario { get; set; }
 
         public decimal MontoOtorgado { get; set; }
 
