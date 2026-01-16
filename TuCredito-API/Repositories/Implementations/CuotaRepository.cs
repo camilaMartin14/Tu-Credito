@@ -41,16 +41,7 @@ namespace TuCredito.Repositories.Implementations
         public async Task<bool> UpdateCuota(Cuota cuota) // 5 reprogramada, 3 saldada, nvo monto p pap parcial 
         {
             _context.Cuotas.Update(cuota);
-            return await _context.SaveChangesAsync() >0 ;
-              /*var cuotaEdit = await _context.Cuotas.FindAsync(cuota.IdCuota);
-              if (cuotaEdit == null) { return false; }
-            
-              { 
-                  cuotaEdit.IdEstado = cuota.IdEstado; 
-                  cuotaEdit.Monto = cuota.Monto;
-              }
-              await _context.SaveChangesAsync();
-              return true; */
+            return await _context.SaveChangesAsync() >0 ;             
         }
 
         public async Task<int> AddCuota(Cuota cuota)
@@ -66,6 +57,11 @@ namespace TuCredito.Repositories.Implementations
             if (ultCuota == null) throw new Exception("No se encontró ninguna cuota pendiente"); 
 
             return ultCuota;
+        }
+        public async Task<List<Cuota>> GetAll(int idPrestamo) 
+        {
+            return await _context.Cuotas.Where(c => c.IdPrestamo == idPrestamo).ToListAsync();
+        
         }
     }
 }

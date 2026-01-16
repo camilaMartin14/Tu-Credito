@@ -66,5 +66,12 @@ namespace TuCredito.Repositories.Implementations
             }
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<List<Pago>> GetPagoByIdPrestamo(int id) 
+        {
+            return await _context.Pagos.Where(p => p.IdCuotaNavigation.IdPrestamo == id)
+                                       .ToListAsync();
+
+        }
     }
 }

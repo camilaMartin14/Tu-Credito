@@ -28,4 +28,5 @@ public partial class Cuota
     public virtual Prestamo IdPrestamoNavigation { get; set; }
 
     public virtual ICollection<Pago> Pagos { get; set; } = new List<Pago>();
+    public bool EstaVencida => IdEstado != 2 && FecVto.Date < DateTime.Today;
 }

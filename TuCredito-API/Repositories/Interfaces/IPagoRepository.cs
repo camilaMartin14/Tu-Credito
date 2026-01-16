@@ -7,6 +7,7 @@ namespace TuCredito.Repositories.Interfaces
     {
         Task<List<Pago>> GetAllPagos();
         Task<Pago> GetPagoById(int id);
+        Task<List<Pago>> GetPagoByIdPrestamo(int id);
         Task<List<PagoOutputDTO>> GetPagoConFiltro(string? nombre, int? mes);
         Task<bool> NewPago(Pago pago);
         Task<bool> UpdatePago(int id, string estado); // en caso de errores solo se permite eliminar y registrar uno nuevo 

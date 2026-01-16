@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TuCredito.DTOs;
 using TuCredito.Models;
 using TuCredito.Repositories.Interfaces;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace TuCredito.Repositories.Implementations
@@ -84,6 +85,12 @@ namespace TuCredito.Repositories.Implementations
                                         .AnyAsync(c => _context.Pagos
                                         .Where(p => p.IdCuota == c.IdCuota)
                                         .Sum(p => p.Monto) < c.Monto); 
+        }
+
+        public async Task<Prestamo> GetPrestamoEntityById(int id) 
+        {
+            return await _context.Prestamos.FindAsync(id);
+        
         }
     }
 }

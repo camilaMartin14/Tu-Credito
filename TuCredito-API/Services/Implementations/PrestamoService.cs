@@ -1,6 +1,5 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using System.Runtime.CompilerServices;
 using TuCredito.Controllers;
 using TuCredito.DTOs;
 using TuCredito.Models;
@@ -16,13 +15,17 @@ namespace TuCredito.Services.Implementations
         private readonly ICalculadoraService _calculadora;
         private readonly IMapper _mapper;
         private readonly IPrestamistaService _prestamista;
-        public PrestamoService(IPrestamoRepository prestamo, IMapper mapper, ICalculadoraService calculadora, IPrestatarioRepository prestatario, IPrestamistaService prestamista)
+        private readonly ICuotaRepository _cuota;
+        private readonly IPagoService _pago;
+        public PrestamoService(IPrestamoRepository prestamo, IMapper mapper, ICalculadoraService calculadora, IPrestatarioRepository prestatario, IPrestamistaService prestamista, ICuotaRepository cuota, IPagoService pago)
         {
             _prestamo = prestamo;
             _prestatario = prestatario;
             _mapper = mapper;
             _calculadora = calculadora;
             _prestamista = prestamista;
+            _cuota = cuota;
+            _pago = pago;
         }
         public async Task<List<PrestamoDTO>> GetAll()
         {
@@ -75,7 +78,7 @@ namespace TuCredito.Services.Implementations
             entidad.FechaFinEstimada = entidad.FechaOtorgamiento.AddMonths(entidad.CantidadCtas);
 
             if (entidad.FechaOtorgamiento > DateTime.Now) throw new ArgumentException("La fecha de otorgamiento no puede ser futura"); 
-            if (entidad.IdEstado != 1) throw new ArgumentException("El estado debe ser 'Activo'"); // etc... await _prestatarlo.PostPrestamo(dto); GenerarCuotas(entidad); return true;
+            if (entidad.IdEstado != 1) throw new ArgumentException("El estado debe ser 'Activo'"); // etc... 
             if (entidad.FechaOtorgamiento < DateTime.Now.AddMonths(-24)) throw new ArgumentException("La fecha de otorgamiento puede ser de hasta 24 meses anteriores");
             if (entidad.FechaOtorgamiento > entidad.Fec1erVto) throw new ArgumentException("La fecha del primer vencimiento debe ser posterior a la fecha de otorgamiento");
             
@@ -125,6 +128,41 @@ namespace TuCredito.Services.Implementations
                     FecVto = cuotaSimulada.FechaVencimiento ?? throw new InvalidOperationException("Fecha de vencimiento no calculada")
                 });
             }
+        }
+
+        public async Task<Prestamo> GetPrestamoEntityById(int id) 
+        { 
+            return await _prestamo.GetPrestamoEntityById(id); 
+        }
+
+        private int CalcularMesesActivo(DateTime inicio, DateTime fin)
+        {
+            return (fin.Year - inicio.Year) * 12 + fin.Month - inicio.Month + 1;
+        }
+
+        public async Task<ResumenPrestamoDTO> GetResumenPrestamo(int prestamoId)
+        {
+            if (prestamoId <= 0) throw new ArgumentException("ID inválido");
+
+            var prestamo = await _prestamo.GetPrestamoEntityById(prestamoId);
+            if (prestamo == null) throw new Exception("Préstamo no encontrado");
+
+            var cuotas = await _cuota.GetAll(prestamoId);
+
+            var cuotasSaldadas = cuotas.Where(c => c.IdEstado == 2) // Saldada
+                                       .ToList();
+            var pagos = await _pago.GetPagoByIdPrestamo(prestamoId);
+
+            DateTime? ultimaFechaPago = pagos.Any()? pagos.Max(p => p.FecPago): null;
+
+            return new ResumenPrestamoDTO
+            {
+                IdPrestamo = prestamoId,
+                CantidadCuotasOriginales = prestamo.CantidadCtas,
+                CantidadCuotasEfectivas = cuotasSaldadas.Count,
+                MesesActivo = ultimaFechaPago.HasValue? 
+                CalcularMesesActivo(prestamo.FechaOtorgamiento, ultimaFechaPago.Value) : 0, EstadoPrestamo = prestamo.IdEstado
+            };
         }
     }
 

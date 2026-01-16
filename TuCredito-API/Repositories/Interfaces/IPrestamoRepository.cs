@@ -7,7 +7,8 @@ namespace TuCredito.Repositories.Interfaces
     {
         Task<bool> SoftDelete(int id);
         Task<bool> PostPrestamo(Prestamo NvoPrestamo);
-        Task<PrestamoDTO> GetPrestamoById(int id); 
+        Task<PrestamoDTO> GetPrestamoById(int id); // devuelve dto
+        Task<Prestamo> GetPrestamoEntityById(int id); // devuelve entidad
         Task<List<PrestamoDTO>> GetAllPrestamo();
         Task<List<PrestamoDTO>> GetPrestamoConFiltro(string? nombre, int? estado, int? mesVto, int? anio);
         Task<bool> TienePagosPendientes(int idPrestamo);

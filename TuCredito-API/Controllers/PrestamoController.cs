@@ -44,6 +44,13 @@ namespace TuCredito.Controllers
             return lista;
         }
 
+        [HttpGet("{id}/resumen")]
+        public async Task<ActionResult<ResumenPrestamoDTO>> GetResumen(int id)
+        {
+            var resumen = await _service.GetResumenPrestamo(id);
+            return Ok(resumen);
+        }
+
         // POST api/<PrestamoController>
         [HttpPost]
         public async Task<IActionResult> PostPrestamo([FromBody] PrestamoDTO prestamo)
