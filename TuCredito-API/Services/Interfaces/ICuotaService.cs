@@ -10,5 +10,6 @@ namespace TuCredito.Services.Interfaces
         Task<bool> AddCuota(Cuota cuota); // agregaria la clonada y la q opera como multa 
         Task<bool> UpdateCuota(Cuota cuota); // reprogramada - softdelete
         Task<int> ActualizarCuotasVencidas();
+        Task<List<Cuota>> Getall(int idPrestamo); // todas las cuotas de ese prestamo
     }
 }

@@ -1,6 +1,5 @@
 using TuCredito.Models;
 using TuCredito.Services.Interfaces;
-using TuCredito.DTOs;
 using TuCredito.Repositories.Interfaces;
 using System.Globalization;
 using Microsoft.EntityFrameworkCore;
@@ -10,11 +9,11 @@ namespace TuCredito.Services.Implementations
 {
     public class CuotaService : ICuotaService
     {
-        private readonly IPrestamoService _prestamo;
+        private readonly IPrestamoRepository _prestamo;
         private readonly ICuotaRepository _cuota;
         private readonly TuCreditoContext _context;
 
-        public CuotaService(IPrestamoService prestamo, ICuotaRepository cuota, TuCreditoContext context)
+        public CuotaService(IPrestamoRepository prestamo, ICuotaRepository cuota, TuCreditoContext context)
         {
             _prestamo = prestamo;
             _cuota = cuota;
@@ -104,6 +103,11 @@ namespace TuCredito.Services.Implementations
             }
 
             return await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Cuota>> Getall(int idPrestamo)
+        {
+            return await _cuota.GetAll(idPrestamo);
         }
     }
 }

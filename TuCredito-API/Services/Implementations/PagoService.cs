@@ -13,15 +13,13 @@ namespace TuCredito.Services.Implementations
         private readonly IPagoRepository _pago;
         private readonly ICuotaRepository _cuotaRepo;
         private readonly IPrestamoRepository _prestamo;
-        private readonly ICuotaService _cuotaService;
         private readonly TuCreditoContext _context;
 
-        public PagoService(IPagoRepository pago, ICuotaRepository cuotaRepo, IPrestamoRepository prestamo, ICuotaService cuotaService, TuCreditoContext context)
+        public PagoService(IPagoRepository pago, ICuotaRepository cuotaRepo, IPrestamoRepository prestamo, TuCreditoContext context)
         {
             _pago = pago;
             _cuotaRepo = cuotaRepo;
             _prestamo = prestamo;
-            _cuotaService = cuotaService;
             _context = context;
         }
         public Task<List<Pago>> GetAllPagos() // AllActivos. 
@@ -161,6 +159,9 @@ namespace TuCredito.Services.Implementations
             return true;
         }
 
-
+        public async Task<List<Pago>> GetPagoByIdPrestamo(int id)
+        {
+            return await _pago.GetPagoByIdPrestamo(id);
+        }
     }
 }

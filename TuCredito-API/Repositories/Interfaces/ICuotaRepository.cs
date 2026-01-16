@@ -10,5 +10,6 @@ namespace TuCredito.Repositories.Interfaces
         //Task<bool> UpdateCuota(int idCuota, int? nvoEstado, int? monto); // saldada, pendiente, reprogramada. nvo monto en caso de pago parcial 
         Task<Cuota> GetUltimaPendiente(int IdPrestamo);
         Task<bool> UpdateCuota(Cuota cuota);
+        Task<List<Cuota>> GetAll(int idPrestamo);
     }
 }
