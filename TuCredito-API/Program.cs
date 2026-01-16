@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using System.Text;
 using TuCredito.Interceptors;
 using TuCredito.MinIO;
@@ -19,7 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
 if (!jwtSection.Exists())
-    throw new InvalidOperationException("La secci�n Jwt no est� configurada en appsettings.json");
+    throw new InvalidOperationException("La sección Jwt no está configurada en appsettings.json");
 
 var jwtKey = jwtSection["Key"];
 var jwtIssuer = jwtSection["Issuer"];
@@ -76,6 +77,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
+// Registramos el documento OpenAPI "v1" (título y versión) para que Swagger UI
+// pueda obtener una definición válida  y renderizar la API. --> Esto lo tuve q hacer por el cambio de version de swashbuckle
+options.SwaggerDoc("v1", new OpenApiInfo
+{
+    Title = "TuCredito",
+    Version = "v1"
+});
+
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -86,19 +95,9 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Bearer {token}"
     });
 
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = new List<string>()
     });
 });
 
@@ -130,8 +129,7 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped<JwtTokenGenerator>();
 
-//builder.Services.AddAutoMapper(typeof(MappingProfile));
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(cfg => { }, AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<IFileStorage, MinioFileStorage>();
 builder.Services.AddScoped<IDocumentoService, DocumentoService>();

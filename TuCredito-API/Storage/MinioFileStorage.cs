@@ -1,4 +1,4 @@
-﻿using Minio;
+using Minio;
 using Minio.DataModel.Args;
 
 namespace TuCredito.MinIO
@@ -10,14 +10,22 @@ namespace TuCredito.MinIO
 
         public MinioFileStorage(IConfiguration config)
         {
-            _bucket = config["Minio:Bucket"];
+            _bucket = config["Minio:Bucket"] ?? "default-bucket";
+            var endpoint = config["Minio:Endpoint"] ?? "localhost:9000";
+            var accessKey = config["Minio:AccessKey"] ?? "minioadmin";
+            var secretKey = config["Minio:SecretKey"] ?? "minioadmin";
+            var useSslStr = config["Minio:UseSSL"];
+            bool useSsl = false;
+            
+            if (!string.IsNullOrEmpty(useSslStr))
+            {
+                bool.TryParse(useSslStr, out useSsl);
+            }
 
             _minio = new MinioClient()
-                .WithEndpoint(config["Minio:Endpoint"])
-                .WithCredentials(
-                    config["Minio:AccessKey"],
-                    config["Minio:SecretKey"])
-                .WithSSL(bool.Parse(config["Minio:UseSSL"]))
+                .WithEndpoint(endpoint)
+                .WithCredentials(accessKey, secretKey)
+                .WithSSL(useSsl)
                 .Build();
         }
 
