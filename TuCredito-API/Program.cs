@@ -123,7 +123,16 @@ builder.Services.AddScoped<IPagoService, PagoService>();
 builder.Services.AddScoped<ICalculadoraService, CalculadoraService>();
 builder.Services.AddScoped<IDolarService, DolarService>();
 builder.Services.AddScoped<IEvaluacionCrediticiaService, EvaluacionCrediticiaService>();
-builder.Services.AddHttpClient<IBcraDeudoresService, BcraDeudoresService>();
+builder.Services.AddHttpClient<IBcraDeudoresService, BcraDeudoresService>((sp, client) =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var baseUrl = configuration["BcraApi:BaseUrl"];
+    if (string.IsNullOrEmpty(baseUrl))
+    {
+        throw new InvalidOperationException("La URL base de la API del BCRA no está configurada.");
+    }
+    client.BaseAddress = new Uri(baseUrl);
+});
 
 builder.Services.AddHttpContextAccessor(); 
 

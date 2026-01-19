@@ -7,7 +7,7 @@ using TuCredito.Services.Interfaces;
 
 namespace TuCredito.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/lenders")]
     [ApiController]
     public class PrestamistaController : ControllerBase
     {
@@ -19,7 +19,7 @@ namespace TuCredito.Controllers
             _jwt = jwt;
         }
 
-        [HttpPost("registro")]
+        [HttpPost("register")]
         public async Task<IActionResult> Registrar([FromBody] PrestamistaRegisterDto dto)
         {
             try
@@ -29,7 +29,7 @@ namespace TuCredito.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, new { message = "Error al registrar el prestamista.", error = ex.Message });
             }
         }
 
@@ -37,33 +37,47 @@ namespace TuCredito.Controllers
         [HttpGet("me")]
         public async Task<IActionResult> ObtenerActual()
         {
-            var prestamistaIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (prestamistaIdClaim == null)
-                return Unauthorized();
+            try
+            {
+                var prestamistaIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (prestamistaIdClaim == null)
+                    return Unauthorized(new { message = "Token inválido o expirado." });
 
-            int prestamistaId = int.Parse(prestamistaIdClaim.Value);
+                int prestamistaId = int.Parse(prestamistaIdClaim.Value);
 
-            var prestamista= await _service.ObtenerPrestamistaPorIdAsync(prestamistaId);
-            if (prestamista== null)
-                return NotFound();
+                var prestamista = await _service.ObtenerPrestamistaPorIdAsync(prestamistaId);
+                if (prestamista == null)
+                    return NotFound(new { message = "Prestamista no encontrado." });
 
-            return Ok(prestamista);
+                return Ok(prestamista);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Ocurrió un error interno al obtener el prestamista.", error = ex.Message });
+            }
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] PrestamistaLoginDTO dto)
         {
-            var prestamista= await _service.LoginAsync(dto.Usuario, dto.Contrasenia);
-            if (prestamista== null)
-                return Unauthorized();
-
-            var token = _jwt.GenerateToken(prestamista.Id, prestamista.Usuario);
-
-            return Ok(new
+            try
             {
-                token,
-                prestamista
-            });
+                var prestamista = await _service.LoginAsync(dto.Usuario, dto.Contrasenia);
+                if (prestamista == null)
+                    return Unauthorized(new { message = "Credenciales incorrectas." });
+
+                var token = _jwt.GenerateToken(prestamista.Id, prestamista.Usuario);
+
+                return Ok(new
+                {
+                    token,
+                    prestamista
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Ocurrió un error interno durante el inicio de sesión.", error = ex.Message });
+            }
         }
     }
 }

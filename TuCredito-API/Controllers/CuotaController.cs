@@ -1,14 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using TuCredito.Models;
 using TuCredito.Services.Implementations;
 using TuCredito.DTOs;
 using TuCredito.Services.Interfaces;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace TuCredito.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/installments")]
     [ApiController]
     public class CuotaController : ControllerBase
     {
@@ -18,7 +16,6 @@ namespace TuCredito.Controllers
             _service = service;
         }
         
-        // GET api/<CuotaController>/5
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -30,11 +27,15 @@ namespace TuCredito.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener la cuota.", error = ex.Message });
             }
         }
 
-        [HttpGet("filtro")]
+        [HttpGet("filter")]
         public async Task<IActionResult> GetByFiltro([FromQuery] int? estado, [FromQuery] int? mesVto,[FromQuery] string? prestatario)
         {
             try
@@ -44,34 +45,41 @@ namespace TuCredito.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al filtrar cuotas.", error = ex.Message });
             }
         }
 
-        // POST api/<CuotaController>
         [HttpPost]
         public async Task<IActionResult> AddCuota([FromBody] CuotaInputDTO nvaCuota)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var cuota = new Cuota
-            {
-                IdPrestamo = nvaCuota.IdPrestamo,
-                Monto = nvaCuota.Monto,
-                NroCuota = nvaCuota.NroCuota,
-                FecVto = nvaCuota.FecVto,
-                Interes = nvaCuota.Interes,
-                IdEstado = 1 // Pendiente
-            };
-
             try
             {
+                var cuota = new Cuota
+                {
+                    IdPrestamo = nvaCuota.IdPrestamo,
+                    Monto = nvaCuota.Monto,
+                    NroCuota = nvaCuota.NroCuota,
+                    FecVto = nvaCuota.FecVto,
+                    Interes = nvaCuota.Interes,
+                    IdEstado = 1 // Pendiente
+                };
+
                 await _service.AddCuota(cuota);
-                return Ok("Cuota creada correctamente");
+                return Ok(new { message = "Cuota creada correctamente" });
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al crear la cuota.", error = ex.Message });
             }
         }
        

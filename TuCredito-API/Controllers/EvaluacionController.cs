@@ -4,7 +4,7 @@ using TuCredito.Services.Interfaces;
 
 namespace TuCredito.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/credit-evaluation")]
     [ApiController]
     public class EvaluacionController : ControllerBase
     {

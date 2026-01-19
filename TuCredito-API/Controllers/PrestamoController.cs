@@ -10,8 +10,8 @@ using TuCredito.Services.Interfaces;
 
 namespace TuCredito.Controllers
 {
-    //[Authorize] //Se agrega auth para que solo los usuarios autenticados puedan crear o acceder a los prestamos
-    [Route("api/[controller]")]
+    [Authorize] 
+    [Route("api/loans")]
     [ApiController]
     public class PrestamoController : ControllerBase
     {
@@ -23,52 +23,92 @@ namespace TuCredito.Controllers
         [HttpGet]
         public async Task<ActionResult<List<PrestamoDTO>>> GetAll()
         {
-            var lista = await _service.GetAll();
-            return Ok(lista);
+            try
+            {
+                var lista = await _service.GetAll();
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener los préstamos.", error = ex.Message });
+            }
 
         }
 
-        // GET api/<PrestamoController>/5
         [HttpGet("{id}")]
         public async Task<ActionResult<PrestamoDTO>> GetById(int id)
         {
-            var prestamo = await _service.GetPrestamoById(id);
-            return prestamo;
+            try
+            {
+                var prestamo = await _service.GetPrestamoById(id);
+                if (prestamo == null)
+                    return NotFound(new { message = "Préstamo no encontrado." });
+                return Ok(prestamo);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener el préstamo.", error = ex.Message });
+            }
         }
 
-        [HttpGet("Get-con-filtro")] 
+        [HttpGet("filter")] 
         public async Task<ActionResult<List<PrestamoDTO>>> GetConFiltro(string? nombre, int? estado, int? mesVto, int? anio)
         {
-
-            var lista = await _service.GetPrestamoConFiltro(nombre, estado, mesVto, anio);
-            return lista;
+            try
+            {
+                var lista = await _service.GetPrestamoConFiltro(nombre, estado, mesVto, anio);
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al filtrar préstamos.", error = ex.Message });
+            }
         }
 
-        [HttpGet("{id}/resumen")]
+        [HttpGet("{id}/summary")]
         public async Task<ActionResult<ResumenPrestamoDTO>> GetResumen(int id)
         {
-            var resumen = await _service.GetResumenPrestamo(id);
-            return Ok(resumen);
+            try
+            {
+                var resumen = await _service.GetResumenPrestamo(id);
+                if (resumen == null)
+                    return NotFound(new { message = "Resumen no encontrado." });
+                return Ok(resumen);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener el resumen del préstamo.", error = ex.Message });
+            }
         }
 
-        // POST api/<PrestamoController>
         [HttpPost]
         public async Task<IActionResult> PostPrestamo([FromBody] PrestamoDTO prestamo)
         {
-            var resultado = await _service.PostPrestamo(prestamo);
-            if (!resultado) return BadRequest("No se pudo registrar el préstamo. Verifique los datos ingresados.");
-            return Ok("Préstamo registrado correctamente.");
+            try
+            {
+                var resultado = await _service.PostPrestamo(prestamo);
+                if (!resultado) return BadRequest(new { message = "No se pudo registrar el préstamo. Verifique los datos ingresados." });
+                return Ok(new { message = "Préstamo registrado correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al registrar el préstamo.", error = ex.Message });
+            }
         }
 
-        // PUT api/<PrestamoController>/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> CambioDeEstado(int id, [FromBody] string value)
+        [HttpPut("{id}/archive")]
+        public async Task<IActionResult> CambioDeEstado(int id)
         {
-            var resultado = await _service.SoftDelete(id);
-            if (resultado) return Ok("Préstamo finalizado correctamente.");
-            return BadRequest("No se pudo finalizar el préstamo.");
+            try
+            {
+                var resultado = await _service.SoftDelete(id);
+                if (resultado) return Ok(new { message = "Préstamo finalizado correctamente." });
+                return BadRequest(new { message = "No se pudo finalizar el préstamo." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al finalizar el préstamo.", error = ex.Message });
+            }
         }
-
-
     }
 }

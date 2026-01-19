@@ -5,7 +5,7 @@ using TuCredito.DTOs.Dashboard;
 
 namespace TuCredito.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/dashboard")]
     [ApiController]
     public class DashboardController : ControllerBase
     {
@@ -19,58 +19,114 @@ namespace TuCredito.Controllers
         [HttpGet("kpis")]
         public async Task<ActionResult<DashboardKpisDTO>> GetKpis()
         {
-            var kpis = await _dashboardService.GetKpisAsync();
-            return Ok(kpis);
+            try
+            {
+                var kpis = await _dashboardService.GetKpisAsync();
+                return Ok(kpis);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener KPIs.", error = ex.Message });
+            }
         }
 
-        [HttpGet("prestamos-estado")]
+        [HttpGet("loans-by-status")]
         public async Task<ActionResult<List<GraficoDatoDTO>>> GetPrestamosPorEstado()
         {
-            var result = await _dashboardService.GetPrestamosPorEstadoAsync();
-            return Ok(result);
+            try
+            {
+                var result = await _dashboardService.GetPrestamosPorEstadoAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener préstamos por estado.", error = ex.Message });
+            }
         }
 
-        [HttpGet("cobranzas-mensuales")]
+        [HttpGet("monthly-collections")]
         public async Task<ActionResult<List<SerieTiempoDTO>>> GetFlujoCobranzas()
         {
-            var result = await _dashboardService.GetFlujoCobranzasAsync();
-            return Ok(result);
+            try
+            {
+                var result = await _dashboardService.GetFlujoCobranzasAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener flujo de cobranzas.", error = ex.Message });
+            }
         }
 
-        [HttpGet("morosidad")]
+        [HttpGet("delinquency")]
         public async Task<ActionResult<List<MorosidadDetalleDTO>>> GetMorosidadDetallada()
         {
-            var result = await _dashboardService.GetMorosidadDetalladaAsync();
-            return Ok(result);
+            try
+            {
+                var result = await _dashboardService.GetMorosidadDetalladaAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener detalle de morosidad.", error = ex.Message });
+            }
         }
 
-        [HttpGet("cuotas-vencer")]
+        [HttpGet("upcoming-installments")]
         public async Task<ActionResult<List<CuotaVencerDTO>>> GetCuotasAVencer()
         {
-            var result = await _dashboardService.GetCuotasAVencerAsync();
-            return Ok(result);
+            try
+            {
+                var result = await _dashboardService.GetCuotasAVencerAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener cuotas a vencer.", error = ex.Message });
+            }
         }
 
-        [HttpGet("ranking-clientes")]
+        [HttpGet("customer-ranking")]
         public async Task<ActionResult<List<GraficoDatoDTO>>> GetRankingClientes()
         {
-            var result = await _dashboardService.GetRankingClientesDeudaAsync();
-            return Ok(result);
+            try
+            {
+                var result = await _dashboardService.GetRankingClientesDeudaAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener ranking de clientes.", error = ex.Message });
+            }
         }
 
-        [HttpGet("analisis-tasas")]
+        [HttpGet("rate-analysis")]
         public async Task<ActionResult<AnalistaTasaDTO>> GetAnalisisTasas()
         {
-            var result = await _dashboardService.GetAnalisisTasasAsync();
-            return Ok(result);
+            try
+            {
+                var result = await _dashboardService.GetAnalisisTasasAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener análisis de tasas.", error = ex.Message });
+            }
         }
 
 
-        [HttpGet("evolucion-saldo")]
+        [HttpGet("balance-evolution")]
         public async Task<ActionResult<List<SerieTiempoDTO>>> GetEvolucionSaldo()
         {
-            var result = await _dashboardService.GetEvolucionSaldoAsync();
-            return Ok(result);
+            try
+            {
+                var result = await _dashboardService.GetEvolucionSaldoAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener evolución de saldo.", error = ex.Message });
+            }
         }
     }
 }

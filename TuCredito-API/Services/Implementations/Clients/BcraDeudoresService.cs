@@ -3,8 +3,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using TuCredito.Models.EntidadesApisTerceros;
 using TuCredito.Models.Enums;
-using Microsoft.Extensions.Configuration;
-
 using TuCredito.Services.Interfaces.Clients;
 
 namespace TuCredito.Services.Implementations.Clients
@@ -12,24 +10,15 @@ namespace TuCredito.Services.Implementations.Clients
     public class BcraDeudoresService : IBcraDeudoresService
     {
         private readonly HttpClient _httpClient;
-        private readonly IConfiguration _configuration;
 
-        public BcraDeudoresService(HttpClient httpClient, IConfiguration configuration)
+        public BcraDeudoresService(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _configuration = configuration;
         }
 
         public async Task<DeudaResponse> GetDeudasByCuitAsync(long cuit)
         {
-            var baseUrl = _configuration["BcraApi:BaseUrl"];
-            if (string.IsNullOrEmpty(baseUrl))
-            {
-                throw new InvalidOperationException("La URL base de la API del BCRA no está configurada.");
-            }
-
-            // Asumiendo que el endpoint es /Deudas/{cuit} 
-            var requestUrl = $"{baseUrl}Deudas/{cuit}";
+            var requestUrl = $"Deudas/{cuit}";
 
             try
             {
@@ -54,7 +43,6 @@ namespace TuCredito.Services.Implementations.Clients
                 
                 if (bcraResponse == null || bcraResponse.Results == null) return null;
 
-                // Mapeo manual de la respuesta del BCRA a nuestro modelo interno DeudaResponse
                 var resultado = new DeudaResponse
                 {
                     Cuit = bcraResponse.Results.Identificacion,
@@ -63,7 +51,9 @@ namespace TuCredito.Services.Implementations.Clients
                         .Select(e => new EntidadDeuda
                         {
                             Entidad = e.Entidad,
-                            Situacion = (SituacionCrediticia)e.Situacion, 
+                            Situacion = Enum.IsDefined(typeof(SituacionCrediticia), e.Situacion)
+                                        ? (SituacionCrediticia)e.Situacion
+                                        : SituacionCrediticia.Desconocido, 
                             Monto = e.Monto,
                             DiasAtraso = e.DiasAtrasoPago
                         }).ToList() ?? new List<EntidadDeuda>()

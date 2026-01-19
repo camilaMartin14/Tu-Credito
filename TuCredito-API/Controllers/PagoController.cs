@@ -5,11 +5,9 @@ using TuCredito.Models;
 using TuCredito.Services.Implementations;
 using TuCredito.Services.Interfaces;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace TuCredito.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/payments")]
     [ApiController]
     public class PagoController : ControllerBase
     {
@@ -21,15 +19,21 @@ namespace TuCredito.Controllers
             _service = service;
             _mapper = mapper;
         }
-        // GET: api/<PagosController>
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var pagos = await _service.GetAllPagos();
-            return Ok(pagos);
+            try
+            {
+                var pagos = await _service.GetAllPagos();
+                return Ok(pagos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener los pagos.", error = ex.Message });
+            }
         }
 
-        // GET api/<PagosController>/5
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -41,11 +45,15 @@ namespace TuCredito.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener el pago.", error = ex.Message });
             }
         }
 
-        [HttpGet("filtro")]
+        [HttpGet("filter")]
         public async Task<IActionResult> GetConFiltro( [FromQuery] string? nombre, [FromQuery] int? mes)
         {
             try
@@ -60,72 +68,80 @@ namespace TuCredito.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al filtrar pagos.", error = ex.Message });
             }
         }
 
-        // POST api/<PagosController>
         [HttpPost]
         public async Task<IActionResult> RegistrarPago([FromBody] PagoInputDTO nvoPago)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var pago = _mapper.Map<Pago>(nvoPago);
-
             try
             {
+                var pago = _mapper.Map<Pago>(nvoPago);
                 await _service.NewPago(pago);
-                return Ok("Pago registrado correctamente");
+                return Ok(new { message = "Pago registrado correctamente" });
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
             catch (InvalidOperationException ex)
             {
-                return Conflict(ex.Message);
+                return Conflict(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al registrar el pago.", error = ex.Message });
             }
         }
 
-        [HttpPost("anticipado")]
+        [HttpPost("advance")]
         public async Task<IActionResult> RegistrarPagoAnticipado([FromBody] PagoInputDTO nvoPago)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var pago = _mapper.Map<Pago>(nvoPago);
-
             try
             {
+                var pago = _mapper.Map<Pago>(nvoPago);
                 await _service.RegistrarPagoAnticipadoAsync(pago);
-                return Ok("Pago anticipado registrado correctamente");
+                return Ok(new { message = "Pago anticipado registrado correctamente" });
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
-           
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new { message = "Error al registrar el pago anticipado.", error = ex.Message });
             }
         }
 
-        [HttpPut("{id:int}/estado")]
+        [HttpPut("{id:int}/status")]
         public async Task<IActionResult> UpdateEstado(int id, [FromBody] string estado) // eliminado x errores
         {
             if (string.IsNullOrWhiteSpace(estado)) 
-                return BadRequest("El estado es obligatorio");
+                return BadRequest(new { message = "El estado es obligatorio" });
 
             try
             {
                 await _service.UpdatePago(id, estado);
-                return Ok("Estado del pago actualizado");
+                return Ok(new { message = "Estado del pago actualizado" });
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al actualizar el estado del pago.", error = ex.Message });
             }
         }
     }

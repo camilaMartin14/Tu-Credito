@@ -5,7 +5,7 @@ using TuCredito.Services.Interfaces.Clients;
 
 namespace TuCredito.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/dollar")]
     [ApiController]
     public class DolarController : ControllerBase
     {
@@ -16,10 +16,17 @@ namespace TuCredito.Controllers
             _service = service;
         }
 
-        [HttpGet("dolar/hoy")] // Solo el oficial!! Consultar al cliente si quiere conocer otras cotizaciones como blue, etc
+        [HttpGet("official/today")] // Solo el oficial!! Consultar al cliente si quiere conocer otras cotizaciones como blue, etc
         public async Task<ActionResult<DolarOficialModel?>> GetDolarHoy()
         {
-            return await _service.GetDolarOficialAsync();
+            try
+            {
+                return await _service.GetDolarOficialAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener la cotización del dólar.", error = ex.Message });
+            }
         }
     }
 }

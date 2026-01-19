@@ -6,7 +6,7 @@ using TuCredito.Services.Interfaces;
 
 namespace TuCredito.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/documents")]
     [ApiController]
     public class DocumentosController : ControllerBase
     {
@@ -20,8 +20,15 @@ namespace TuCredito.Controllers
         [HttpPost]
         public async Task<IActionResult> Subir([FromForm] SubirDocumentoRequestDTO request)
         {
-            await _service.SubirAsync(request);
-            return Ok();
+            try
+            {
+                await _service.SubirAsync(request);
+                return Ok(new { message = "Documento subido correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al subir el documento.", error = ex.Message });
+            }
         }
 
         [HttpGet]
@@ -29,25 +36,46 @@ namespace TuCredito.Controllers
             [FromQuery] string entidadTipo,
             [FromQuery] int entidadId)
         {
-            var docs = await _service.ListarAsync(entidadTipo, entidadId);
-            return Ok(docs);
+            try
+            {
+                var docs = await _service.ListarAsync(entidadTipo, entidadId);
+                return Ok(docs);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al listar documentos.", error = ex.Message });
+            }
         }
 
         [HttpGet("{idDocumento}/download")]
         public async Task<IActionResult> Descargar(int idDocumento)
         {
-            var archivo = await _service.DescargarAsync(idDocumento);
-            return File(
-                archivo.Stream,
-                archivo.ContentType,
-                archivo.NombreOriginal);
+            try
+            {
+                var archivo = await _service.DescargarAsync(idDocumento);
+                return File(
+                    archivo.Stream,
+                    archivo.ContentType,
+                    archivo.NombreOriginal);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al descargar el documento.", error = ex.Message });
+            }
         }
 
         [HttpDelete("{idDocumento}")]
         public async Task<IActionResult> Eliminar(int idDocumento)
         {
-            await _service.EliminarAsync(idDocumento);
-            return NoContent();
+            try
+            {
+                await _service.EliminarAsync(idDocumento);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al eliminar el documento.", error = ex.Message });
+            }
         }
     }
 }

@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TuCredito.Services.Implementations.Clients;
 
 namespace TuCredito.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/debts")]
     [ApiController]
     public class DeudasController : ControllerBase
     {
@@ -20,7 +20,7 @@ namespace TuCredito.Controllers
         {
             if (!long.TryParse(cuit, out var cuitNumerico))
             {
-                return BadRequest("El CUIT debe ser un valor numérico válido.");
+                return BadRequest(new { message = "El CUIT debe ser un valor numérico válido." });
             }
 
             try
@@ -28,13 +28,13 @@ namespace TuCredito.Controllers
                 var resultado = await _deudaService.GetDeudasByCuitAsync(cuitNumerico);
 
                 if (resultado == null)
-                    return NotFound("No se encontraron deudas para el CUIT informado.");
+                    return NotFound(new { message = "No se encontraron deudas para el CUIT informado." });
 
                 return Ok(resultado);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error interno al consultar deudas: {ex.Message}");
+                return StatusCode(500, new { message = "Error interno al consultar deudas", error = ex.Message });
             }
         }
     }
