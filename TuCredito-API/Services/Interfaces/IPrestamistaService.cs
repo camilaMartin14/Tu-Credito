@@ -10,5 +10,6 @@ namespace TuCredito.Services.Interfaces
         Task<Prestamista?> ObtenerPrestamistaPorIdAsync(int idPrestamista);
         Task<int> RegistrarPrestamistaAsync(PrestamistaRegisterDto dto);
         Task<int> ObtenerIdUsuarioLogueado();
+        Task<bool> UpdatePerfilAsync(int id, PrestamistaUpdateDTO dto);
     }
 }

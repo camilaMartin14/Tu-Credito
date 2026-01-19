@@ -20,7 +20,7 @@ namespace TuCredito.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Registrar([FromBody] PrestamistaRegisterDto dto)
+        public async Task<ActionResult> Registrar([FromBody] PrestamistaRegisterDto dto)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace TuCredito.Controllers
 
         [Authorize]
         [HttpGet("me")]
-        public async Task<IActionResult> ObtenerActual()
+        public async Task<ActionResult<Prestamista>> ObtenerActual()
         {
             try
             {
@@ -58,7 +58,7 @@ namespace TuCredito.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] PrestamistaLoginDTO dto)
+        public async Task<ActionResult> Login([FromBody] PrestamistaLoginDTO dto)
         {
             try
             {
@@ -77,6 +77,32 @@ namespace TuCredito.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "Ocurrió un error interno durante el inicio de sesión.", error = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpPut("me")]
+        public async Task<ActionResult> ActualizarPerfil([FromBody] PrestamistaUpdateDTO dto)
+        {
+            try
+            {
+                var prestamistaIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (prestamistaIdClaim == null)
+                    return Unauthorized(new { message = "Token inválido o expirado." });
+
+                int id = int.Parse(prestamistaIdClaim.Value);
+                
+                var resultado = await _service.UpdatePerfilAsync(id, dto);
+                if (resultado) return Ok(new { message = "Perfil actualizado correctamente." });
+                return BadRequest(new { message = "No se pudo actualizar el perfil." });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al actualizar el perfil.", error = ex.Message });
             }
         }
     }

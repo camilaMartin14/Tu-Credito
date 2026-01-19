@@ -21,7 +21,7 @@ namespace TuCredito.Controllers
             _service = service;
         }
         [HttpGet]
-        public async Task<ActionResult<List<PrestamoDTO>>> GetAll()
+        public async Task<ActionResult<List<PrestamoDTO>>> ObtenerTodos()
         {
             try
             {
@@ -36,7 +36,7 @@ namespace TuCredito.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PrestamoDTO>> GetById(int id)
+        public async Task<ActionResult<PrestamoDTO>> ObtenerPorId(int id)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace TuCredito.Controllers
         }
 
         [HttpGet("filter")] 
-        public async Task<ActionResult<List<PrestamoDTO>>> GetConFiltro(string? nombre, int? estado, int? mesVto, int? anio)
+        public async Task<ActionResult<List<PrestamoDTO>>> ObtenerConFiltro(string? nombre, int? estado, int? mesVto, int? anio)
         {
             try
             {
@@ -66,7 +66,7 @@ namespace TuCredito.Controllers
         }
 
         [HttpGet("{id}/summary")]
-        public async Task<ActionResult<ResumenPrestamoDTO>> GetResumen(int id)
+        public async Task<ActionResult<ResumenPrestamoDTO>> ObtenerResumen(int id)
         {
             try
             {
@@ -82,13 +82,14 @@ namespace TuCredito.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostPrestamo([FromBody] PrestamoDTO prestamo)
+        public async Task<ActionResult> Crear([FromBody] PrestamoDTO prestamo)
         {
             try
             {
                 var resultado = await _service.PostPrestamo(prestamo);
                 if (!resultado) return BadRequest(new { message = "No se pudo registrar el préstamo. Verifique los datos ingresados." });
-                return Ok(new { message = "Préstamo registrado correctamente." });
+                
+                return StatusCode(201, new { message = "Préstamo registrado correctamente." });
             }
             catch (Exception ex)
             {
@@ -97,7 +98,7 @@ namespace TuCredito.Controllers
         }
 
         [HttpPut("{id}/archive")]
-        public async Task<IActionResult> CambioDeEstado(int id)
+        public async Task<IActionResult> Archivar(int id)
         {
             try
             {

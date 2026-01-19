@@ -64,13 +64,33 @@ namespace TuCredito.Services.Implementations
             var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("IdPrestamista");
             
             if (claim == null) throw new ArgumentException("No se pudo obtener el IdPrestamista del token");
-            return int.Parse(claim.Value); // ESTA TMB VA CUANDO SE DESCOMENTE EL DE PRUEBA
-            //if (claim == null) { return 1; }// ID de prueba --- el correcto es la linea que quedo comentada arriba
-            //else { return 2; }
-            
-               
+            return int.Parse(claim.Value);
         }
 
+        public async Task<bool> UpdatePerfilAsync(int id, PrestamistaUpdateDTO dto)
+        {
+            var prestamista = await _repository.ObtenerPrestamistaPorId(id);
+            if (prestamista == null) throw new ArgumentException("Prestamista no encontrado");
+
+            if (!string.IsNullOrWhiteSpace(dto.Nombre)) prestamista.Nombre = dto.Nombre;
+            if (!string.IsNullOrWhiteSpace(dto.Apellido)) prestamista.Apellido = dto.Apellido;
+            if (!string.IsNullOrWhiteSpace(dto.Usuario)) prestamista.Usuario = dto.Usuario;
+            if (!string.IsNullOrWhiteSpace(dto.Email)) prestamista.Correo = dto.Email;
+
+            if (!string.IsNullOrWhiteSpace(dto.NuevaContrasenia))
+            {
+                // Optional: Verify old password if provided
+                if (!string.IsNullOrWhiteSpace(dto.ContraseniaActual))
+                {
+                    if (!PasswordHasher.Verify(dto.ContraseniaActual, prestamista.ContraseniaHash))
+                        throw new ArgumentException("La contraseña actual es incorrecta");
+                }
+                
+                prestamista.ContraseniaHash = PasswordHasher.Hash(dto.NuevaContrasenia);
+            }
+
+            return await _repository.UpdatePrestamista(prestamista);
+        }
         
     }
 }

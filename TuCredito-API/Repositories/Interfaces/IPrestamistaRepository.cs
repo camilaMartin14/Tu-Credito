@@ -1,4 +1,4 @@
-﻿using TuCredito.Models;
+using TuCredito.Models;
 
 namespace TuCredito.Repositories.Interfaces
 {
@@ -8,6 +8,7 @@ namespace TuCredito.Repositories.Interfaces
         Task<Prestamista?> ObtenerPrestamistaPorId(int idPrestamista);
         Task<Prestamista?> ObtenerPrestamistaPorEmail(string email);
         Task<Prestamista?> ObtenerPrestamistaPorUsuario(string usuario);
+        Task<bool> UpdatePrestamista(Prestamista prestamista);
 
     }
 }

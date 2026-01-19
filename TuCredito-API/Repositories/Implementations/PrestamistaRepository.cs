@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using TuCredito.Models;
 using TuCredito.Repositories.Interfaces;
 
@@ -35,6 +35,12 @@ namespace TuCredito.Repositories.Implementations
             _context.Prestamistas.Add(p);
             await _context.SaveChangesAsync();
             return p.Id;
+        }
+
+        public async Task<bool> UpdatePrestamista(Prestamista prestamista)
+        {
+            _context.Prestamistas.Update(prestamista);
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }
