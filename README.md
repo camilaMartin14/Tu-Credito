@@ -1,10 +1,14 @@
 # 📌 Tu Crédito – Sistema de Gestión de Préstamos
 
+![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge&logoColor=white)
+![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white)
+![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)
+![EF Core](https://img.shields.io/badge/EF%20Core-512BD4?style=for-the-badge&logo=.net&logoColor=white)
+![MinIO](https://img.shields.io/badge/MinIO-C72E49?style=for-the-badge&logo=minio&logoColor=white)
+
 **Tu Crédito** es una plataforma integral diseñada para la administración eficiente de créditos y prestatarios. Desarrollada con un enfoque profesional, implementa una arquitectura robusta y escalable que permite gestionar el ciclo de vida completo de un préstamo, desde la solicitud hasta la cancelación total.
 
 Este proyecto destaca por su **backend sólido en .NET**, implementación de **seguridad con JWT**, **auditoría de datos** y **consumo de APIs externas** para enriquecer la experiencia del usuario.
-
-🔗 **[Deploy del Frontend](https://tu-credito.vercel.app/)**
 
 ---
 
@@ -50,6 +54,23 @@ El backend ha sido construido siguiendo las mejores prácticas de la industria, 
 - **Gestión de Documentación con MinIO**: Integración con almacenamiento de multimedia mediante MinIO, permitiendo la carga, descarga y persistencia segura de documentación asociada a los clientes y préstamos (pagarés, recibos de sueldo, documentación identificatoria).
 Los archivos se almacenan de forma desacoplada de la base de datos, conservando únicamente las referencias necesarias, lo que mejora la escalabilidad, seguridad y mantenibilidad del sistema.
 
+### 📂 Estructura del Proyecto
+
+El proyecto sigue una arquitectura limpia para garantizar la separación de responsabilidades:
+
+```
+TuCredito-API/
+├── Controllers/       # Puntos de entrada de la API
+├── Services/          # Lógica de negocio y orquestación
+│   ├── Interfaces/    # Contratos de servicios
+│   └── Implementations/
+├── Repositories/      # Acceso a datos (Patrón Repositorio)
+├── Models/            # Entidades de dominio (EF Core)
+├── DTOs/              # Objetos de transferencia de datos
+├── Security/          # Configuración de JWT y Hashing
+└── Interceptors/      # Auditoría automática (EF Core)
+```
+
 ---
 
 ## 💻 Funcionalidades Principales
@@ -78,11 +99,12 @@ Los archivos se almacenan de forma desacoplada de la base de datos, conservando 
 
 ### Backend
 - **Lenguaje**: C#
-- **Framework**: .NET 8 Web API
+- **Framework**: .NET 10 Web API (aprovechando las últimas mejoras de rendimiento y JIT)
 - **ORM**: Entity Framework Core
 - **Base de Datos**: SQL Server
 - **Autenticación**: JWT Bearer
 - **Mapeo**: AutoMapper
+- **Almacenamiento**: MinIO (S3 Compatible)
 
 ### Frontend
 - **Framework**: Angular / Vanilla JS (según implementación actual)
