@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TuCredito.DTOs;
+using TuCredito.Models;
 using TuCredito.Security;
 using TuCredito.Services.Interfaces;
 
