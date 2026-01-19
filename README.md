@@ -72,23 +72,6 @@ TuCredito-API/
 └── Interceptors/      # Auditoría automática (EF Core)
 ```
 
-### 📂 Estructura del Proyecto
-
-El proyecto sigue una arquitectura limpia para garantizar la separación de responsabilidades:
-
-```
-TuCredito-API/
-├── Controllers/       # Puntos de entrada de la API
-├── Services/          # Lógica de negocio y orquestación
-│   ├── Interfaces/    # Contratos de servicios
-│   └── Implementations/
-├── Repositories/      # Acceso a datos (Patrón Repositorio)
-├── Models/            # Entidades de dominio (EF Core)
-├── DTOs/              # Objetos de transferencia de datos
-├── Security/          # Configuración de JWT y Hashing
-└── Interceptors/      # Auditoría automática (EF Core)
-```
-
 ---
 
 ## 💻 Funcionalidades Principales
