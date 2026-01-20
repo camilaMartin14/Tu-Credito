@@ -107,7 +107,6 @@ TuCredito-API/
 - **Autenticación**: JWT Bearer
 - **Mapeo**: AutoMapper
 - **Almacenamiento**: MinIO (S3 Compatible)
-- **Almacenamiento**: MinIO (S3 Compatible)
 
 ### Frontend
 - **Framework**: Angular / Vanilla JS (según implementación actual)
