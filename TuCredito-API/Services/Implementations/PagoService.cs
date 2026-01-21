@@ -5,8 +5,7 @@ using TuCredito.Services.Interfaces;
 using TuCredito.DTOs;
 using Microsoft.EntityFrameworkCore;
 
-namespace TuCredito.Services.Implementations
-{
+namespace TuCredito.Services.Implementations;
     public class PagoService : IPagoService
 
     {
@@ -65,10 +64,8 @@ namespace TuCredito.Services.Implementations
                 if (pago.Monto > saldoActualCuota)
                     throw new InvalidOperationException($"El pago ({pago.Monto}) excede el saldo pendiente de la cuota ({saldoActualCuota}).");
 
-                // Aplicar pago a la cuota
                 cuotaObjetivo.SaldoPendiente = saldoActualCuota - pago.Monto;
 
-                // Actualizar estado de la cuota
                 if (cuotaObjetivo.SaldoPendiente <= 0)
                 {
                     cuotaObjetivo.IdEstado = 3; // Saldada
@@ -79,7 +76,6 @@ namespace TuCredito.Services.Implementations
                     cuotaObjetivo.IdEstado = 1; // Sigue Pendiente (o parcial)
                 }
 
-                // Actualizar Préstamo: Recalcular SaldoRestante
                 var prestamo = cuotaObjetivo.IdPrestamoNavigation;
                 
                 prestamo.SaldoRestante -= pago.Monto;
@@ -88,7 +84,6 @@ namespace TuCredito.Services.Implementations
                 {
                     prestamo.SaldoRestante = 0;
                     
-                    // Verificar si quedan cuotas pendientes en BD que NO sean la actual (por si hubo error de cálculo previo)
                     bool quedanOtrasPendientes = await _context.Cuotas
                         .AnyAsync(c => c.IdPrestamo == prestamo.IdPrestamo && c.IdCuota != cuotaObjetivo.IdCuota && c.IdEstado != 3);
                     
@@ -99,16 +94,14 @@ namespace TuCredito.Services.Implementations
                 }
                 else
                 {
-                    if (prestamo.IdEstado == 2) prestamo.IdEstado = 1; // Reactivar si estaba finalizado erróneamente
+                    if (prestamo.IdEstado == 2) prestamo.IdEstado = 1; // reactivar si estaba finalizado erróneamente
                 }
 
-                // Registrar el pago
                 pago.Estado = "Registrado";
-                pago.Saldo = cuotaObjetivo.SaldoPendiente ?? 0; // Saldo remanente de la cuota tras el pago
+                pago.Saldo = cuotaObjetivo.SaldoPendiente ?? 0; 
                 
                 _context.Pagos.Add(pago);
 
-                // Guardar todo
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
@@ -164,4 +157,3 @@ namespace TuCredito.Services.Implementations
             return await _pago.GetPagoByIdPrestamo(id);
         }
     }
-}

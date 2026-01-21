@@ -3,8 +3,7 @@ using TuCredito.DTOs;
 using TuCredito.Models;
 using TuCredito.Repositories.Interfaces;
 
-namespace TuCredito.Repositories.Implementations
-{
+namespace TuCredito.Repositories.Implementations;
     public class PrestatarioRepository : IPrestatarioRepository
     {
         private readonly TuCreditoContext _context;
@@ -72,4 +71,3 @@ namespace TuCredito.Repositories.Implementations
                 .FirstOrDefaultAsync(p => p.Dni == dni);
         }
     }
-}

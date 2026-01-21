@@ -3,8 +3,7 @@ using TuCredito.Services.Interfaces;
 using TuCredito.Services.Interfaces.Clients;
 using TuCredito.Models.Enums;
 
-namespace TuCredito.Services.Implementations
-{
+namespace TuCredito.Services.Implementations;
     public class EvaluacionCrediticiaService : IEvaluacionCrediticiaService
     {
         private readonly IBcraDeudoresService _bcraService;
@@ -106,4 +105,3 @@ namespace TuCredito.Services.Implementations
             return response;
         }
     }
-}

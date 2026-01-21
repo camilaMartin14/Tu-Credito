@@ -2,8 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TuCredito.Services.Implementations.Clients;
 
-namespace TuCredito.Controllers
-{
+namespace TuCredito.Controllers;
     [Route("api/debts")]
     [ApiController]
     public class DeudasController : ControllerBase
@@ -38,4 +37,3 @@ namespace TuCredito.Controllers
             }
         }
     }
-}

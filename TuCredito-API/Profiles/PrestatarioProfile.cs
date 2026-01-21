@@ -2,8 +2,7 @@ using AutoMapper;
 using TuCredito.DTOs;
 using TuCredito.Models;
 
-namespace TuCredito.Profiles
-{
+namespace TuCredito.Profiles;
     public class PrestatarioProfile : Profile
     {
         public PrestatarioProfile()
@@ -18,4 +17,3 @@ namespace TuCredito.Profiles
             CreateMap<PrestatarioDTO, Prestatario>();
         }
     }
-}

@@ -1,8 +1,7 @@
 using Minio;
 using Minio.DataModel.Args;
 
-namespace TuCredito.MinIO
-{
+namespace TuCredito.MinIO;
     public class MinioFileStorage : IFileStorage
     {
         private readonly IMinioClient _minio;
@@ -65,4 +64,3 @@ namespace TuCredito.MinIO
             );
         }
     }
-}

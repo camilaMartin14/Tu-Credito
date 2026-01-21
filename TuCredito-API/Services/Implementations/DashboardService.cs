@@ -3,8 +3,7 @@ using TuCredito.DTOs.Dashboard;
 using TuCredito.Models;
 using TuCredito.Services.Interfaces;
 
-namespace TuCredito.Services.Implementations
-{
+namespace TuCredito.Services.Implementations;
     public class DashboardService : IDashboardService
     {
         private readonly TuCreditoContext _context;
@@ -14,11 +13,20 @@ namespace TuCredito.Services.Implementations
             _context = context;
         }
 
-        public async Task<DashboardKpisDTO> GetKpisAsync()
+        public async Task<DashboardKpisDTO> GetKpisAsync(DateTime? from = null, DateTime? to = null)
         {
             var now = DateTime.Now;
+            
+            bool hasFilter = from.HasValue || to.HasValue;
+            var startDate = from ?? DateTime.MinValue;
+            var endDate = to ?? DateTime.MaxValue;
 
-            var totalPrestado = await _context.Prestamos.SumAsync(p => p.MontoOtorgado);
+            IQueryable<Prestamo> prestamosQuery = _context.Prestamos;
+            if (hasFilter)
+            {
+                prestamosQuery = prestamosQuery.Where(p => p.FechaOtorgamiento >= startDate && p.FechaOtorgamiento <= endDate);
+            }
+            var totalPrestado = await prestamosQuery.SumAsync(p => p.MontoOtorgado);
 
             var capitalPendiente = await _context.Cuotas
                 .Include(c => c.IdEstadoNavigation)
@@ -26,9 +34,33 @@ namespace TuCredito.Services.Implementations
                          || c.IdEstadoNavigation.Descripcion == "Vencida")
                 .SumAsync(c => c.Monto - (c.Interes ?? 0));
 
-            var totalCobradoMes = await _context.Pagos
-                .Where(p => p.FecPago.Month == now.Month && p.FecPago.Year == now.Year)
-                .SumAsync(p => p.Monto);
+            IQueryable<Pago> pagosQuery = _context.Pagos;
+            if (hasFilter)
+            {
+                pagosQuery = pagosQuery.Where(p => p.FecPago >= startDate && p.FecPago <= endDate);
+            }
+            else
+            {
+                pagosQuery = pagosQuery.Where(p => p.FecPago.Month == now.Month && p.FecPago.Year == now.Year);
+            }
+            var totalCobrado = await pagosQuery.SumAsync(p => p.Monto);
+
+            var pagosConCuota = await pagosQuery
+                .Join(_context.Cuotas,
+                      p => p.IdCuota,
+                      c => c.IdCuota,
+                      (p, c) => new { PagoMonto = p.Monto, CuotaMonto = c.Monto, CuotaInteres = c.Interes ?? 0 })
+                .ToListAsync();
+
+            decimal totalInteresCobrado = 0;
+            foreach (var item in pagosConCuota)
+            {
+                if (item.CuotaMonto > 0)
+                {
+                    var ratio = item.CuotaInteres / item.CuotaMonto;
+                    totalInteresCobrado += item.PagoMonto * ratio;
+                }
+            }
 
             var totalEnMora = await _context.Cuotas
                 .Include(c => c.IdEstadoNavigation)
@@ -39,13 +71,88 @@ namespace TuCredito.Services.Implementations
             if (capitalPendiente > 0)
                 porcentajeMorosidad = (totalEnMora / capitalPendiente) * 100;
 
+            decimal rentabilidad = 0;
+            if (totalPrestado > 0)
+                rentabilidad = (totalInteresCobrado / totalPrestado) * 100;
+
             return new DashboardKpisDTO
             {
                 TotalPrestadoHistorico = totalPrestado,
                 CapitalPendiente = capitalPendiente,
-                TotalCobradoMes = totalCobradoMes,
+                TotalCobrado = totalCobrado,
+                TotalInteresCobrado = totalInteresCobrado,
                 TotalEnMora = totalEnMora,
-                PorcentajeMorosidad = Math.Round(porcentajeMorosidad, 2)
+                PorcentajeMorosidad = Math.Round(porcentajeMorosidad, 2),
+                Rentabilidad = Math.Round(rentabilidad, 2)
+            };
+        }
+
+        public async Task<List<GraficoDatoDTO>> GetProyeccionFlujoCajaAsync()
+        {
+            var today = DateTime.Today;
+            var endDate = today.AddDays(28);
+
+            var cuotas = await _context.Cuotas
+                .Include(c => c.IdEstadoNavigation)
+                .Where(c => c.IdEstadoNavigation.Descripcion == "Pendiente"
+                        && c.FecVto >= today && c.FecVto <= endDate)
+                .Select(c => new { c.FecVto, c.Monto })
+                .ToListAsync();
+
+            var result = new List<GraficoDatoDTO>();
+            for (int i = 0; i < 4; i++)
+            {
+                var startWeek = today.AddDays(i * 7);
+                var endWeek = startWeek.AddDays(6);
+                var sum = cuotas.Where(c => c.FecVto >= startWeek && c.FecVto <= endWeek).Sum(c => c.Monto);
+                
+                result.Add(new GraficoDatoDTO 
+                { 
+                    Etiqueta = $"Semana {i + 1}", 
+                    Valor = sum 
+                });
+            }
+            return result;
+        }
+
+        public async Task<List<SerieTiempoDTO>> GetEvolucionColocacionAsync(DateTime? from = null, DateTime? to = null)
+        {
+             var query = _context.Prestamos.AsQueryable();
+
+            if (from.HasValue)
+                query = query.Where(p => p.FechaOtorgamiento >= from.Value);
+            
+            if (to.HasValue)
+                query = query.Where(p => p.FechaOtorgamiento <= to.Value);
+
+            return await query
+                .GroupBy(p => new { p.FechaOtorgamiento.Year, p.FechaOtorgamiento.Month })
+                .Select(g => new SerieTiempoDTO
+                {
+                    Anio = g.Key.Year,
+                    Mes = g.Key.Month,
+                    Valor = g.Sum(p => p.MontoOtorgado)
+                })
+                .OrderBy(x => x.Anio)
+                .ThenBy(x => x.Mes)
+                .ToListAsync();
+        }
+
+        public async Task<List<GraficoDatoDTO>> GetComposicionRiesgoAsync()
+        {
+            var today = DateTime.Today;
+            var vencidas = await _context.Cuotas
+                .Include(c => c.IdEstadoNavigation)
+                .Where(c => c.IdEstadoNavigation.Descripcion == "Vencida")
+                .Select(c => new { c.FecVto, c.Monto })
+                .ToListAsync();
+
+            return new List<GraficoDatoDTO>
+            {
+                new GraficoDatoDTO { Etiqueta = "1-30 Días", Valor = vencidas.Where(c => (today - c.FecVto).Days <= 30).Sum(c => c.Monto) },
+                new GraficoDatoDTO { Etiqueta = "31-60 Días", Valor = vencidas.Where(c => (today - c.FecVto).Days > 30 && (today - c.FecVto).Days <= 60).Sum(c => c.Monto) },
+                new GraficoDatoDTO { Etiqueta = "61-90 Días", Valor = vencidas.Where(c => (today - c.FecVto).Days > 60 && (today - c.FecVto).Days <= 90).Sum(c => c.Monto) },
+                new GraficoDatoDTO { Etiqueta = "+90 Días", Valor = vencidas.Where(c => (today - c.FecVto).Days > 90).Sum(c => c.Monto) }
             };
         }
 
@@ -62,9 +169,17 @@ namespace TuCredito.Services.Implementations
                 .ToListAsync();
         }
 
-        public async Task<List<SerieTiempoDTO>> GetFlujoCobranzasAsync()
+        public async Task<List<SerieTiempoDTO>> GetFlujoCobranzasAsync(DateTime? from = null, DateTime? to = null)
         {
-            return await _context.Pagos
+            var query = _context.Pagos.AsQueryable();
+
+            if (from.HasValue)
+                query = query.Where(p => p.FecPago >= from.Value);
+            
+            if (to.HasValue)
+                query = query.Where(p => p.FecPago <= to.Value);
+
+            return await query
                 .GroupBy(p => new { p.FecPago.Year, p.FecPago.Month })
                 .Select(g => new SerieTiempoDTO
                 {
@@ -198,4 +313,3 @@ namespace TuCredito.Services.Implementations
             return result;
         }
     }
-}

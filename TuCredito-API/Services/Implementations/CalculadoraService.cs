@@ -2,8 +2,7 @@ using TuCredito.Controllers;
 using TuCredito.DTOs;
 using TuCredito.Services.Interfaces;
 
-namespace TuCredito.Services.Implementations
-{
+namespace TuCredito.Services.Implementations;
     public class CalculadoraService : ICalculadoraService
     {
 
@@ -93,6 +92,4 @@ namespace TuCredito.Services.Implementations
                 });
             }
         }
-
     }
-}

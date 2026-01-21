@@ -6,8 +6,7 @@ using TuCredito.Models;
 using TuCredito.Repositories.Interfaces;
 using TuCredito.Services.Interfaces;
 
-namespace TuCredito.Services.Implementations
-{
+namespace TuCredito.Services.Implementations;
     public class PrestamoService : IPrestamoService
     {
         private readonly IPrestamoRepository _prestamo;
@@ -163,7 +162,4 @@ namespace TuCredito.Services.Implementations
                 CalcularMesesActivo(prestamo.FechaOtorgamiento, ultimaFechaPago.Value) : 0, EstadoPrestamo = prestamo.IdEstado
             };
         }
-    }
-
-       
     }

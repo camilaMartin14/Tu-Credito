@@ -3,8 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace TuCredito.Security
-{
+namespace TuCredito.Security;
     public class JwtTokenGenerator
     {
         private readonly IConfiguration _configuration;
@@ -47,4 +46,3 @@ namespace TuCredito.Security
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
-}

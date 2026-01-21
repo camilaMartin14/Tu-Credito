@@ -1,8 +1,7 @@
 ﻿using TuCredito.Models;
 using TuCredito.DTOs;
 
-namespace TuCredito.Services.Interfaces
-{
+namespace TuCredito.Services.Interfaces;
     public interface IPagoService
     {
         Task<List<Pago>> GetAllPagos();
@@ -13,4 +12,3 @@ namespace TuCredito.Services.Interfaces
         Task<bool> UpdatePago(int id, string estado);
         Task<bool> RegistrarPagoAnticipadoAsync(Pago pago);
     }
-}

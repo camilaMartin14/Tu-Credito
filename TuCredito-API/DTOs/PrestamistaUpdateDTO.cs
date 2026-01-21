@@ -1,5 +1,4 @@
-namespace TuCredito.DTOs
-{
+namespace TuCredito.DTOs;
     public class PrestamistaUpdateDTO
     {
         public string? Nombre { get; set; }
@@ -9,4 +8,3 @@ namespace TuCredito.DTOs
         public string? ContraseniaActual { get; set; }
         public string? NuevaContrasenia { get; set; }
     }
-}

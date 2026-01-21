@@ -1,5 +1,4 @@
-﻿namespace TuCredito.DTOs
-{
+﻿namespace TuCredito.DTOs;
     public class PrestatarioDTO // Datos completos del prestatario y garante
     {
         public int? Dni { get; set; }
@@ -23,4 +22,3 @@
         public string? GaranteCorreo { get; set; }
 
     }
-}

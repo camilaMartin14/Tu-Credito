@@ -2,8 +2,7 @@ using AutoMapper;
 using TuCredito.DTOs;
 using TuCredito.Models;
 
-namespace TuCredito.Profiles
-{
+namespace TuCredito.Profiles;
     public class PrestamistaProfile : Profile
     {
         public PrestamistaProfile()
@@ -13,4 +12,3 @@ namespace TuCredito.Profiles
                 .ForMember(dest => dest.ContraseniaHash, opt => opt.Ignore()); // Se maneja manualmente el hash
         }
     }
-}

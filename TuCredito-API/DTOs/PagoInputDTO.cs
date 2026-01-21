@@ -1,5 +1,4 @@
-﻿namespace TuCredito.DTOs
-{
+﻿namespace TuCredito.DTOs;
     public class PagoInputDTO
     {
         public int IdCuota { get; set; }
@@ -8,4 +7,3 @@
         public string? Observaciones { get; set; }
         public DateTime FecPago { get; set; }
     }
-}

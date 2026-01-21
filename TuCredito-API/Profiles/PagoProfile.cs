@@ -2,8 +2,7 @@ using AutoMapper;
 using TuCredito.DTOs;
 using TuCredito.Models;
 
-namespace TuCredito.Profiles
-{
+namespace TuCredito.Profiles;
     public class PagoProfile : Profile
     {
         public PagoProfile()
@@ -16,4 +15,3 @@ namespace TuCredito.Profiles
                 .ForMember(dest => dest.FecPago, opt => opt.MapFrom(src => DateTime.Now));
         }
     }
-}

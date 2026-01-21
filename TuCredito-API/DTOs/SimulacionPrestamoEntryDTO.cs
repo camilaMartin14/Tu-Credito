@@ -1,5 +1,4 @@
-﻿namespace TuCredito.Controllers
-{
+﻿namespace TuCredito.Controllers;
     public class SimulacionPrestamoEntryDTO
     {
         public decimal MontoPrestamo { get; set; }  // solicitado
@@ -8,4 +7,3 @@
         public DateTime? FechaInicio { get; set; }    
         public int? RedondeoMultiplo { get; set; } 
     }
-}

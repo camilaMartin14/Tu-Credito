@@ -1,8 +1,7 @@
 using TuCredito.DTOs;
 using TuCredito.Models;
 
-namespace TuCredito.Services.Interfaces
-{
+namespace TuCredito.Services.Interfaces;
     public interface IPrestamoService
     {
         Task<bool> SoftDelete(int id);
@@ -15,4 +14,3 @@ namespace TuCredito.Services.Interfaces
 
 
     }
-}

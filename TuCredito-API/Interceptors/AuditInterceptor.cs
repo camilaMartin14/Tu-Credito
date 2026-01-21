@@ -5,8 +5,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using TuCredito.Models;
 
-namespace TuCredito.Interceptors
-{
+namespace TuCredito.Interceptors;
     public class AuditInterceptor : SaveChangesInterceptor
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -125,4 +124,3 @@ namespace TuCredito.Interceptors
             return "N/A";
         }
     }
-}

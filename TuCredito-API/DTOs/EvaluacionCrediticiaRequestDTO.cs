@@ -1,5 +1,4 @@
-namespace TuCredito.DTOs
-{
+namespace TuCredito.DTOs;
     public class EvaluacionCrediticiaRequestDTO
     {
         public long Cuit { get; set; }
@@ -7,4 +6,3 @@ namespace TuCredito.DTOs
         public decimal CuotaEstimada { get; set; }
         public decimal? IngresoMensual { get; set; }
     }
-}

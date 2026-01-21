@@ -1,7 +1,4 @@
-using System.Text.Json.Serialization;
-
-namespace TuCredito.Models.EntidadesApisTerceros
-{
+namespace TuCredito.Models.EntidadesApisTerceros;
     public class BcraApiResponse
     {
         public int Status { get; set; }
@@ -28,4 +25,3 @@ namespace TuCredito.Models.EntidadesApisTerceros
         public decimal Monto { get; set; }
         public int DiasAtrasoPago { get; set; }
     }
-}

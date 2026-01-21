@@ -1,7 +1,5 @@
-using TuCredito.Models;
 
-namespace TuCredito.DTOs
-{
+namespace TuCredito.DTOs;
     public class PrestamoDTO
     {
         public int DniPrestatario { get; set; }
@@ -18,4 +16,3 @@ namespace TuCredito.DTOs
         public decimal TasaInteres {  get; set; }   
 
     }
-}

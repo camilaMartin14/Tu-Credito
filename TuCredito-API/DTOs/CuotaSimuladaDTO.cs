@@ -1,5 +1,4 @@
-﻿namespace TuCredito.DTOs
-{
+﻿namespace TuCredito.DTOs;
     public class CuotaSimuladaDTO
     {
         public int NumeroCuota { get; set; }
@@ -9,4 +8,3 @@
         public decimal Interes { get; set; }
         public DateTime? FechaVencimiento { get; set; }
     }
-}
