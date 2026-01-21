@@ -1,0 +1,210 @@
+.profile-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+  background-color: var(--color-bg-main);
+  min-height: calc(100vh - 64px); // Ajustar según altura del header si existe
+}
+
+.profile-card {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-border);
+  width: 100%;
+  max-width: 400px;
+  overflow: hidden;
+  height: fit-content;
+}
+
+.profile-header {
+  background: var(--gradient-primary);
+  color: var(--text-light);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  .avatar {
+    width: 80px;
+    height: 80px;
+    background-color: var(--color-bg-card);
+    color: var(--color-primary);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    box-shadow: var(--shadow-card);
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .role {
+    margin: 0.5rem 0 0;
+    opacity: 0.9;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+}
+
+.profile-details {
+  padding: 2rem;
+
+  .detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--color-border-subtle);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .value {
+      color: var(--text-main);
+      font-weight: 600;
+      
+      &.active {
+        color: var(--color-success);
+      }
+      
+      &.inactive {
+        color: var(--color-danger);
+      }
+    }
+  }
+}
+
+.edit-btn {
+  width: calc(100% - 4rem);
+  margin: 1rem 2rem 1rem;
+  padding: 0.875rem;
+  background: var(--color-bg-elevated);
+  color: var(--text-main);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-button);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: none;
+
+  &:hover {
+    background: var(--color-border);
+    transform: translateY(-1px);
+  }
+}
+
+.logout-btn {
+  width: calc(100% - 4rem);
+  margin: 0 2rem 2rem;
+  padding: 0.875rem;
+  background-color: rgba(244, 67, 54, 0.1);
+  color: var(--color-danger);
+  border: 1px solid transparent;
+  border-radius: var(--radius-button);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: var(--color-danger);
+    color: white;
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+    transform: translateY(-2px);
+  }
+}
+
+/* Edit Form Styles */
+.edit-form {
+  padding: 2rem;
+  
+  .form-group {
+    margin-bottom: 1.25rem;
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    
+    input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      background-color: var(--color-bg-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      color: var(--text-main);
+      font-size: 1rem;
+      transition: all 0.2s;
+      
+      &:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(140, 82, 255, 0.1);
+      }
+
+      &::placeholder {
+        color: var(--text-muted);
+      }
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    
+    button {
+      flex: 1;
+      padding: 0.875rem;
+      border-radius: var(--radius-button);
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      
+      &.save-btn {
+        background: var(--gradient-primary);
+        color: white;
+        box-shadow: var(--shadow-glow-primary);
+        
+        &:hover:not(:disabled) {
+          transform: translateY(-2px);
+        }
+        
+        &:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+      }
+      
+      &.cancel-btn {
+        background-color: transparent;
+        border: 1px solid var(--color-border);
+        color: var(--text-secondary);
+        
+        &:hover {
+          background-color: var(--color-bg-elevated);
+          color: var(--text-main);
+        }
+      }
+    }
+  }
+}

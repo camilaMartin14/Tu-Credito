@@ -1,0 +1,96 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Pagos</h1>
+      <p class="subtitle">Registro y control de cobranzas</p>
+    </div>
+    <button class="btn-primary" (click)="createNew()">
+      <span class="material-icons-round">payments</span>
+      Registrar Pago
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-card">
+    <div class="search-box">
+      <span class="material-icons-round">search</span>
+      <input 
+        type="text" 
+        placeholder="Buscar por nombre..." 
+        [(ngModel)]="searchTerm" 
+        (ngModelChange)="applyFilters()"
+      >
+    </div>
+    <!-- TODO: Add Month Filter here later -->
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nro Cuota</th>
+            <th>Monto</th>
+            <th>Fecha Pago</th>
+            <th>Medio Pago</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (payment of filteredPayments(); track payment.idPago) {
+            <tr>
+              <td>
+                <span style="font-family: monospace; font-size: 0.95rem;">#{{ payment.idPago }}</span>
+              </td>
+              <td>{{ payment.nroCuota }}</td>
+              <td>
+                <span class="amount">{{ payment.monto | currency:'ARS':'symbol-narrow':'1.0-0' }}</span>
+              </td>
+              <td>{{ payment.fecPago | date:'dd/MM/yyyy' }}</td>
+              <td>{{ getPaymentMethodName(payment.medioPago) }}</td>
+              <td>
+                <span class="status-badge" 
+                  [class.completed]="payment.estado === 'Aprobado'" 
+                  [class.pending]="payment.estado === 'Pendiente'"
+                  [class.rejected]="payment.estado === 'Rechazado'">
+                  {{ payment.estado }}
+                </span>
+              </td>
+              <td>
+                <div style="display: flex; gap: 0.5rem;">
+                  <button class="btn-icon-sm" title="Ver Detalle" (click)="viewDetail(payment)">
+                    <span class="material-icons-round">visibility</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+          
+          @if (filteredPayments().length === 0 && !isLoading()) {
+            <tr>
+              <td colspan="7" class="empty-state">
+                <div class="empty-content">
+                  <span class="material-icons-round">receipt_long</span>
+                  <p>No se encontraron pagos</p>
+                </div>
+              </td>
+            </tr>
+          }
+
+          @if (isLoading()) {
+            <tr>
+              <td colspan="7" class="empty-state">
+                <div class="empty-content">
+                  <p>Cargando pagos...</p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
