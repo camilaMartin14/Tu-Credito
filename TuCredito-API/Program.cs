@@ -104,12 +104,15 @@ options.SwaggerDoc("v1", new OpenApiInfo
     });
 });
 
-builder.Services.AddDbContext<TuCreditoContext>(options =>
+builder.Services.AddDbContext<TuCreditoContext>((sp, options) =>
+{
+    var interceptor = sp.GetRequiredService<AuditInterceptor>();
     options.UseSqlServer(
         //builder.Configuration.GetConnectionString("AylenConnection")
         builder.Configuration.GetConnectionString("CamilaConnection")
     )
-);
+    .AddInterceptors(interceptor);
+});
 
 builder.Services.AddScoped<IPrestamoRepository, PrestamoRepository>();
 builder.Services.AddScoped<IPrestatarioRepository, PrestatarioRepository>();

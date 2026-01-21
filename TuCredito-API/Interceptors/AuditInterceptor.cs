@@ -31,14 +31,14 @@ namespace TuCredito.Interceptors;
         {
             if (context == null) return;
 
-            // Evitar recursión si estamos guardando AuditLogs
             if (context.ChangeTracker.Entries<AuditLog>().Any(e => e.State == EntityState.Added))
             {
                 return;
             }
 
-            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value 
-                         ?? _httpContextAccessor.HttpContext?.User?.FindFirst("id")?.Value
+            var httpContext = _httpContextAccessor.HttpContext;
+            var userId = httpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value 
+                         ?? httpContext?.User?.FindFirst("id")?.Value
                          ?? "System";
 
             var entries = context.ChangeTracker.Entries()
