@@ -101,7 +101,6 @@ TuCredito-API/
 ### Backend
 - **Lenguaje**: C#
 - **Framework**: .NET 10 Web API (aprovechando las últimas mejoras de rendimiento y JIT)
-- **Framework**: .NET 10 Web API (aprovechando las últimas mejoras de rendimiento y JIT)
 - **ORM**: Entity Framework Core
 - **Base de Datos**: SQL Server
 - **Autenticación**: JWT Bearer
