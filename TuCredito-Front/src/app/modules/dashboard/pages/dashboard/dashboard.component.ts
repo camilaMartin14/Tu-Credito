@@ -2,20 +2,20 @@ import { Component, OnInit, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions, ChartType } from 'chart.js';
-import { DashboardService } from './services/dashboard.service';
-import { LayoutService } from '../layout/services/layout.service';
+import { DashboardService } from '../../services/dashboard.service';
+import { LayoutService } from '../../../../layout/services/layout.service';
 import {
   DashboardKpisDTO,
   GraficoDatoDTO,
   SerieTiempoDTO,
   SimulacionPrestamoEntryDTO,
   SimulacionPrestamoOutputDTO
-} from './models/dashboard.models';
+} from '../../models/dashboard.models';
 import { forkJoin, finalize } from 'rxjs';
 
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CalculatorService } from './services/calculator.service';
+import { CalculatorService } from '../../services/calculator.service';
 
 @Component({
   selector: 'app-dashboard',

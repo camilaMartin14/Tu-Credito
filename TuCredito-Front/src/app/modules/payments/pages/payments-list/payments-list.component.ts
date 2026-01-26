@@ -2,8 +2,8 @@ import { Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PaymentService } from '../services/payment.service';
-import { PagoOutputDTO } from '../models/payment.models';
+import { PaymentService } from '../../../../payments/services/payment.service';
+import { PagoOutputDTO } from '../../models/payment.models';
 import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 
 @Component({

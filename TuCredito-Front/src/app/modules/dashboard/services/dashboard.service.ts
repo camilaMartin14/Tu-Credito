@@ -6,7 +6,7 @@ import {
   DashboardKpisDTO,
   GraficoDatoDTO,
   SerieTiempoDTO,
-} from '../models/dashboard.models';
+} from '../../modules/dashboard/models/dashboard.models';
 
 @Injectable({
   providedIn: 'root',

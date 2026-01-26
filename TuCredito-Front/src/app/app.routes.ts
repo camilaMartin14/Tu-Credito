@@ -19,7 +19,7 @@ export const routes: Routes = [
     children: [
       { 
         path: 'dashboard', 
-        loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent) 
+        loadComponent: () => import('./modules/dashboard/pages/dashboard/dashboard.component').then(m => m.DashboardComponent) 
       },
       { 
         path: 'profile', 
@@ -43,7 +43,7 @@ export const routes: Routes = [
       },
       { 
         path: 'payments', 
-        loadComponent: () => import('./payments/payments-list/payments-list.component').then(m => m.PaymentsListComponent) 
+        loadComponent: () => import('./modules/payments/pages/payments-list/payments-list.component').then(m => m.PaymentsListComponent) 
       },
     ]
   },
