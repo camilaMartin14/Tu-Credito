@@ -1,5 +1,4 @@
-﻿namespace TuCredito.DTOs.Dashboard
-{
+﻿namespace TuCredito.DTOs.Dashboard;
     public class CuotaVencerDTO
     {
         public string Cliente { get; set; } = string.Empty;
@@ -7,4 +6,3 @@
         public decimal Monto { get; set; }
         public int DiasParaVencer { get; set; }
     }
-}

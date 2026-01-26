@@ -1,0 +1,238 @@
+.page-container {
+  padding: 1.5rem;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  .header-content {
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+  }
+}
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-button);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-glow-primary);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(140, 82, 255, 0.4);
+  }
+
+  .material-icons-round {
+    font-size: 1.25rem;
+  }
+}
+
+/* Filters Section */
+.filters-card {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-card);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-border-subtle);
+
+  .search-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--color-bg-elevated);
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-button);
+    border: 1px solid var(--color-border);
+    transition: all 0.2s;
+
+    &:focus-within {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(140, 82, 255, 0.1);
+    }
+
+    .material-icons-round {
+      color: var(--text-secondary);
+    }
+
+    input {
+      border: none;
+      background: none;
+      width: 100%;
+      outline: none;
+      color: var(--text-main);
+      font-size: 0.95rem;
+
+      &::placeholder {
+        color: var(--text-muted);
+      }
+    }
+  }
+}
+
+/* Table Section */
+.table-container {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-card);
+  padding: 0;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-border-subtle);
+  overflow: hidden;
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap;
+
+    th {
+      text-align: left;
+      padding: 1.25rem 1.5rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.85rem;
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-bg-card);
+    }
+
+    td {
+      padding: 1.25rem 1.5rem;
+      color: var(--text-main);
+      font-weight: 500;
+      border-bottom: 1px solid var(--color-border-subtle);
+      font-size: 0.95rem;
+
+      .client-info {
+        display: flex;
+        flex-direction: column;
+        
+        .name {
+          font-weight: 600;
+          color: var(--text-main);
+        }
+        .dni {
+          font-size: 0.8rem;
+          color: var(--text-secondary);
+        }
+      }
+
+      .contact-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        font-size: 0.9rem;
+
+        div {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          color: var(--text-secondary);
+          
+          span.material-icons-round {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background-color: var(--color-bg-elevated);
+    }
+  }
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  
+  &.active { 
+    background: var(--color-success-light); 
+    color: var(--color-success); 
+  }
+  
+  &.inactive { 
+    background: var(--color-danger-light); 
+    color: var(--color-danger); 
+  }
+}
+
+.btn-icon-sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--color-bg-elevated);
+    color: var(--color-primary);
+  }
+}
+
+.empty-state {
+  padding: 4rem;
+  text-align: center;
+  
+  .empty-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    
+    .material-icons-round {
+      font-size: 3rem;
+      color: var(--text-muted);
+      opacity: 0.5;
+    }
+    
+    p {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+  }
+}

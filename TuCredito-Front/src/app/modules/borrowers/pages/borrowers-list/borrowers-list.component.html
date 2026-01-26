@@ -1,0 +1,106 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Clientes</h1>
+      <p class="subtitle">Gestión de base de datos de prestatarios</p>
+    </div>
+    <button class="btn-primary" (click)="createNew()">
+      <span class="material-icons-round">person_add</span>
+      Nuevo Cliente
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-card">
+    <div class="search-box">
+      <span class="material-icons-round">search</span>
+      <input 
+        type="text" 
+        placeholder="Buscar por nombre, apellido o DNI..." 
+        [(ngModel)]="searchTerm" 
+        (ngModelChange)="applyFilters()"
+      >
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>DNI</th>
+            <th>Contacto</th>
+            <th>Dirección</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (client of filteredBorrowers(); track client.dni) {
+            <tr>
+              <td>
+                <div class="client-info">
+                  <span class="name">{{ client.nombre }} {{ client.apellido }}</span>
+                </div>
+              </td>
+              <td>
+                <span style="font-family: monospace; font-size: 0.95rem;">{{ client.dni }}</span>
+              </td>
+              <td>
+                <div class="contact-info">
+                  <div *ngIf="client.telefono">
+                    <span class="material-icons-round">phone</span>
+                    {{ client.telefono }}
+                  </div>
+                  <div *ngIf="client.correo">
+                    <span class="material-icons-round">email</span>
+                    {{ client.correo }}
+                  </div>
+                </div>
+              </td>
+              <td>{{ client.domicilio || '-' }}</td>
+              <td>
+                <span class="status-badge" [class.active]="client.esActivo" [class.inactive]="!client.esActivo">
+                  {{ client.esActivo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td>
+                <div style="display: flex; gap: 0.5rem;">
+                  <button class="btn-icon-sm" title="Editar" (click)="editClient(client)">
+                    <span class="material-icons-round">edit</span>
+                  </button>
+                  <button class="btn-icon-sm" [title]="client.esActivo ? 'Desactivar' : 'Activar'" (click)="toggleStatus(client)">
+                    <span class="material-icons-round">{{ client.esActivo ? 'block' : 'check_circle' }}</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+          
+          @if (filteredBorrowers().length === 0 && !isLoading()) {
+            <tr>
+              <td colspan="6" class="empty-state">
+                <div class="empty-content">
+                  <span class="material-icons-round">person_off</span>
+                  <p>No se encontraron clientes</p>
+                </div>
+              </td>
+            </tr>
+          }
+
+          @if (isLoading()) {
+            <tr>
+              <td colspan="6" class="empty-state">
+                <div class="empty-content">
+                  <p>Cargando clientes...</p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

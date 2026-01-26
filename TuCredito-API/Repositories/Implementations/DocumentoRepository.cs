@@ -2,8 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using TuCredito.Models;
 using TuCredito.Repositories.Interfaces;
 
-namespace TuCredito.Repositories.Implementations
-{
+namespace TuCredito.Repositories.Implementations;
     public class DocumentoRepository : IDocumentoRepository
     {
         private readonly TuCreditoContext _context;
@@ -39,4 +38,3 @@ namespace TuCredito.Repositories.Implementations
             await _context.SaveChangesAsync();
         }
     }
-}

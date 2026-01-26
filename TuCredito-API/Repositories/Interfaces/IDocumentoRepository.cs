@@ -1,7 +1,6 @@
 using TuCredito.Models;
 
-namespace TuCredito.Repositories.Interfaces
-{
+namespace TuCredito.Repositories.Interfaces;
     public interface IDocumentoRepository
     {
         Task AgregarAsync(Documento documento);
@@ -9,4 +8,4 @@ namespace TuCredito.Repositories.Interfaces
         Task<List<Documento>> ListarAsync(string entidadTipo, int entidadId);
         Task ActualizarAsync(Documento documento);
     }
-}
+

@@ -1,7 +1,6 @@
 using TuCredito.Models;
 
-namespace TuCredito.Repositories.Interfaces
-{
+namespace TuCredito.Repositories.Interfaces;
     public interface IPrestamistaRepository
     {
         Task<int> RegistrarPrestamista(Prestamista p);
@@ -11,4 +10,3 @@ namespace TuCredito.Repositories.Interfaces
         Task<bool> UpdatePrestamista(Prestamista prestamista);
 
     }
-}

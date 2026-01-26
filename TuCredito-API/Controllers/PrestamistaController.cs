@@ -6,8 +6,7 @@ using TuCredito.Models;
 using TuCredito.Security;
 using TuCredito.Services.Interfaces;
 
-namespace TuCredito.Controllers
-{
+namespace TuCredito.Controllers;
     [Route("api/lenders")]
     [ApiController]
     public class PrestamistaController : ControllerBase
@@ -107,4 +106,3 @@ namespace TuCredito.Controllers
             }
         }
     }
-}

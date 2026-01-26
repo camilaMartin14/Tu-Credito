@@ -5,8 +5,7 @@ using TuCredito.Models;
 using TuCredito.Services.Implementations;
 using TuCredito.Services.Interfaces;
 
-namespace TuCredito.Controllers
-{
+namespace TuCredito.Controllers;
     [Route("api/payments")]
     [ApiController]
     public class PagoController : ControllerBase
@@ -145,4 +144,3 @@ namespace TuCredito.Controllers
             }
         }
     }
-}

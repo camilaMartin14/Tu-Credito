@@ -1,7 +1,6 @@
 using TuCredito.DTOs.Documentos;
 
-namespace TuCredito.Services.Interfaces
-{
+namespace TuCredito.Services.Interfaces;
     public interface IDocumentoService
     {
         Task SubirAsync(SubirDocumentoRequestDTO request);
@@ -9,4 +8,3 @@ namespace TuCredito.Services.Interfaces
         Task<(Stream Stream, string ContentType, string NombreOriginal)> DescargarAsync(int idDocumento);
         Task EliminarAsync(int idDocumento);
     }
-}

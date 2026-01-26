@@ -1,8 +1,7 @@
 ﻿using TuCredito.DTOs;
 using TuCredito.Models;
 
-namespace TuCredito.Services.Interfaces
-{
+namespace TuCredito.Services.Interfaces;
     public interface IPrestatarioService
     {
         Task<int> CrearAsync(Prestatario prestatario);
@@ -11,4 +10,3 @@ namespace TuCredito.Services.Interfaces
         Task<bool> ActualizarAsync(Prestatario prestatario);
         Task<bool> CambiarEstadoAsync(int dni, bool activo);
     }
-}

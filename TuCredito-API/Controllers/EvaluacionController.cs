@@ -2,8 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using TuCredito.DTOs;
 using TuCredito.Services.Interfaces;
 
-namespace TuCredito.Controllers
-{
+namespace TuCredito.Controllers;
     [Route("api/credit-evaluation")]
     [ApiController]
     public class EvaluacionController : ControllerBase
@@ -29,4 +28,3 @@ namespace TuCredito.Controllers
             }
         }
     }
-}

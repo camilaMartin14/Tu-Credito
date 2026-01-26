@@ -3,11 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using TuCredito.DTOs;
 using TuCredito.Models;
 using TuCredito.Repositories.Interfaces;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
-namespace TuCredito.Repositories.Implementations
-{
+namespace TuCredito.Repositories.Implementations;
 
     public class PrestamoRepository : IPrestamoRepository
     {
@@ -93,4 +91,3 @@ namespace TuCredito.Repositories.Implementations
         
         }
     }
-}

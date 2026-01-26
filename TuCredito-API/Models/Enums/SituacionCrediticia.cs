@@ -1,5 +1,4 @@
-namespace TuCredito.Models.Enums
-{
+namespace TuCredito.Models.Enums;
     public enum SituacionCrediticia
     {
         Desconocido = 0,
@@ -9,4 +8,3 @@ namespace TuCredito.Models.Enums
         AltoRiesgo = 4,
         Irrecuperable = 5
     }
-}

@@ -5,8 +5,7 @@ using TuCredito.DTOs;
 using TuCredito.Models;
 using TuCredito.Services.Interfaces;
 
-namespace TuCredito.Controllers
-{
+namespace TuCredito.Controllers;
     [Route("api/borrowers")]
     [ApiController]
     public class PrestatarioController : ControllerBase
@@ -26,7 +25,10 @@ namespace TuCredito.Controllers
             try
             {
                 var dni = await _service.CrearAsync(prestatario);
-                return CreatedAtAction(nameof(ObtenerPorDni), new { dni }, prestatario);
+                
+                var dto = _mapper.Map<PrestatarioDTO>(prestatario);
+                
+                return CreatedAtAction(nameof(ObtenerPorDni), new { dni }, dto);
             }
             catch (Exception ex)
             {
@@ -107,4 +109,3 @@ namespace TuCredito.Controllers
             }
         }
     }
-}

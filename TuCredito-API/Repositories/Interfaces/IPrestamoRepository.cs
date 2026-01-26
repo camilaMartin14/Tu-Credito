@@ -1,8 +1,7 @@
 using TuCredito.Models;
 using TuCredito.DTOs;
 
-namespace TuCredito.Repositories.Interfaces
-{
+namespace TuCredito.Repositories.Interfaces;
     public interface IPrestamoRepository
     {
         Task<bool> SoftDelete(int id);
@@ -13,4 +12,3 @@ namespace TuCredito.Repositories.Interfaces
         Task<List<PrestamoDTO>> GetPrestamoConFiltro(string? nombre, int? estado, int? mesVto, int? anio);
         Task<bool> TienePagosPendientes(int idPrestamo);
     }
-}

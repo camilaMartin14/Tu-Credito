@@ -5,8 +5,7 @@ using TuCredito.Repositories.Interfaces;
 
 using TuCredito.Services.Interfaces;
 
-namespace TuCredito.Services.Implementations
-{
+namespace TuCredito.Services.Implementations;
     public class DocumentoService : IDocumentoService
     {
         private readonly IDocumentoRepository _documentoRepo;
@@ -122,4 +121,3 @@ namespace TuCredito.Services.Implementations
             }
         }
     }
-}

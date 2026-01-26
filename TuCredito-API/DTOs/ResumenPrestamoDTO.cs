@@ -1,5 +1,4 @@
-﻿namespace TuCredito.DTOs
-{
+﻿namespace TuCredito.DTOs;
     public class ResumenPrestamoDTO
     {
         public int IdPrestamo { get; set; }
@@ -8,4 +7,3 @@
         public int MesesActivo { get; set; }
         public int EstadoPrestamo { get; set; }
     }
-}

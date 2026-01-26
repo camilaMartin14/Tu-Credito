@@ -1,15 +1,15 @@
 using TuCredito.Models;
 using TuCredito.DTOs;
+using TuCredito.Core;
 
-namespace TuCredito.Services.Interfaces
+namespace TuCredito.Services.Interfaces;
+
+public interface ICuotaService
 {
-    public interface ICuotaService
-    {
-        Task<Cuota> GetById(int id);
-        Task<List<Cuota>> GetByFiltro(int? estado, int? mesVto, string? prestatario);
-        Task<bool> AddCuota(Cuota cuota); // agregaria la clonada y la q opera como multa 
-        Task<bool> UpdateCuota(Cuota cuota); // reprogramada - softdelete
-        Task<int> ActualizarCuotasVencidas();
-        Task<List<Cuota>> Getall(int idPrestamo); // todas las cuotas de ese prestamo
-    }
+    Task<Result<Cuota>> GetById(int id);
+    Task<Result<List<Cuota>>> GetByFiltro(int? estado, int? mesVto, string? prestatario);
+    Task<Result<bool>> AddCuota(Cuota cuota); 
+    Task<Result<bool>> UpdateCuota(Cuota cuota); 
+    Task<Result<int>> ActualizarCuotasVencidas();
+    Task<Result<List<Cuota>>> Getall(int idPrestamo);
 }

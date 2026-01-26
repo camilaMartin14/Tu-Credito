@@ -8,8 +8,7 @@ using TuCredito.Models;
 using TuCredito.Services.Implementations;
 using TuCredito.Services.Interfaces;
 
-namespace TuCredito.Controllers
-{
+namespace TuCredito.Controllers;
     [Authorize] 
     [Route("api/loans")]
     [ApiController]
@@ -112,4 +111,3 @@ namespace TuCredito.Controllers
             }
         }
     }
-}

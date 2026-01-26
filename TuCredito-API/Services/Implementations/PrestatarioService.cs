@@ -3,8 +3,7 @@ using TuCredito.Models;
 using TuCredito.Repositories.Interfaces;
 using TuCredito.Services.Interfaces;
 
-namespace TuCredito.Services.Implementations
-{
+namespace TuCredito.Services.Implementations;
     public class PrestatarioService : IPrestatarioService
     {
         private readonly IPrestatarioRepository _repository;
@@ -54,4 +53,3 @@ namespace TuCredito.Services.Implementations
             return await _repository.ObtenerPorDniAsync(dni);
         }
     }
-}

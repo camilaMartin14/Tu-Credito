@@ -7,8 +7,7 @@ using TuCredito.Repositories.Interfaces;
 using TuCredito.Security;
 using TuCredito.Services.Interfaces;
 
-namespace TuCredito.Services.Implementations
-{
+namespace TuCredito.Services.Implementations;
     public class PrestamistaService : IPrestamistaService
     {
         private readonly IPrestamistaRepository _repository;
@@ -22,7 +21,6 @@ namespace TuCredito.Services.Implementations
             _mapper = mapper;
         }
 
-        //Lo tengo que corregir, se inicia sesion con usuario
         public async Task<Prestamista?> LoginAsync(string usuario, string contrasenia)
         {
             var prestamista = await _repository.ObtenerPrestamistaPorUsuario(usuario);
@@ -49,9 +47,13 @@ namespace TuCredito.Services.Implementations
 
         public async Task<int> RegistrarPrestamistaAsync(PrestamistaRegisterDto dto)
         {
-            var existente = await _repository.ObtenerPrestamistaPorEmail(dto.Correo);
-            if (existente != null)
+            var existenteEmail = await _repository.ObtenerPrestamistaPorEmail(dto.Correo);
+            if (existenteEmail != null)
                 throw new Exception("El email ya está registrado");
+
+            var existenteUsuario = await _repository.ObtenerPrestamistaPorUsuario(dto.Usuario);
+            if (existenteUsuario != null)
+                throw new Exception("El nombre de usuario ya está registrado");
 
             var prestamista = _mapper.Map<Prestamista>(dto);
             prestamista.ContraseniaHash = PasswordHasher.Hash(dto.Contrasenia);
@@ -79,7 +81,6 @@ namespace TuCredito.Services.Implementations
 
             if (!string.IsNullOrWhiteSpace(dto.NuevaContrasenia))
             {
-                // Optional: Verify old password if provided
                 if (!string.IsNullOrWhiteSpace(dto.ContraseniaActual))
                 {
                     if (!PasswordHasher.Verify(dto.ContraseniaActual, prestamista.ContraseniaHash))
@@ -91,6 +92,4 @@ namespace TuCredito.Services.Implementations
 
             return await _repository.UpdatePrestamista(prestamista);
         }
-        
     }
-}
