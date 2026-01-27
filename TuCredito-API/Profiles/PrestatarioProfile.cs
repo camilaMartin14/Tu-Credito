@@ -12,8 +12,8 @@ namespace TuCredito.Profiles;
                 .ForMember(dest => dest.GaranteApellido, opt => opt.MapFrom(src => src.IdGaranteNavigation.Apellido))
                 .ForMember(dest => dest.GaranteTelefono, opt => opt.MapFrom(src => src.IdGaranteNavigation.Telefono))
                 .ForMember(dest => dest.GaranteDomicilio, opt => opt.MapFrom(src => src.IdGaranteNavigation.Domicilio))
-                .ForMember(dest => dest.GaranteCorreo, opt => opt.MapFrom(src => src.IdGaranteNavigation.Correo));
+                .ForMember(dest => dest.GaranteCorreo, opt => opt.MapFrom(src => src.IdGaranteNavigation.Correo)).ReverseMap();
 
-            CreateMap<PrestatarioDTO, Prestatario>();
+           
         }
     }

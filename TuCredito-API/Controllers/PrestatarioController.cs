@@ -19,24 +19,33 @@ namespace TuCredito.Controllers;
             _mapper = mapper;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Crear([FromBody] Prestatario prestatario)
-        {
-            try
-            {
-                var dni = await _service.CrearAsync(prestatario);
-                
-                var dto = _mapper.Map<PrestatarioDTO>(prestatario);
-                
-                return CreatedAtAction(nameof(ObtenerPorDni), new { dni }, dto);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error al crear el prestatario.", error = ex.Message });
-            }
-        }
+    [HttpPost]
+    public async Task<IActionResult> Crear([FromBody] PrestatarioDTO dto)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-        [HttpGet("{dni:int}")]
+        try
+        {
+            var prestatario = _mapper.Map<Prestatario>(dto);
+            
+            var dni = await _service.CrearAsync(prestatario);
+
+            var salida = _mapper.Map<PrestatarioDTO>(prestatario);
+
+            return CreatedAtAction(nameof(ObtenerPorDni), new { dni }, salida);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error al crear el prestatario.", error = ex.Message });
+        }
+    }
+
+    [HttpGet("{dni:int}")]
         public async Task<IActionResult> ObtenerPorDni(int dni)
         {
             try

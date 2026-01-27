@@ -7,13 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Repositories\Interfaces\MinIO\**" />
-    <Content Remove="Repositories\Interfaces\MinIO\**" />
-    <EmbeddedResource Remove="Repositories\Interfaces\MinIO\**" />
-    <None Remove="Repositories\Interfaces\MinIO\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="efpt.config.json.user" />
   </ItemGroup>
 

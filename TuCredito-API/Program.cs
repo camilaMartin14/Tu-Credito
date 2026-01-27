@@ -1,15 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
 using TuCredito.Interceptors;
 using TuCredito.MinIO;
 using TuCredito.Models;
-using TuCredito.Profiles;
-using TuCredito.Repositories.Implementations;
-using TuCredito.Repositories.Interfaces;
 using TuCredito.Security;
 using TuCredito.Services.Implementations;
 using TuCredito.Services.Implementations.Clients;
@@ -108,18 +104,12 @@ builder.Services.AddDbContext<TuCreditoContext>((sp, options) =>
 {
     var interceptor = sp.GetRequiredService<AuditInterceptor>();
     options.UseSqlServer(
-        //builder.Configuration.GetConnectionString("AylenConnection")
-        builder.Configuration.GetConnectionString("CamilaConnection")
+        builder.Configuration.GetConnectionString("AylenConnection")
+        //builder.Configuration.GetConnectionString("CamilaConnection")
     )
     .AddInterceptors(interceptor);
 });
 
-builder.Services.AddScoped<IPrestamoRepository, PrestamoRepository>();
-builder.Services.AddScoped<IPrestatarioRepository, PrestatarioRepository>();
-builder.Services.AddScoped<IPrestamistaRepository, PrestamistaRepository>();
-builder.Services.AddScoped<ICuotaRepository, CuotaRepository>();
-builder.Services.AddScoped<IPagoRepository, PagoRepository>();
-builder.Services.AddScoped<IDocumentoRepository, DocumentoRepository>();
 builder.Services.AddScoped<IPrestamoService, PrestamoService>();
 builder.Services.AddScoped<IPrestatarioService, PrestatarioService>();
 builder.Services.AddScoped<IPrestamistaService, PrestamistaService>();

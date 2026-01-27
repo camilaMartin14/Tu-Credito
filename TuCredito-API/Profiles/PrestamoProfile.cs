@@ -7,7 +7,7 @@ public class PrestamoProfile : Profile
     {
         public PrestamoProfile()
         {
-            CreateMap<Prestamo, PrestamoDTO>();
-            CreateMap<PrestamoDTO, Prestamo>();
+            CreateMap<Prestamo, PrestamoDTO>().ReverseMap();
+           
         }
     }
