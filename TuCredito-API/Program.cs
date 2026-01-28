@@ -11,6 +11,7 @@ using TuCredito.Services.Implementations;
 using TuCredito.Services.Implementations.Clients;
 using TuCredito.Services.Interfaces;
 using TuCredito.Services.Interfaces.Clients;
+using TuCredito.Services.Background;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -119,6 +120,9 @@ builder.Services.AddScoped<IPagoService, PagoService>();
 builder.Services.AddScoped<ICalculadoraService, CalculadoraService>();
 builder.Services.AddScoped<IDolarService, DolarService>();
 builder.Services.AddScoped<IEvaluacionCrediticiaService, EvaluacionCrediticiaService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddHostedService<NotificacionVencimientoCuotaService>();
+
 builder.Services.AddHttpClient<IBcraDeudoresService, BcraDeudoresService>((sp, client) =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
