@@ -174,6 +174,21 @@ namespace TuCredito.Services.Implementations
             return true;
         }
 
+        public async Task<bool> Delete(int id)
+        {
+            if (id <= 0) throw new ArgumentException("ID inválido");
+
+            var prestamo = await _context.Prestamos.FindAsync(id);
+            if (prestamo == null) throw new ArgumentException("El préstamo indicado no existe");
+
+            if (prestamo.IdEstado == 3) throw new ArgumentException("El préstamo ya se encuentra eliminado");
+
+            prestamo.IdEstado = 3; // 1 activo, 2 finalizado, 3 eliminado
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
         private async Task<bool> TienePagosPendientes(int idPrestamo)
         {
             // “Pendiente” = suma de pagos de una cuota < monto de cuota

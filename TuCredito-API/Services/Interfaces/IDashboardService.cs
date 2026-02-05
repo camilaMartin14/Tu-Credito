@@ -11,7 +11,8 @@ namespace TuCredito.Services.Interfaces;
         Task<List<GraficoDatoDTO>> GetComposicionRiesgoAsync();
         Task<List<MorosidadDetalleDTO>> GetMorosidadDetalladaAsync();
         Task<List<CuotaVencerDTO>> GetCuotasAVencerAsync();
-        Task<List<GraficoDatoDTO>> GetRankingClientesDeudaAsync();
+    Task<List<TransactionDTO>> GetRecentTransactionsAsync();
+    Task<List<GraficoDatoDTO>> GetRankingClientesDeudaAsync();
         Task<AnalistaTasaDTO> GetAnalisisTasasAsync();
         Task<List<SerieTiempoDTO>> GetEvolucionSaldoAsync();
     }

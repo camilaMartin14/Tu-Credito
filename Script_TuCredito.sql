@@ -43,6 +43,7 @@ CREATE TABLE Garantes (
     telefono VARCHAR(20),
     domicilio VARCHAR(100),
     correo VARCHAR(100),
+    Dni VARCHAR(20),
     esActivo BIT NOT NULL
 );
 
@@ -106,6 +107,8 @@ CREATE TABLE Pagos (
     saldo DECIMAL(12,2) NOT NULL,
     Estado varchar(20) NOT NULL,
     Monto DECIMAL(12,2) NOT NULL,
+    Descuento DECIMAL(12,2) NOT NULL DEFAULT 0,
+    Recargo DECIMAL(12,2) NOT NULL DEFAULT 0,
     Observaciones VARCHAR(255),
     CONSTRAINT FK_Pagos_Cuota
         FOREIGN KEY (idCuota) REFERENCES Cuotas(idCuota),

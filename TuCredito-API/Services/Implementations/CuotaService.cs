@@ -11,7 +11,7 @@ namespace TuCredito.Services.Implementations
 
         
         private const int ESTADO_PENDIENTE = 1;
-        private const int ESTADO_SALDADA = 3;
+        private const int ESTADO_SALDADA = 2;
 
         public CuotaService(TuCreditoContext context)
         {
@@ -64,7 +64,7 @@ namespace TuCredito.Services.Implementations
             }
         }
 
-        public async Task<Result<List<Cuota>>> GetByFiltro(int? estado, int? mesVto, string? prestatario)
+        public async Task<Result<List<Cuota>>> GetByFiltro(int? estado, int? mesVto, string? prestatario, int? idPrestamo)
         {
             try
             {
@@ -77,6 +77,9 @@ namespace TuCredito.Services.Implementations
                 if (!string.IsNullOrWhiteSpace(prestatario) &&
                     !prestatario.All(c => char.IsLetter(c) || char.IsWhiteSpace(c)))
                     return Result<List<Cuota>>.Failure("El nombre del prestatario solo puede contener letras.");
+                
+                if (idPrestamo.HasValue && idPrestamo.Value <= 0)
+                     return Result<List<Cuota>>.Failure("Ingrese un ID de préstamo válido.");
 
                 var query = _context.Cuotas
                     .Include(c => c.IdPrestamoNavigation)
@@ -92,6 +95,9 @@ namespace TuCredito.Services.Implementations
                 if (!string.IsNullOrWhiteSpace(prestatario))
                     query = query.Where(c =>
                         c.IdPrestamoNavigation.DniPrestatarioNavigation.Nombre.Contains(prestatario));
+                
+                if (idPrestamo.HasValue)
+                    query = query.Where(c => c.IdPrestamo == idPrestamo.Value);
 
                 var cuotas = await query.ToListAsync();
                 return Result<List<Cuota>>.Success(cuotas);

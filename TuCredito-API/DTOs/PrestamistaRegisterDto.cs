@@ -21,6 +21,7 @@ namespace TuCredito.DTOs;
         public string Usuario { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "La Contraseña es obligatoria")]
-        [StringLength(32, MinimumLength = 6, ErrorMessage = "La Contraseña debe tener entre 6 y 35 caracteres")]
+        [StringLength(32, MinimumLength = 8, ErrorMessage = "La Contraseña debe tener entre 8 y 32 caracteres")]
+        [RegularExpression(@"^(?=.*[0-9]).*$", ErrorMessage = "La contraseña debe contener al menos un número")]
         public string Contrasenia { get; set; } = string.Empty;
     }

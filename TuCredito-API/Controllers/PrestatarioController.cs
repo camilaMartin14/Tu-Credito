@@ -65,11 +65,23 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet]
-        public async Task<IActionResult> ObtenerConFiltros([FromQuery] PrestatarioDTO filtro)
+        public async Task<IActionResult> ObtenerConFiltros([FromQuery] PrestatarioSearchDTO filtro)
         {
             try
             {
-                var lista = await _service.ObtenerConFiltrosAsync(filtro);
+                // Map FilterDTO to PrestatarioDTO manually or via AutoMapper if configured
+                var dto = new PrestatarioDTO
+                {
+                    Dni = filtro.Dni,
+                    Nombre = filtro.Nombre,
+                    Apellido = filtro.Apellido,
+                    Telefono = filtro.Telefono,
+                    Domicilio = filtro.Domicilio,
+                    Correo = filtro.Correo,
+                    EsActivo = filtro.EsActivo
+                };
+
+                var lista = await _service.ObtenerConFiltrosAsync(dto);
                 var dtos = _mapper.Map<List<PrestatarioDTO>>(lista);
                 return Ok(dtos);
             }

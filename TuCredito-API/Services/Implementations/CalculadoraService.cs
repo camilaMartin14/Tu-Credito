@@ -78,16 +78,29 @@ namespace TuCredito.Services.Implementations;
             decimal montoCuota)
         {
             var capitalPorCuota = entry.MontoPrestamo / entry.CantidadCuotas;
-            var interesPorCuota = entry.MontoPrestamo * entry.InteresMensual;
+            var interesPorCuota = entry.MontoPrestamo * (entry.InteresMensual / 100);
+            var saldoRestante = entry.MontoPrestamo;
 
             for (int i = 1; i <= entry.CantidadCuotas; i++)
             {
+                var capitalRound = Math.Round(capitalPorCuota, 0, MidpointRounding.AwayFromZero);
+                saldoRestante -= capitalRound;
+                
+                if (i == entry.CantidadCuotas && saldoRestante != 0)
+                {
+                     // Ajuste en la última cuota si hay diferencias por redondeo
+                     // Esto es opcional, pero buena práctica. Por ahora lo dejamos simple o ajustamos capital?
+                     // Si ajustamos capital, el montoCuota podría variar.
+                     // En Flat Rate, el monto cuota es fijo. El capital es derivado.
+                }
+
                 resultado.DetalleCuotas.Add(new CuotaSimuladaDTO
                 {
                     NumeroCuota = i,
                     Monto = montoCuota,
-                    Capital = Math.Round(capitalPorCuota, 0, MidpointRounding.AwayFromZero),
+                    Capital = capitalRound,
                     Interes = Math.Round(interesPorCuota, 0, MidpointRounding.AwayFromZero),
+                    SaldoRestante = saldoRestante > 0 ? saldoRestante : 0,
                     FechaVencimiento = entry.FechaInicio?.AddMonths(i)
                 });
             }

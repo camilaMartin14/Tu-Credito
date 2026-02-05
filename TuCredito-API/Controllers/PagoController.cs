@@ -25,7 +25,8 @@ namespace TuCredito.Controllers;
             try
             {
                 var pagos = await _service.GetAllPagos();
-                return Ok(pagos);
+                var dtos = _mapper.Map<List<PagoOutputDTO>>(pagos);
+                return Ok(dtos);
             }
             catch (Exception ex)
             {

@@ -127,6 +127,20 @@ namespace TuCredito.Controllers;
             }
         }
 
+        [HttpGet("recent-transactions")]
+        public async Task<ActionResult<List<TransactionDTO>>> GetRecentTransactions()
+        {
+            try
+            {
+                var result = await _dashboardService.GetRecentTransactionsAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener transacciones recientes.", error = ex.Message });
+            }
+        }
+
         [HttpGet("customer-ranking")]
         public async Task<ActionResult<List<GraficoDatoDTO>>> GetRankingClientes()
         {

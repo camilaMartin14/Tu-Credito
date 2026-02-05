@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 namespace TuCredito.DTOs;
     public class PrestamoDTO
     {
+        public int IdPrestamo { get; set; }
+
         [Required(ErrorMessage = "El DNI del Prestatario es obligatorio")]
         public int DniPrestatario { get; set; }
 

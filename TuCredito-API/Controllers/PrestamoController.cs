@@ -110,4 +110,19 @@ namespace TuCredito.Controllers;
                 return StatusCode(500, new { message = "Error al finalizar el préstamo.", error = ex.Message });
             }
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Eliminar(int id)
+        {
+            try
+            {
+                var resultado = await _service.Delete(id);
+                if (resultado) return Ok(new { message = "Préstamo eliminado correctamente." });
+                return BadRequest(new { message = "No se pudo eliminar el préstamo." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al eliminar el préstamo.", error = ex.Message });
+            }
+        }
     }

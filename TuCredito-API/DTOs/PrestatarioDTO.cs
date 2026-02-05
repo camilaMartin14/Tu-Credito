@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace TuCredito.DTOs;
     public class PrestatarioDTO // Datos completos del prestatario y garante
@@ -43,4 +43,7 @@ namespace TuCredito.DTOs;
         [EmailAddress(ErrorMessage = "Formato de correo del Garante inválido")]
         [StringLength(100, ErrorMessage = "El Correo del Garante no puede exceder los 100 caracteres")]
         public string? GaranteCorreo { get; set; }
+
+        [StringLength(20, ErrorMessage = "El DNI del Garante no puede exceder los 20 caracteres")]
+        public string? GaranteDni { get; set; }
     }

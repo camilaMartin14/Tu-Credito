@@ -24,9 +24,9 @@ public class CuotaController : ControllerBase
     }
 
     [HttpGet("filter")]
-    public async Task<IActionResult> GetByFiltro([FromQuery] int? estado, [FromQuery] int? mesVto,[FromQuery] string? prestatario)
+    public async Task<IActionResult> GetByFiltro([FromQuery] int? estado, [FromQuery] int? mesVto,[FromQuery] string? prestatario, [FromQuery] int? idPrestamo)
     {
-        var result = await _service.GetByFiltro(estado, mesVto, prestatario);
+        var result = await _service.GetByFiltro(estado, mesVto, prestatario, idPrestamo);
         if (result.IsFailure) return BadRequest(new { message = result.Error });
         return Ok(result.Value);
     }

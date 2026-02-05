@@ -39,10 +39,8 @@ namespace TuCredito.Services.Implementations;
             {
                 pagosQuery = pagosQuery.Where(p => p.FecPago >= startDate && p.FecPago <= endDate);
             }
-            else
-            {
-                pagosQuery = pagosQuery.Where(p => p.FecPago.Month == now.Month && p.FecPago.Year == now.Year);
-            }
+            // Si no hay filtro, tomamos TODO el histórico para que sea consistente con TotalPrestado
+            
             var totalCobrado = await pagosQuery.SumAsync(p => p.Monto);
 
             var pagosConCuota = await pagosQuery
@@ -226,13 +224,57 @@ namespace TuCredito.Services.Implementations;
                       && c.FecVto <= limitDate
                 select new CuotaVencerDTO
                 {
-                    Cliente = cl.Nombre + " " + cl.Apellido,
+                    IdCuota = c.IdCuota,
+                    IdPrestamo = c.IdPrestamo,
+                    NroCuota = c.NroCuota,
+                    NombrePrestatario = cl.Nombre,
+                    ApellidoPrestatario = cl.Apellido,
+                    DniPrestatario = cl.Dni,
                     FechaVencimiento = c.FecVto,
                     Monto = c.Monto,
                     DiasParaVencer = (c.FecVto - today).Days
                 };
 
             return await query.OrderBy(x => x.FechaVencimiento).ToListAsync();
+        }
+
+        public async Task<List<TransactionDTO>> GetRecentTransactionsAsync()
+        {
+            var loans = await _context.Prestamos
+                .Include(p => p.DniPrestatarioNavigation)
+                .Include(p => p.IdEstadoNavigation)
+                .OrderByDescending(p => p.FechaOtorgamiento)
+                .Take(5)
+                .Select(p => new TransactionDTO
+                {
+                    Type = "Prestamo",
+                    Date = p.FechaOtorgamiento,
+                    Amount = p.MontoOtorgado,
+                    EntityName = p.DniPrestatarioNavigation.Nombre + " " + p.DniPrestatarioNavigation.Apellido,
+                    Status = p.IdEstadoNavigation.Descripcion
+                })
+                .ToListAsync();
+
+            var payments = await _context.Pagos
+                .Include(p => p.IdCuotaNavigation)
+                    .ThenInclude(c => c.IdPrestamoNavigation)
+                        .ThenInclude(pr => pr.DniPrestatarioNavigation)
+                .OrderByDescending(p => p.FecPago)
+                .Take(5)
+                .Select(p => new TransactionDTO
+                {
+                    Type = "Pago",
+                    Date = p.FecPago,
+                    Amount = p.Monto,
+                    EntityName = p.IdCuotaNavigation.IdPrestamoNavigation.DniPrestatarioNavigation.Nombre + " " + p.IdCuotaNavigation.IdPrestamoNavigation.DniPrestatarioNavigation.Apellido,
+                    Status = "Completado"
+                })
+                .ToListAsync();
+
+            return loans.Concat(payments)
+                .OrderByDescending(x => x.Date)
+                .Take(10)
+                .ToList();
         }
 
         public async Task<List<GraficoDatoDTO>> GetRankingClientesDeudaAsync()

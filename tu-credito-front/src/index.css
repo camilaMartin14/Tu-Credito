@@ -1,0 +1,60 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  
+  /* Light Theme Variables */
+  --color-background: 249 250 251; /* gray-50 */
+  --color-surface: 255 255 255; /* white */
+  --color-surface-highlight: 243 244 246; /* gray-100 */
+  --color-border: 229 231 235; /* gray-200 */
+  --color-text-main: 17 24 39; /* gray-900 */
+  --color-text-muted: 107 114 128; /* gray-500 */
+}
+
+.dark {
+  color-scheme: dark;
+  /* Dark Theme Variables (Original) */
+  --color-background: 11 14 20; /* #0B0E14 */
+  --color-surface: 21 26 35;    /* #151A23 */
+  --color-surface-highlight: 30 37 50; /* #1E2532 */
+  --color-border: 42 50 65;     /* #2A3241 */
+  --color-text-main: 243 244 246; /* gray-100 */
+  --color-text-muted: 156 163 175; /* gray-400 */
+}
+
+body {
+  @apply bg-background text-main antialiased selection:bg-primary-500/30 transition-colors duration-300;
+}
+
+/* Scrollbar personalizada para modo oscuro */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-background;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-surfaceHighlight rounded-full hover:bg-border transition-colors;
+}
+
+/* Clases de utilidad custom */
+.glass-panel {
+  @apply bg-surface/80 backdrop-blur-md border border-border;
+}
+
+.card-gradient {
+  background: linear-gradient(145deg, rgba(21, 26, 35, 0.9) 0%, rgba(11, 14, 20, 0.95) 100%);
+}
+
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400;
+}
+
+.primary-gradient {
+  @apply bg-gradient-to-r from-primary-600 to-accent-purple hover:from-primary-500 hover:to-accent-pink transition-all duration-300;
+}

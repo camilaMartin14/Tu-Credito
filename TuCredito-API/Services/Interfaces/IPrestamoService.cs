@@ -5,6 +5,7 @@ namespace TuCredito.Services.Interfaces;
     public interface IPrestamoService
     {
         Task<bool> SoftDelete(int id);
+        Task<bool> Delete(int id);
         Task<bool> PostPrestamo(PrestamoDTO NvoPrestamo);
         Task<PrestamoDTO> GetPrestamoById(int id); // devuelve DTO
         Task<Prestamo> GetPrestamoEntityById(int id); // devuelve entidad

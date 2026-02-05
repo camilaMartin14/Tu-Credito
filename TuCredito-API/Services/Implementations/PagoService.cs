@@ -30,6 +30,7 @@ namespace TuCredito.Services.Implementations
         {
             // “Registrado” NO debería venir del front, es un estado del sistema.
             return await _context.Pagos
+                .Include(p => p.IdCuotaNavigation)
                 .Where(p => p.Estado == PAGO_REGISTRADO)
                 .ToListAsync();
         }
@@ -106,12 +107,19 @@ namespace TuCredito.Services.Implementations
                 // Saldo actual de la cuota
                 var saldoActualCuota = cuotaObjetivo.SaldoPendiente ?? cuotaObjetivo.Monto;
 
-                if (pago.Monto > saldoActualCuota)
+                // Calcular cuánto reduce realmente la deuda
+                // Amortización = Lo pagado + Lo perdonado (descuento) - Lo cobrado extra (recargo)
+                var montoAmortizado = pago.Monto + pago.Descuento - pago.Recargo;
+
+                if (montoAmortizado <= 0)
+                     throw new InvalidOperationException("El pago neto (ajustado por descuentos/recargos) no reduce la deuda.");
+
+                if (montoAmortizado > saldoActualCuota)
                     throw new InvalidOperationException(
-                        $"El pago ({pago.Monto}) excede el saldo pendiente de la cuota ({saldoActualCuota}).");
+                        $"El pago amortizable ({montoAmortizado}) excede el saldo pendiente de la cuota ({saldoActualCuota}).");
 
                 // Actualizar cuota
-                cuotaObjetivo.SaldoPendiente = saldoActualCuota - pago.Monto;
+                cuotaObjetivo.SaldoPendiente = saldoActualCuota - montoAmortizado;
 
                 if (cuotaObjetivo.SaldoPendiente <= 0)
                 {
@@ -124,7 +132,7 @@ namespace TuCredito.Services.Implementations
                 }
 
                 // Actualizar préstamo
-                prestamo.SaldoRestante -= pago.Monto;
+                prestamo.SaldoRestante -= montoAmortizado;
 
                 if (prestamo.SaldoRestante <= 0)
                 {

@@ -19,6 +19,7 @@ namespace TuCredito.DTOs;
         [StringLength(32, ErrorMessage = "La Contraseña no puede exceder los 32 caracteres")]
         public string? ContraseniaActual { get; set; }
 
-        [StringLength(32, MinimumLength = 6, ErrorMessage = "La Nueva Contraseña debe tener entre 6 y 32 caracteres")]
+        [StringLength(32, MinimumLength = 8, ErrorMessage = "La Nueva Contraseña debe tener entre 8 y 32 caracteres")]
+        [RegularExpression(@"^(?=.*[0-9]).*$", ErrorMessage = "La nueva contraseña debe contener al menos un número")]
         public string? NuevaContrasenia { get; set; }
     }

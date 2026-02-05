@@ -8,10 +8,18 @@ namespace TuCredito.Profiles;
         public PagoProfile()
         {
             CreateMap<Pago, PagoOutputDTO>()
-                 .ForMember(dest => dest.NroCuota, opt => opt.MapFrom(src => src.IdCuotaNavigation.NroCuota)).ReverseMap();
+                 .ForMember(dest => dest.NroCuota, opt => opt.MapFrom(src => src.IdCuotaNavigation.NroCuota))
+                 .ForMember(dest => dest.MedioPago, opt => opt.MapFrom(src => src.IdMedioPago))
+                 .ReverseMap();
             
 
             CreateMap<PagoInputDTO, Pago>()
-                .ForMember(dest => dest.FecPago, opt => opt.MapFrom(src => DateTime.Now)).ReverseMap();
+                .ForMember(dest => dest.FecPago, opt => opt.MapFrom(src => src.FechaPago))
+                .ForMember(dest => dest.IdPago, opt => opt.Ignore())
+                .ForMember(dest => dest.Saldo, opt => opt.Ignore())
+                .ForMember(dest => dest.Estado, opt => opt.Ignore())
+                .ForMember(dest => dest.IdCuotaNavigation, opt => opt.Ignore())
+                .ForMember(dest => dest.IdMedioPagoNavigation, opt => opt.Ignore())
+                .ReverseMap();
         }
     }

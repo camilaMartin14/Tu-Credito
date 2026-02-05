@@ -35,7 +35,7 @@ namespace TuCredito.Controllers;
 
         [Authorize]
         [HttpGet("me")]
-        public async Task<ActionResult<Prestamista>> ObtenerActual()
+        public async Task<ActionResult<PrestamistaResponseDTO>> ObtenerActual()
         {
             try
             {
@@ -49,7 +49,17 @@ namespace TuCredito.Controllers;
                 if (prestamista == null)
                     return NotFound(new { message = "Prestamista no encontrado." });
 
-                return Ok(prestamista);
+                var response = new PrestamistaResponseDTO
+                {
+                    Id = prestamista.Id,
+                    Nombre = prestamista.Nombre,
+                    Apellido = prestamista.Apellido,
+                    Usuario = prestamista.Usuario,
+                    Correo = prestamista.Correo,
+                    EsActivo = prestamista.EsActivo
+                };
+
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -68,10 +78,20 @@ namespace TuCredito.Controllers;
 
                 var token = _jwt.GenerateToken(prestamista.Id, prestamista.Usuario);
 
+                var response = new PrestamistaResponseDTO
+                {
+                    Id = prestamista.Id,
+                    Nombre = prestamista.Nombre,
+                    Apellido = prestamista.Apellido,
+                    Usuario = prestamista.Usuario,
+                    Correo = prestamista.Correo,
+                    EsActivo = prestamista.EsActivo
+                };
+
                 return Ok(new
                 {
                     token,
-                    prestamista
+                    prestamista = response
                 });
             }
             catch (Exception ex)

@@ -32,6 +32,26 @@ namespace TuCredito.Services.Implementations
             if (existe)
                 throw new ArgumentException("Ya existe un prestatario con ese DNI.");
 
+            // Verificar si hay datos de garante y gestionarlo
+            if (prestatario.IdGaranteNavigation != null && !string.IsNullOrWhiteSpace(prestatario.IdGaranteNavigation.Dni))
+            {
+                var garanteExistente = await _context.Garantes
+                    .FirstOrDefaultAsync(g => g.Dni == prestatario.IdGaranteNavigation.Dni);
+
+                if (garanteExistente != null)
+                {
+                    // Asociar al existente
+                    prestatario.IdGaranteNavigation = garanteExistente;
+                    prestatario.IdGarante = garanteExistente.IdGarante;
+                }
+                else
+                {
+                    // Es nuevo, aseguramos que se marque como activo por defecto si no viene
+                    prestatario.IdGaranteNavigation.EsActivo = true;
+                    // EF lo insertará automáticamente
+                }
+            }
+
             await _context.Prestatarios.AddAsync(prestatario);
             await _context.SaveChangesAsync();
 

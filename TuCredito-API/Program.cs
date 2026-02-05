@@ -11,7 +11,6 @@ using TuCredito.Services.Implementations;
 using TuCredito.Services.Implementations.Clients;
 using TuCredito.Services.Interfaces;
 using TuCredito.Services.Interfaces.Clients;
-using TuCredito.Services.Background;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -105,8 +104,8 @@ builder.Services.AddDbContext<TuCreditoContext>((sp, options) =>
 {
     var interceptor = sp.GetRequiredService<AuditInterceptor>();
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("AylenConnection")
-        //builder.Configuration.GetConnectionString("CamilaConnection")
+        //builder.Configuration.GetConnectionString("AylenConnection")
+        builder.Configuration.GetConnectionString("CamilaConnection")
     )
     .AddInterceptors(interceptor);
 });
@@ -121,7 +120,6 @@ builder.Services.AddScoped<ICalculadoraService, CalculadoraService>();
 builder.Services.AddScoped<IDolarService, DolarService>();
 builder.Services.AddScoped<IEvaluacionCrediticiaService, EvaluacionCrediticiaService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddHostedService<NotificacionVencimientoCuotaService>();
 
 builder.Services.AddHttpClient<IBcraDeudoresService, BcraDeudoresService>((sp, client) =>
 {
@@ -153,10 +151,26 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+// Ensure Database Created
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<TuCreditoContext>();
+        context.Database.EnsureCreated();
+        Console.WriteLine("✅ Database ensured created.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ An error occurred creating the DB: {ex.Message}");
+    }
+}
 
 app.Run();

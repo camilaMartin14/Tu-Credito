@@ -7,8 +7,11 @@ namespace TuCredito.DTOs;
         public int IdCuota { get; set; }
 
         [Required(ErrorMessage = "El Monto es obligatorio")]
-        [Range(1, int.MaxValue, ErrorMessage = "El Monto debe ser mayor a 0")]
-        public int Monto { get; set; }
+        [Range(0.01, double.MaxValue, ErrorMessage = "El Monto debe ser mayor a 0")]
+        public decimal Monto { get; set; }
+
+        public decimal Descuento { get; set; }
+        public decimal Recargo { get; set; }
 
         [Required(ErrorMessage = "El IdMedioPago es obligatorio")]
         public int IdMedioPago { get; set; }
@@ -17,5 +20,5 @@ namespace TuCredito.DTOs;
         public string? Observaciones { get; set; }
 
         [Required(ErrorMessage = "La Fecha de pago es obligatoria")]
-        public DateTime FecPago { get; set; }
+        public DateTime FechaPago { get; set; }
     }
