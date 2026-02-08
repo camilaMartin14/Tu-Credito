@@ -127,7 +127,7 @@ namespace TuCredito.Data
                 var prestamo1 = new Prestamo
                 {
                     DniPrestatario = p1.Dni,
-                    IdPrestamista = prestamista.IdPrestamista,
+                    IdPrestamista = prestamista.Id,
                     MontoOtorgado = 50000.00m,
                     TasaInteres = 10.00m,
                     CantidadCtas = 6,
@@ -171,7 +171,7 @@ namespace TuCredito.Data
                 var prestamo2 = new Prestamo
                 {
                     DniPrestatario = p2.Dni,
-                    IdPrestamista = prestamista.IdPrestamista,
+                    IdPrestamista = prestamista.Id,
                     MontoOtorgado = 100000.00m,
                     TasaInteres = 5.00m,
                     CantidadCtas = 12,
