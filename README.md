@@ -1,122 +1,140 @@
-# 📌 Tu Crédito – Sistema de Gestión de Préstamos
+# 🚀 Tu Crédito – Gestión Financiera Inteligente
 
-![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge&logoColor=white)
-![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white)
+![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge&logo=.net&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)
-![EF Core](https://img.shields.io/badge/EF%20Core-512BD4?style=for-the-badge&logo=.net&logoColor=white)
-![MinIO](https://img.shields.io/badge/MinIO-C72E49?style=for-the-badge&logo=minio&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-**Tu Crédito** es una plataforma integral diseñada para la administración eficiente de créditos y prestatarios. Desarrollada con un enfoque profesional, implementa una arquitectura robusta y escalable que permite gestionar el ciclo de vida completo de un préstamo, desde la solicitud hasta la cancelación total.
+> **Transforma la gestión de préstamos con una plataforma moderna, segura y escalable.**
 
-Este proyecto destaca por su **backend sólido en .NET**, implementación de **seguridad con JWT**, **auditoría de datos** y **consumo de APIs externas** para enriquecer la experiencia del usuario.
+**Tu Crédito** es una solución fintech integral diseñada para automatizar y optimizar el ciclo de vida de los préstamos. Desde la evaluación de riesgo hasta la cobranza final, nuestra plataforma ofrece herramientas potentes para prestamistas que buscan profesionalizar su operación.
 
 ---
 
-## 🎯 Contexto y Objetivo del Proyecto
+## ✨ ¿Por qué Tu Crédito?
 
-Este proyecto nace de una **necesidad real de negocio**. Fue desarrollado a medida para un cliente del sector financiero, quien participó activamente en el proceso, definiendo los requerimientos funcionales y flujos de trabajo específicos.
+Más que un simple sistema de registro, **Tu Crédito** es un aliado estratégico para la toma de decisiones financieras.
 
-El objetivo principal es proveer una herramienta personalizada que automatice su gestión diaria de créditos, reemplazando procesos manuales por un sistema **auditable, seguro y eficiente**.
+### 📊 Dashboard Ejecutivo en Tiempo Real
+Visualiza la salud de tu cartera en un solo vistazo.
+- **KPIs Financieros:** Capital prestado, interés ganado, tasa de morosidad y proyecciones de cobro.
+- **Gráficos Interactivos:** Evolución de préstamos y análisis de tendencias.
+- **Alertas:** Notificaciones automáticas de cuotas vencidas y pagos pendientes.
 
-### 🔄️ Estado Actual y Roadmap
-El proyecto se encuentra en **desarrollo activo y continuo**, evolucionando iterativamente en base al feedback del cliente.
+### 🤝 Gestión 360° de Prestatarios
+Conoce a tus clientes a fondo para minimizar riesgos.
+- **Perfil Digital Completo:** Datos personales, historial de contacto y score interno.
+- **Evaluación Crediticia (BCRA):** Integración directa para consultar antecedentes financieros y situación crediticia en tiempo real.
+- **Digitalización de Legajos:** Carga y gestión segura de documentos (DNI, recibos, garantías) con soporte para PDF e imágenes, respaldado por **MinIO**.
 
-- **Backend**: ✅ Etapa avanzada. Arquitectura consolidada, lógica de negocio robusta e integraciones completadas.
-- **Frontend**: 🔄 **Próximo paso**. Actualmente estamos enfocadas en el rediseño y modernización de la interfaz de usuario para mejorar la experiencia (UX/UI).
+### 💰 Motor de Préstamos Flexible
+Adapta la financiación a las necesidades del negocio.
+- **Simulador de Créditos:** Cálculo instantáneo de planes de pago (Sistema Francés, Alemán, Americano).
+- **Multi-Moneda:** Integración con APIs de cotización (Dólar Oficial/Blue) para operaciones en moneda extranjera.
+- **Control de Cobranzas:** Registro de pagos parciales/totales, refinanciación y cálculo automático de punitorios.
 
----
-
-## Características Destacadas del Backend
-
-El backend ha sido construido siguiendo las mejores prácticas de la industria, asegurando mantenibilidad, escalabilidad y seguridad.
-
-### 🏗️ Arquitectura y Patrones de Diseño
-- **Arquitectura en Capas (Clean Architecture)**: Separación clara de responsabilidades en Controladores, Servicios, Repositorios, DTOs y Modelos. Esto facilita el testing y el mantenimiento.
-- **Patrón Repositorio**: Abstracción de la capa de acceso a datos, permitiendo cambiar la fuente de datos sin afectar la lógica de negocio.
-- **Inyección de Dependencias (DI)**: Uso extensivo de DI para desacoplar componentes y mejorar la testabilidad.
-- **DTOs (Data Transfer Objects)**: Uso de objetos específicos para la transferencia de datos entre el cliente y el servidor, evitando exponer las entidades de base de datos directamente.
-
-### 🔐 Seguridad y Auditoría
-- **Autenticación JWT (JSON Web Tokens)**: Implementación segura de autenticación mediante tokens Bearer, protegiendo los endpoints sensibles.
-- **Hashing de Contraseñas**: Almacenamiento seguro de credenciales utilizando algoritmos de hash robustos.
-- **Auditoría Avanzada (Audit Interceptor)**: Sistema automático de auditoría mediante **Entity Framework Core Interceptors**.
-  - Registra automáticamente cambios (creación, modificación, eliminación) en entidades sensibles como `Prestamo`, `Pago`, `Prestatario` y `Garante`.
-  - Guarda el historial detallado de valores anteriores y nuevos en formato JSON, junto con el usuario responsable y la fecha.
-
-### 🌐 Integraciones y APIs Externas
-- **Servicio BCRA (Banco Central)**: Integración para consultar la situación crediticia de los prestatarios en tiempo real, ayudando en la toma de decisiones de riesgo.
-- **Cotización de Monedas**: Consumo de API externa para obtener la cotización del Dólar (Oficial, Blue, etc.) en tiempo real, permitiendo conversiones y visualización de datos en múltiples monedas.
-
-### 🛠️ Funcionalidades Técnicas Adicionales
-- **Paginación y Filtrado**: Endpoints optimizados con soporte para paginación y filtros dinámicos (por nombre, estado, fecha), mejorando el rendimiento en grandes volúmenes de datos.
-- **Swagger / OpenAPI**: Documentación interactiva de la API generada automáticamente, facilitando la exploración y prueba de los endpoints durante el desarrollo.
-- **Manejo de Errores**: Estructura consistente para el manejo de excepciones y respuestas HTTP.
-- **Gestión de Documentación con MinIO**: Integración con almacenamiento de multimedia mediante MinIO, permitiendo la carga, descarga y persistencia segura de documentación asociada a los clientes y préstamos (pagarés, recibos de sueldo, documentación identificatoria).
-Los archivos se almacenan de forma desacoplada de la base de datos, conservando únicamente las referencias necesarias, lo que mejora la escalabilidad, seguridad y mantenibilidad del sistema.
-
-### 📂 Estructura del Proyecto
-
-El proyecto sigue una arquitectura limpia para garantizar la separación de responsabilidades:
-
-```
-TuCredito-API/
-├── Controllers/       # Puntos de entrada de la API
-├── Services/          # Lógica de negocio y orquestación
-│   ├── Interfaces/    # Contratos de servicios
-│   └── Implementations/
-├── Repositories/      # Acceso a datos (Patrón Repositorio)
-├── Models/            # Entidades de dominio (EF Core)
-├── DTOs/              # Objetos de transferencia de datos
-├── Security/          # Configuración de JWT y Hashing
-└── Interceptors/      # Auditoría automática (EF Core)
-```
-
----
-
-## 💻 Funcionalidades Principales
-
-### 🔹 Gestión de Créditos
-- Alta, baja y modificación de préstamos.
-- Consulta detallada de créditos activos y finalizados.
-- Cálculo automático de estados y seguimiento de vencimientos.
-
-### 🔹 Gestión de Prestatarios
-- Registro completo de información personal y financiera.
-- Historial crediticio y scoring interno.
-
-### 🔹 Control de Pagos y Cuotas
-- Generación de planes de cuotas con diferentes sistemas de amortización.
-- Registro de pagos parciales o totales.
-- Detección automática de mora y cálculo de intereses punitorios.
-
-### 🔹 Dashboard y Métricas
-- Visualización de KPIs financieros.
-- Gráficos de evolución de cartera y morosidad.
+### 🛡️ Seguridad y Auditoría Bancaria
+Protege tu información crítica con estándares empresariales.
+- **Trazabilidad Total:** Cada operación queda registrada en un log de auditoría inmutable (Quién, Qué, Cuándo).
+- **Acceso Seguro:** Autenticación robusta vía **JWT** y hashing de contraseñas.
+- **Arquitectura Clean:** Backend desacoplado y testearle basado en principios SOLID.
 
 ---
 
 ## 🛠️ Stack Tecnológico
 
-### Backend
-- **Lenguaje**: C#
-- **Framework**: .NET 10 Web API (aprovechando las últimas mejoras de rendimiento y JIT)
-- **ORM**: Entity Framework Core
-- **Base de Datos**: SQL Server
-- **Autenticación**: JWT Bearer
-- **Mapeo**: AutoMapper
-- **Almacenamiento**: MinIO (S3 Compatible)
+Construido sobre una base tecnológica de vanguardia para garantizar rendimiento y mantenibilidad a largo plazo.
 
-### Frontend
-- **Framework**: Angular / Vanilla JS (según implementación actual)
-- **Estilos**: CSS3, HTML5
-- **Hosting**: Vercel
+### Backend (The Core)
+- **Framework:** .NET 10 (Web API)
+- **ORM:** Entity Framework Core (Code First)
+- **Base de Datos:** SQL Server
+- **Almacenamiento:** MinIO (S3 Compatible) para gestión documental
+- **Arquitectura:** Clean Architecture + CQRS pattern inspiration + Repository Pattern
 
-### Herramientas
-- **Control de Versiones**: Git & GitHub
-- **API Testing**: Postman / Swagger UI
+### Frontend (The Experience)
+- **Framework:** React 18 + Vite
+- **Lenguaje:** TypeScript
+- **Estilos:** Tailwind CSS (Diseño responsivo y moderno)
+- **UI Components:** Shadcn/UI (inspiración), Lucide Icons
+- **Estado:** React Hooks & Context API
 
 ---
+
+## 🚀 Quick Start
+
+¿Listo para ver **Tu Crédito** en acción? Sigue estos pasos para desplegar el entorno de desarrollo.
+
+### Prerrequisitos
+- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [Node.js](https://nodejs.org/) (v18+)
+- [SQL Server](https://www.microsoft.com/sql-server/)
+- [MinIO](https://min.io/) (Opcional, si se usa almacenamiento local)
+
+### 1️⃣ Configuración del Backend
+
+```bash
+# Clonar el repositorio
+git clone https://github.com/tu-usuario/tu-credito.git
+
+# Navegar al backend
+cd Tu-Credito/TuCredito-API
+
+# Restaurar dependencias
+dotnet restore
+
+# Configurar conexión a BD en appsettings.json
+# Actualizar "DefaultConnection" con tu cadena de conexión local
+
+# Aplicar migraciones (o ejecutar scripts SQL provistos)
+dotnet ef database update
+
+# Iniciar el servidor
+dotnet run
+```
+
+### 2️⃣ Configuración del Frontend
+
+```bash
+# Navegar al frontend (en nueva terminal)
+cd Tu-Credito/tu-credito-front
+
+# Instalar dependencias
+npm install
+
+# Iniciar servidor de desarrollo
+npm run dev
+```
+
+¡Listo! Accede a la aplicación en `http://localhost:5173`.
+
+---
+
+## 📂 Estructura del Proyecto
+
+```
+Tu-Credito/
+├── TuCredito-API/          # 🧠 Backend (.NET 10)
+│   ├── Controllers/        # API Endpoints
+│   ├── Core/               # Lógica compartida (Result pattern)
+│   ├── Services/           # Reglas de Negocio
+│   ├── Models/             # Entidades de Dominio (EF Core)
+│   ├── DTOs/               # Objetos de Transferencia de Datos
+│   ├── Security/           # Autenticación y JWT
+│   └── Storage/            # Gestión de archivos (MinIO/Local)
+│
+├── tu-credito-front/       # 🎨 Frontend (React)
+│   ├── src/
+│   │   ├── components/     # Componentes UI Reutilizables
+│   │   ├── pages/          # Vistas Principales
+│   │   ├── services/       # Comunicación con API (Axios)
+│   │   ├── hooks/          # Custom Hooks
+│   │   ├── context/        # Estado Global (Auth, Toast)
+│   │   └── types/          # Definiciones TypeScript
+│
+└── *.sql                   # 📜 Scripts de Base de Datos (en raíz)
+```
 
 ## 👩‍💻 Equipo de Desarrollo
 
