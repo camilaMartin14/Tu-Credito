@@ -228,8 +228,13 @@ export function Payments() {
                   </td>
                   <td className="px-6 py-4 text-muted">{getPaymentMethodLabel(payment.medioPago as PaymentMethod)}</td>
                   <td className="px-6 py-4">
-                     <StatusBadge variant={payment.estado === 'Aprobado' ? 'success' : 'default'}>
-                        <CheckCircle2 className="h-3 w-3" /> {payment.estado}
+                     <StatusBadge variant={
+                        payment.estado === 'Aprobado' || payment.estado === 'Registrado' ? 'success' : 
+                        payment.estado === 'Anulado' ? 'error' : 
+                        payment.estado === 'Pendiente' ? 'warning' : 'default'
+                     }>
+                        {payment.estado === 'Anulado' ? <Ban className="h-3 w-3" /> : <CheckCircle2 className="h-3 w-3" />} 
+                        {payment.estado}
                      </StatusBadge>
                   </td>
                   <td className="px-6 py-4">

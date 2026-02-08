@@ -33,22 +33,31 @@ namespace TuCredito.Services.Implementations
                 throw new ArgumentException("Ya existe un prestatario con ese DNI.");
 
             // Verificar si hay datos de garante y gestionarlo
-            if (prestatario.IdGaranteNavigation != null && !string.IsNullOrWhiteSpace(prestatario.IdGaranteNavigation.Dni))
+            if (prestatario.IdGaranteNavigation != null)
             {
-                var garanteExistente = await _context.Garantes
-                    .FirstOrDefaultAsync(g => g.Dni == prestatario.IdGaranteNavigation.Dni);
-
-                if (garanteExistente != null)
+                if (string.IsNullOrWhiteSpace(prestatario.IdGaranteNavigation.Dni))
                 {
-                    // Asociar al existente
-                    prestatario.IdGaranteNavigation = garanteExistente;
-                    prestatario.IdGarante = garanteExistente.IdGarante;
+                    // Si el DNI del garante es vacío/nulo, descartamos el objeto vacío que crea AutoMapper
+                    prestatario.IdGaranteNavigation = null;
+                    prestatario.IdGarante = null;
                 }
                 else
                 {
-                    // Es nuevo, aseguramos que se marque como activo por defecto si no viene
-                    prestatario.IdGaranteNavigation.EsActivo = true;
-                    // EF lo insertará automáticamente
+                    var garanteExistente = await _context.Garantes
+                        .FirstOrDefaultAsync(g => g.Dni == prestatario.IdGaranteNavigation.Dni);
+
+                    if (garanteExistente != null)
+                    {
+                        // Asociar al existente
+                        prestatario.IdGaranteNavigation = garanteExistente;
+                        prestatario.IdGarante = garanteExistente.IdGarante;
+                    }
+                    else
+                    {
+                        // Es nuevo, aseguramos que se marque como activo por defecto si no viene
+                        prestatario.IdGaranteNavigation.EsActivo = true;
+                        // EF lo insertará automáticamente
+                    }
                 }
             }
 
