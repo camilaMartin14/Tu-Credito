@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getPayments, getPaymentsByFilter, updatePaymentStatus } from '../services/paymentService';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search, Filter, Download, AlertCircle, CheckCircle2, X, Ban, Plus } from 'lucide-react';
 import { PaymentMethod, getPaymentMethodLabel } from '../types/enums';
 import { formatCurrency, formatDate } from '../utils/formatters';
@@ -15,6 +15,7 @@ import { NewPaymentModal } from '../components/payments/NewPaymentModal';
 import { Cuota } from '../types';
 
 export function Payments() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
@@ -181,6 +182,7 @@ export function Payments() {
             <thead className="bg-surfaceHighlight text-muted">
               <tr>
                 <th className="px-6 py-3 font-medium">ID Pago</th>
+                <th className="px-6 py-3 font-medium">Cliente</th>
                 <th className="px-6 py-3 font-medium">Cuota</th>
                 <th className="px-6 py-3 font-medium">Monto</th>
                 <th className="px-6 py-3 font-medium">Fecha</th>
@@ -193,6 +195,17 @@ export function Payments() {
               {payments?.map((payment) => (
                 <tr key={payment.idPago} className="hover:bg-surfaceHighlight/50 transition-colors">
                   <td className="px-6 py-4 font-medium text-main">#{payment.idPago}</td>
+                  <td className="px-6 py-4">
+                    <button
+                      onClick={() => payment.dniCliente && navigate(`/borrowers/${payment.dniCliente}`)}
+                      className="text-primary-400 hover:text-primary-300 font-medium hover:underline text-left"
+                      disabled={!payment.dniCliente}
+                    >
+                      {payment.nombreCliente && payment.apellidoCliente 
+                        ? `${payment.nombreCliente} ${payment.apellidoCliente}`
+                        : 'N/A'}
+                    </button>
+                  </td>
                   <td className="px-6 py-4 text-muted">#{payment.nroCuota}</td>
                   <td className="px-6 py-4 text-main font-semibold">{formatCurrency(payment.monto || 0)}</td>
                   <td className="px-6 py-4 text-muted">

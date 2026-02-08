@@ -67,6 +67,9 @@ export interface PagoOutputDTO {
   fecPago: string;
   medioPago: number;
   estado: string;
+  nombreCliente?: string;
+  apellidoCliente?: string;
+  dniCliente?: number;
 }
 
 export interface DashboardKpisDTO {

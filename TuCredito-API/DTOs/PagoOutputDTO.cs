@@ -7,4 +7,7 @@ namespace TuCredito.DTOs;
         public DateTime FecPago { get; set; }
         public int MedioPago { get; set; }
         public required string Estado { get; set; }
+        public string NombreCliente { get; set; }
+        public string ApellidoCliente { get; set; }
+        public int DniCliente { get; set; }
     }

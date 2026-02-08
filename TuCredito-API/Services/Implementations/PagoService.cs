@@ -31,6 +31,8 @@ namespace TuCredito.Services.Implementations
             // Retornamos todos los pagos para el historial, el front se encarga de mostrar el estado
             return await _context.Pagos
                 .Include(p => p.IdCuotaNavigation)
+                    .ThenInclude(c => c.IdPrestamoNavigation)
+                        .ThenInclude(pr => pr.DniPrestatarioNavigation)
                 .OrderByDescending(p => p.FecPago)
                 .ToListAsync();
         }
