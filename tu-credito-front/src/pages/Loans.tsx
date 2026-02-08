@@ -3,12 +3,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getLoansByFilter, archiveLoan, deleteLoan } from '../services/loanService';
 import { Plus, Search, Filter, ArrowUpRight, AlertCircle, X, Download, Archive, Trash2 } from 'lucide-react';
 import { exportToPDF } from '../utils/pdfGenerator';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { LoanStatus, getLoanStatusLabel } from '../types/enums';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useToast } from '../context/ToastContext';
 
 export function Loans() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const [showFilters, setShowFilters] = useState(false);
@@ -293,7 +294,14 @@ export function Loans() {
               {loans?.map((loan) => (
                 <tr key={loan.idPrestamo} className="hover:bg-surfaceHighlight/50 transition-colors">
                   <td className="px-6 py-4 font-medium text-main">#{loan.idPrestamo}</td>
-                  <td className="px-6 py-4 text-muted">{loan.nombrePrestatario || 'N/A'}</td>
+                  <td className="px-6 py-4">
+                    <button
+                      onClick={() => navigate(`/borrowers/${loan.dniPrestatario}`)}
+                      className="text-primary-400 hover:text-primary-300 font-medium hover:underline text-left"
+                    >
+                      {loan.nombrePrestatario || 'N/A'}
+                    </button>
+                  </td>
                   <td className="px-6 py-4 text-main">${loan.montoOtorgado?.toLocaleString()}</td>
                   <td className="px-6 py-4 text-muted">{loan.tasaInteres}%</td>
                   <td className="px-6 py-4 text-muted">
