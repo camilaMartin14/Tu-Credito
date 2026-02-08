@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { simulateLoan, createLoan } from '../../services/loanService';
-import { SimulacionPrestamoOutputDTO } from '../../types';
-import { Loader2, Calculator, CheckCircle } from 'lucide-react';
+import { getBorrowers } from '../../services/borrowerService';
+import { SimulacionPrestamoOutputDTO, PrestatarioDTO } from '../../types';
+import { Loader2, Calculator, CheckCircle, User, Search } from 'lucide-react';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 
 import { useToast } from '../../context/ToastContext';
@@ -28,8 +29,9 @@ type LoanFormData = z.infer<typeof loanSchema>;
 export function LoanForm() {
   const { addToast } = useToast();
   const [simulation, setSimulation] = useState<SimulacionPrestamoOutputDTO | null>(null);
+  const [selectedBorrowerId, setSelectedBorrowerId] = useState<string>("");
   
-  const { register, handleSubmit, formState: { errors }, getValues } = useForm<LoanFormData>({
+  const { register, handleSubmit, formState: { errors }, getValues, setValue, watch } = useForm<LoanFormData>({
     resolver: zodResolver(loanSchema),
     defaultValues: {
       idSistAmortizacion: 1,
@@ -39,6 +41,27 @@ export function LoanForm() {
       fec1erVto: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0],
     }
   });
+
+  const { data: borrowers } = useQuery({
+    queryKey: ['borrowers'],
+    queryFn: () => getBorrowers(),
+  });
+
+  const handleBorrowerSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const dni = e.target.value;
+    setSelectedBorrowerId(dni);
+    
+    if (dni) {
+      const borrower = borrowers?.find(b => b.dni.toString() === dni);
+      if (borrower) {
+        setValue('dniPrestatario', borrower.dni.toString());
+        setValue('nombrePrestatario', `${borrower.nombre} ${borrower.apellido}`);
+      }
+    } else {
+      setValue('dniPrestatario', '');
+      setValue('nombrePrestatario', '');
+    }
+  };
 
   const simulateMutation = useMutation({
     mutationFn: simulateLoan,
@@ -97,13 +120,39 @@ export function LoanForm() {
       {/* Form */}
       <div className="glass-panel p-6">
         <h2 className="mb-6 text-xl font-bold text-main">Nuevo Préstamo</h2>
+        
+        <div className="mb-6 p-4 bg-surfaceHighlight/50 rounded-xl border border-border">
+          <label className="block text-sm font-medium text-muted mb-2 flex items-center gap-2">
+            <User className="h-4 w-4 text-primary-500" />
+            Seleccionar Prestatario Existente (Opcional)
+          </label>
+          <div className="relative">
+            <select
+              value={selectedBorrowerId}
+              onChange={handleBorrowerSelect}
+              className="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-main focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200 [&>option]:bg-surface"
+            >
+              <option value="">-- Nuevo Prestatario / Ingreso Manual --</option>
+              {borrowers?.map((borrower) => (
+                <option key={borrower.dni} value={borrower.dni}>
+                  {borrower.apellido}, {borrower.nombre} (DNI: {borrower.dni})
+                </option>
+              ))}
+            </select>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted">
+              <Search className="h-4 w-4" />
+            </div>
+          </div>
+        </div>
+
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-muted">DNI Prestatario</label>
             <input
               {...register('dniPrestatario')}
-              className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
+              className={`mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200 ${selectedBorrowerId ? 'opacity-75' : ''}`}
               placeholder="Ingrese DNI"
+              readOnly={!!selectedBorrowerId}
             />
             {errors.dniPrestatario && <p className="mt-1 text-xs text-red-400">{errors.dniPrestatario.message}</p>}
           </div>
@@ -112,8 +161,9 @@ export function LoanForm() {
             <label className="block text-sm font-medium text-muted">Nombre Prestatario</label>
             <input
               {...register('nombrePrestatario')}
-              className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
+              className={`mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200 ${selectedBorrowerId ? 'opacity-75' : ''}`}
               placeholder="Ingrese Nombre Completo"
+              readOnly={!!selectedBorrowerId}
             />
             {errors.nombrePrestatario && <p className="mt-1 text-xs text-red-400">{errors.nombrePrestatario.message}</p>}
           </div>
