@@ -96,23 +96,23 @@ export function LoanForm() {
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       {/* Form */}
       <div className="glass-panel p-6">
-        <h2 className="mb-6 text-xl font-bold text-white">Nuevo Préstamo</h2>
+        <h2 className="mb-6 text-xl font-bold text-main">Nuevo Préstamo</h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300">DNI Prestatario</label>
+            <label className="block text-sm font-medium text-muted">DNI Prestatario</label>
             <input
               {...register('dniPrestatario')}
-              className="mt-1 block w-full rounded-xl border border-white/10 bg-surface/50 px-4 py-3 text-white placeholder-gray-500 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
+              className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
               placeholder="Ingrese DNI"
             />
             {errors.dniPrestatario && <p className="mt-1 text-xs text-red-400">{errors.dniPrestatario.message}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300">Nombre Prestatario</label>
+            <label className="block text-sm font-medium text-muted">Nombre Prestatario</label>
             <input
               {...register('nombrePrestatario')}
-              className="mt-1 block w-full rounded-xl border border-white/10 bg-surface/50 px-4 py-3 text-white placeholder-gray-500 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
+              className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
               placeholder="Ingrese Nombre Completo"
             />
             {errors.nombrePrestatario && <p className="mt-1 text-xs text-red-400">{errors.nombrePrestatario.message}</p>}
@@ -120,39 +120,39 @@ export function LoanForm() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300">Monto ($)</label>
+              <label className="block text-sm font-medium text-muted">Monto ($)</label>
               <input
                 type="number"
                 {...register('montoOtorgado', { valueAsNumber: true })}
-                className="mt-1 block w-full rounded-xl border border-white/10 bg-surface/50 px-4 py-3 text-white placeholder-gray-500 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
+                className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
               />
               {errors.montoOtorgado && <p className="mt-1 text-xs text-red-400">{errors.montoOtorgado.message}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300">Tasa Interés (%)</label>
+              <label className="block text-sm font-medium text-muted">Tasa Interés (%)</label>
               <input
                 type="number"
                 step="0.1"
                 {...register('tasaInteres', { valueAsNumber: true })}
-                className="mt-1 block w-full rounded-xl border border-white/10 bg-surface/50 px-4 py-3 text-white placeholder-gray-500 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
+                className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300">Cuotas</label>
+              <label className="block text-sm font-medium text-muted">Cuotas</label>
               <input
                 type="number"
                 {...register('cantidadCtas', { valueAsNumber: true })}
-                className="mt-1 block w-full rounded-xl border border-white/10 bg-surface/50 px-4 py-3 text-white placeholder-gray-500 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
+                className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300">Sistema</label>
+              <label className="block text-sm font-medium text-muted">Sistema</label>
               <select
                 {...register('idSistAmortizacion', { valueAsNumber: true })}
-                className="mt-1 block w-full rounded-xl border border-white/10 bg-surface/50 px-4 py-3 text-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200 [&>option]:bg-surface"
+                className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200 [&>option]:bg-surface"
               >
                 <option value={1}>Francés</option>
                 <option value={2}>Alemán</option>
@@ -163,19 +163,19 @@ export function LoanForm() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300">Fecha Otorgamiento</label>
+              <label className="block text-sm font-medium text-muted">Fecha Otorgamiento</label>
               <input
                 type="date"
                 {...register('fechaOtorgamiento')}
-                className="mt-1 block w-full rounded-xl border border-white/10 bg-surface/50 px-4 py-3 text-white placeholder-gray-500 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200 [color-scheme:dark]"
+                className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300">Primer Vencimiento</label>
+              <label className="block text-sm font-medium text-muted">Primer Vencimiento</label>
               <input
                 type="date"
                 {...register('fec1erVto')}
-                className="mt-1 block w-full rounded-xl border border-white/10 bg-surface/50 px-4 py-3 text-white placeholder-gray-500 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200 [color-scheme:dark]"
+                className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
               />
             </div>
           </div>
@@ -185,7 +185,7 @@ export function LoanForm() {
               type="button"
               onClick={onSimulate}
               disabled={simulateMutation.isPending}
-              className="flex flex-1 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white hover:bg-white/10 transition-all duration-200 disabled:opacity-50"
+              className="flex flex-1 items-center justify-center rounded-xl border border-border bg-surfaceHighlight px-4 py-3 text-sm font-medium text-main hover:bg-border transition-all duration-200 disabled:opacity-50"
             >
               {simulateMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Calculator className="mr-2 h-4 w-4" />}
               Simular
