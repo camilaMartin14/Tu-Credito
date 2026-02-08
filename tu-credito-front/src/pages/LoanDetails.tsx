@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getLoanById, getLoanSummary, deleteLoan } from '../services/loanService';
 import { getInstallments } from '../services/installmentService';
-import { ArrowLeft, Calendar, PieChart, AlertCircle, Clock, CreditCard, Trash2 } from 'lucide-react';
+import { ArrowLeft, Calendar, PieChart, AlertCircle, Clock, CreditCard, Trash2, Zap } from 'lucide-react';
 import { Cuota } from '../types';
 import { LoanStatus, InstallmentStatus, getLoanStatusLabel, getInstallmentStatusLabel } from '../types/enums';
 import { StatusBadge } from '../components/ui/StatusBadge';
@@ -21,6 +21,7 @@ export function LoanDetails() {
 
   const [selectedInstallment, setSelectedInstallment] = useState<Cuota | null>(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isAdvancePayment, setIsAdvancePayment] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const deleteMutation = useMutation({
@@ -51,6 +52,9 @@ export function LoanDetails() {
     queryFn: () => getInstallments({ idPrestamo: loanId }),
     enabled: !!loanId,
   });
+
+  const lastPendingInstallment = installments?.filter(i => i.idEstado === InstallmentStatus.Pending)
+    .sort((a, b) => b.nroCuota - a.nroCuota)[0];
 
   if (isLoadingLoan || isLoadingInstallments || isLoadingSummary) {
     return (
@@ -91,15 +95,31 @@ export function LoanDetails() {
           </div>
         </div>
         
-        {(loan.idEstado === LoanStatus.Active || loan.idEstado === LoanStatus.Finished) && (
-          <button
-            onClick={() => setIsDeleteModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-colors border border-red-500/20"
-          >
-            <Trash2 className="h-4 w-4" />
-            Eliminar
-          </button>
-        )}
+        <div className="flex items-center gap-4">
+          {(loan.idEstado === LoanStatus.Active && lastPendingInstallment) && (
+            <button
+              onClick={() => {
+                setSelectedInstallment(lastPendingInstallment);
+                setIsAdvancePayment(true);
+                setIsPaymentModalOpen(true);
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500 rounded-lg transition-colors border border-yellow-500/20"
+            >
+              <Zap className="h-4 w-4" />
+              Adelantar Cuota
+            </button>
+          )}
+
+          {(loan.idEstado === LoanStatus.Active || loan.idEstado === LoanStatus.Finished) && (
+            <button
+              onClick={() => setIsDeleteModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-colors border border-red-500/20"
+            >
+              <Trash2 className="h-4 w-4" />
+              Eliminar
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -236,8 +256,10 @@ export function LoanDetails() {
         onClose={() => {
           setIsPaymentModalOpen(false);
           setSelectedInstallment(null);
+          setIsAdvancePayment(false);
         }}
         installment={selectedInstallment}
+        isAdvance={isAdvancePayment}
       />
 
       <ConfirmationModal
