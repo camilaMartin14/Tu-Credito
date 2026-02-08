@@ -6,6 +6,7 @@ import {
 import { DollarSign, AlertTriangle, TrendingUp, Users, Plus, UserPlus, FileText, ArrowRight } from 'lucide-react';
 import { KPIWidget } from '../components/dashboard/KPIWidget';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../hooks/useTheme';
 import { calculateDaysToMaturity, formatCurrency, formatDate } from '../utils/formatters';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { InfoTooltip } from '../components/ui/InfoTooltip';
@@ -39,7 +40,11 @@ const ChartEmptyState = ({ message }: { message: string }) => (
 
 export function Dashboard() {
   const { user } = useAuth();
+  const { theme } = useTheme();
   const { data: kpis } = useQuery({ queryKey: ['dashboardKpis'], queryFn: getDashboardKpis });
+
+  const axisColor = theme === 'dark' ? '#9CA3AF' : '#6B7280';
+
   const { data: loansTrend } = useQuery({ queryKey: ['loansTrend'], queryFn: getLoansTrend });
   const { data: loansByStatus } = useQuery({ queryKey: ['loansByStatus'], queryFn: getLoansByStatus });
   const { data: monthlyCollections } = useQuery({ queryKey: ['monthlyCollections'], queryFn: getMonthlyCollections });
@@ -118,8 +123,8 @@ export function Dashboard() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthlyCollections}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" />
-                <XAxis dataKey="mes" stroke="var(--color-text-muted)" />
-                <YAxis stroke="var(--color-text-muted)" />
+                <XAxis dataKey="mes" stroke={axisColor} />
+                <YAxis stroke={axisColor} />
                 <Tooltip 
                     contentStyle={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text-main)' }}
                     itemStyle={{ color: 'var(--color-text-main)' }}
@@ -144,8 +149,8 @@ export function Dashboard() {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={loansTrend}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" />
-                <XAxis dataKey="mes" stroke="var(--color-text-muted)" />
-                <YAxis stroke="var(--color-text-muted)" />
+                <XAxis dataKey="mes" stroke={axisColor} />
+                <YAxis stroke={axisColor} />
                 <Tooltip 
                     contentStyle={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)', color: 'var(--color-text-main)' }}
                 />
