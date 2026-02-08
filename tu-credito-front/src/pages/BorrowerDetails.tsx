@@ -3,9 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getBorrowerByDni, updateBorrower } from '../services/borrowerService';
 import { getLoans } from '../services/loanService';
-import { getDocuments, uploadDocument, deleteDocument } from '../services/documentService';
+import { getDocuments, uploadDocument, deleteDocument, downloadDocument, viewDocument } from '../services/documentService';
 import { evaluateRisk } from '../services/evaluationService';
-import { ArrowLeft, User, FileText, Shield, Upload, Trash2, Download, Edit, Save, X } from 'lucide-react';
+import { ArrowLeft, User, FileText, Shield, Upload, Trash2, Download, Edit, Save, X, Eye } from 'lucide-react';
 import { DocumentoDTO, PrestatarioDTO } from '../types';
 import { getLoanStatusLabel } from '../types/enums';
 import { StatusBadge } from '../components/ui/StatusBadge';
@@ -13,6 +13,7 @@ import { formatDate } from '../utils/formatters';
 import { useToast } from '../context/ToastContext';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { RiskEvaluationModal } from '../components/borrowers/RiskEvaluationModal';
+import { DocumentUploadModal } from '../components/documents/DocumentUploadModal';
 
 export function BorrowerDetails() {
   const { dni } = useParams<{ dni: string }>();
@@ -32,6 +33,10 @@ export function BorrowerDetails() {
 
   // Document Delete State
   const [documentToDelete, setDocumentToDelete] = useState<number | null>(null);
+
+  // Document Upload State
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // Queries
   const { data: borrower, isLoading: isLoadingBorrower } = useQuery({
@@ -92,14 +97,28 @@ export function BorrowerDetails() {
   });
 
   // Handlers
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const formData = new FormData();
-      formData.append('Archivo', e.target.files[0]);
-      formData.append('EntidadTipo', 'Prestatario');
-      formData.append('EntidadId', borrowerDni.toString());
-      formData.append('TipoDocumento', 'Identidad'); // Default or selectable
+      setSelectedFile(e.target.files[0]);
+      setIsUploadModalOpen(true);
+      // Reset input value so the same file can be selected again if needed
+      e.target.value = '';
+    }
+  };
+
+  const handleConfirmUpload = async (file: File, type: string) => {
+    const formData = new FormData();
+    formData.append('Archivo', file);
+    formData.append('EntidadTipo', 'Prestatario');
+    formData.append('EntidadId', borrowerDni.toString());
+    formData.append('TipoDocumento', type);
+    
+    try {
       await uploadMutation.mutateAsync(formData);
+      setIsUploadModalOpen(false);
+      setSelectedFile(null);
+    } catch (error) {
+      // Error is handled by mutation onError
     }
   };
 
@@ -394,13 +413,22 @@ export function BorrowerDetails() {
                       <div className="flex items-center gap-2">
                          <button 
                             className="p-1.5 hover:bg-surfaceHighlight rounded-lg text-muted hover:text-main transition-colors"
-                            onClick={() => window.open(`http://localhost:5000/api/documents/${doc.idDocumento}`, '_blank')}
+                            onClick={() => viewDocument(doc.idDocumento)}
+                            title="Ver documento"
+                         >
+                            <Eye className="h-4 w-4" />
+                         </button>
+                         <button 
+                            className="p-1.5 hover:bg-surfaceHighlight rounded-lg text-muted hover:text-main transition-colors"
+                            onClick={() => downloadDocument(doc.idDocumento, doc.nombreOriginal)}
+                            title="Descargar documento"
                          >
                             <Download className="h-4 w-4" />
                          </button>
                          <button 
                             className="p-1.5 hover:bg-red-500/10 rounded-lg text-muted hover:text-red-500 transition-colors"
                             onClick={() => setDocumentToDelete(doc.idDocumento)}
+                            title="Eliminar documento"
                          >
                             <Trash2 className="h-4 w-4" />
                          </button>
@@ -418,6 +446,17 @@ export function BorrowerDetails() {
           </div>
         )}
       </div>
+
+      <DocumentUploadModal
+        isOpen={isUploadModalOpen}
+        onClose={() => {
+          setIsUploadModalOpen(false);
+          setSelectedFile(null);
+        }}
+        onUpload={handleConfirmUpload}
+        isLoading={uploadMutation.isPending}
+        file={selectedFile}
+      />
 
       <ConfirmationModal
         isOpen={!!documentToDelete}

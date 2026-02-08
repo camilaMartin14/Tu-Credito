@@ -68,7 +68,6 @@ export function Header() {
              >
                  <div className="text-right hidden md:block">
                     <p className="text-sm font-medium text-main">{user?.nombre || 'Usuario'} {user?.apellido || ''}</p>
-                    <p className="text-xs text-muted">Administrador</p>
                  </div>
                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary-600 to-accent-purple shadow-lg shadow-primary-500/20 text-white ring-2 ring-surface">
                     <User className="h-5 w-5" />

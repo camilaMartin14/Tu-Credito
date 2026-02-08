@@ -24,7 +24,6 @@ export function Sidebar() {
             </div>
             <div>
                 <h1 className="text-xl font-bold tracking-tight text-main">Tu Credito</h1>
-                <p className="text-xs text-muted font-medium tracking-wide">CAPITAL</p>
             </div>
         </div>
       </div>
