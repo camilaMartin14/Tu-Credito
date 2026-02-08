@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Settings as SettingsIcon, Bell, Shield, Moon, User, Globe, Check, AlertCircle, Loader2, Eye, EyeOff, X } from 'lucide-react';
+import { Settings as SettingsIcon, Shield, Moon, User, Globe, Check, AlertCircle, Loader2, Eye, EyeOff, X } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
 import { updateProfile } from '../services/authService';
 import { useAuth } from '../context/AuthContext';
@@ -23,17 +23,6 @@ export function Settings() {
     // Profile Edit State
     const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
     const [profileError, setProfileError] = useState('');
-
-    // Notifications State
-    const [paymentAlerts, setPaymentAlerts] = useState(() => {
-        return localStorage.getItem('paymentAlerts') === 'true';
-    });
-
-    const togglePaymentAlerts = () => {
-        const newValue = !paymentAlerts;
-        setPaymentAlerts(newValue);
-        localStorage.setItem('paymentAlerts', String(newValue));
-    };
 
     // Password Form
     const { register, handleSubmit, formState: { errors }, reset, watch } = useForm({
@@ -255,28 +244,7 @@ export function Settings() {
         </div>
       </div>
 
-      <div className="glass-panel rounded-xl border border-border overflow-hidden">
-        <div className="p-6 border-b border-border">
-          <h2 className="text-lg font-semibold text-main flex items-center gap-2">
-            <Bell className="h-5 w-5 text-primary-500" />
-            Notificaciones
-          </h2>
-        </div>
-        <div className="p-6 space-y-4">
-           <div className="flex items-center justify-between py-2">
-              <div>
-                <p className="font-medium text-main">Alertas de Pagos</p>
-                <p className="text-sm text-muted">Recibir notificaciones cuando un pago esté próximo</p>
-              </div>
-              <button 
-                onClick={togglePaymentAlerts}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${paymentAlerts ? 'bg-primary-600' : 'bg-surfaceHighlight'}`}
-              >
-                <span className={`${paymentAlerts ? 'translate-x-6' : 'translate-x-1'} inline-block h-4 w-4 transform rounded-full bg-white transition`} />
-              </button>
-           </div>
-        </div>
-      </div>
+{/* Notificaciones eliminadas */}
 
       <div className="glass-panel rounded-xl border border-border overflow-hidden">
         <div className="p-6 border-b border-border">
