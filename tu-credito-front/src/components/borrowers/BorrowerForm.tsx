@@ -72,7 +72,7 @@ export function BorrowerForm({ initialData, onSubmit, isLoading, submitLabel }: 
       
       {/* Datos Personales */}
       <div>
-        <h3 className="text-lg font-semibold text-white mb-4 border-b border-border pb-2">Datos Personales</h3>
+        <h3 className="text-lg font-semibold text-main mb-4 border-b border-border pb-2">Datos Personales</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-muted mb-1">DNI *</label>
@@ -142,7 +142,7 @@ export function BorrowerForm({ initialData, onSubmit, isLoading, submitLabel }: 
 
       {/* Datos del Garante */}
       <div>
-        <h3 className="text-lg font-semibold text-white mb-4 border-b border-border pb-2 mt-2">Datos del Garante (Opcional)</h3>
+        <h3 className="text-lg font-semibold text-main mb-4 border-b border-border pb-2 mt-2">Datos del Garante (Opcional)</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
            <div className="grid grid-cols-2 gap-4">
                 <div>

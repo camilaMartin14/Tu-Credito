@@ -45,7 +45,7 @@ export function CreateBorrower() {
       <div className="flex items-center gap-4">
         <button 
           onClick={() => navigate('/borrowers')}
-          className="p-2 hover:bg-surfaceHighlight rounded-lg transition-colors text-muted hover:text-white"
+          className="p-2 hover:bg-surfaceHighlight rounded-lg transition-colors text-muted hover:text-main"
         >
           <ArrowLeft className="h-6 w-6" />
         </button>
