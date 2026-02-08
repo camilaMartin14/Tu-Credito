@@ -74,40 +74,48 @@ export function Dashboard() {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <KPIWidget
-          title="Total Prestado Histórico"
-          value={kpis ? `$${kpis.totalPrestadoHistorico.toLocaleString()}` : '...'}
-          icon={DollarSign}
-          trend="+12.5%"
-          trendUp={true}
-          iconColor="bg-primary-500/10 text-primary-400"
-          description="Suma total acumulada de todos los préstamos otorgados desde el inicio de operaciones."
-        />
-        <KPIWidget
-          title="Morosidad"
-          value={kpis ? `${kpis.porcentajeMorosidad}%` : '...'}
-          icon={AlertTriangle}
-          trend="-2.1%"
-          trendUp={true}
-          iconColor="bg-red-500/10 text-red-400"
-          description="Porcentaje de clientes con cuotas vencidas (más de 1 día de retraso) respecto al total de clientes activos."
-        />
-        <KPIWidget
-          title="Rentabilidad"
-          value={kpis ? `${kpis.rentabilidad}%` : '...'}
-          icon={TrendingUp}
-          trend="+5.4%"
-          trendUp={true}
-          iconColor="bg-emerald-500/10 text-emerald-400"
-          description="Margen de ganancia calculado sobre los intereses generados vs el capital prestado."
-        />
-        <KPIWidget
-          title="Capital Pendiente"
-          value={kpis ? `$${kpis.capitalPendiente.toLocaleString()}` : '...'}
-          icon={Users}
-          iconColor="bg-blue-500/10 text-blue-400"
-          description="Monto total de dinero que aún está pendiente de cobro (Capital + Intereses por vencer)."
-        />
+        <Link to="/loans" className="block transition-transform hover:scale-[1.02] cursor-pointer">
+            <KPIWidget
+            title="Total Prestado Histórico"
+            value={kpis ? `$${kpis.totalPrestadoHistorico.toLocaleString()}` : '...'}
+            icon={DollarSign}
+            trend="+12.5%"
+            trendUp={true}
+            iconColor="bg-primary-500/10 text-primary-400"
+            description="Suma total acumulada de todos los préstamos otorgados desde el inicio de operaciones."
+            />
+        </Link>
+        <Link to="/borrowers" className="block transition-transform hover:scale-[1.02] cursor-pointer">
+            <KPIWidget
+            title="Morosidad"
+            value={kpis ? `${kpis.porcentajeMorosidad}%` : '...'}
+            icon={AlertTriangle}
+            trend="-2.1%"
+            trendUp={true}
+            iconColor="bg-red-500/10 text-red-400"
+            description="Porcentaje de clientes con cuotas vencidas (más de 1 día de retraso) respecto al total de clientes activos."
+            />
+        </Link>
+        <Link to="/loans" className="block transition-transform hover:scale-[1.02] cursor-pointer">
+            <KPIWidget
+            title="Rentabilidad"
+            value={kpis ? `${kpis.rentabilidad}%` : '...'}
+            icon={TrendingUp}
+            trend="+5.4%"
+            trendUp={true}
+            iconColor="bg-emerald-500/10 text-emerald-400"
+            description="Margen de ganancia calculado sobre los intereses generados vs el capital prestado."
+            />
+        </Link>
+        <Link to="/payments" className="block transition-transform hover:scale-[1.02] cursor-pointer">
+            <KPIWidget
+            title="Capital Pendiente"
+            value={kpis ? `$${kpis.capitalPendiente.toLocaleString()}` : '...'}
+            icon={Users}
+            iconColor="bg-blue-500/10 text-blue-400"
+            description="Monto total de dinero que aún está pendiente de cobro (Capital + Intereses por vencer)."
+            />
+        </Link>
       </div>
 
       {/* Charts Row 1 */}

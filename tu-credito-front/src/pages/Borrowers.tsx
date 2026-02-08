@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { getBorrowers, toggleBorrowerStatus } from '../services/borrowerService';
+import { getDelinquencyDetails } from '../services/dashboardService';
 import { PrestatarioDTO } from '../types';
 import { Plus, Search, User, Mail, Phone, MapPin, AlertCircle, Filter, X, Power, Pencil, Download } from 'lucide-react';
 import { exportToPDF } from '../utils/pdfGenerator';
@@ -86,6 +87,13 @@ export function Borrowers() {
       });
     }
   });
+
+  const { data: delinquencyDetails } = useQuery({
+    queryKey: ['delinquency'],
+    queryFn: getDelinquencyDetails
+  });
+
+  const delinquentNames = new Set(delinquencyDetails?.map(d => d.cliente));
 
   if (isLoading) {
     return (
@@ -212,21 +220,40 @@ export function Borrowers() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {borrowers?.map((borrower) => (
-            <div key={borrower.dni} className="bg-surfaceHighlight/30 rounded-xl p-5 border border-border hover:border-primary-500/50 transition-all group">
+          {borrowers?.map((borrower) => {
+            const isDelinquent = delinquentNames.has(`${borrower.nombre} ${borrower.apellido}`);
+            return (
+            <div key={borrower.dni} className={`rounded-xl p-5 border transition-all group ${
+              isDelinquent 
+                ? 'bg-red-500/5 border-red-500/30 hover:border-red-500/50' 
+                : 'bg-surfaceHighlight/30 border-border hover:border-primary-500/50'
+            }`}>
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary-500 to-accent-purple flex items-center justify-center text-white font-bold text-lg">
+                  <div className={`h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-lg ${
+                    isDelinquent ? 'bg-gradient-to-br from-red-500 to-red-600' : 'bg-gradient-to-br from-primary-500 to-accent-purple'
+                  }`}>
                     {borrower.nombre?.[0]}{borrower.apellido?.[0]}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-main group-hover:text-primary-400 transition-colors">{borrower.nombre} {borrower.apellido}</h3>
+                    <h3 className={`font-semibold transition-colors ${
+                      isDelinquent ? 'text-red-400 group-hover:text-red-300' : 'text-main group-hover:text-primary-400'
+                    }`}>
+                      {borrower.nombre} {borrower.apellido}
+                    </h3>
                     <p className="text-xs text-muted">DNI: {borrower.dni}</p>
                   </div>
                 </div>
-                <span className={`px-2 py-1 rounded-md text-xs font-medium ${borrower.esActivo ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
-                  {borrower.esActivo ? 'Activo' : 'Inactivo'}
-                </span>
+                <div className="flex flex-col items-end gap-1">
+                  <span className={`px-2 py-1 rounded-md text-xs font-medium ${borrower.esActivo ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                    {borrower.esActivo ? 'Activo' : 'Inactivo'}
+                  </span>
+                  {isDelinquent && (
+                    <span className="px-2 py-1 rounded-md text-xs font-medium bg-red-500/20 text-red-400 border border-red-500/20">
+                      Moroso
+                    </span>
+                  )}
+                </div>
               </div>
               
               <div className="space-y-2 text-sm text-muted">
@@ -276,7 +303,7 @@ export function Borrowers() {
                  </button>
               </div>
             </div>
-          ))}
+          ); })}
           
           {borrowers?.length === 0 && (
             <div className="col-span-full py-12 text-center text-muted">
