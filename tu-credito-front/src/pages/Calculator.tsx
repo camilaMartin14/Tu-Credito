@@ -118,7 +118,7 @@ export function Calculator() {
                   </div>
                    <div className="p-4 rounded-xl bg-surfaceHighlight/50 border border-border">
                      <p className="text-xs text-muted mb-1">Total a Pagar</p>
-                     <p className="text-lg font-bold text-white">
+                     <p className="text-lg font-bold text-main">
                         ${result.detalleCuotas.reduce((acc: number, curr: any) => acc + curr.monto, 0).toFixed(2)}
                      </p>
                   </div>
