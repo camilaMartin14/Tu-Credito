@@ -12,6 +12,7 @@ import { StatusBadge } from '../components/ui/StatusBadge';
 import { formatDate } from '../utils/formatters';
 import { useToast } from '../context/ToastContext';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
+import { RiskEvaluationModal } from '../components/borrowers/RiskEvaluationModal';
 
 export function BorrowerDetails() {
   const { dni } = useParams<{ dni: string }>();
@@ -23,6 +24,7 @@ export function BorrowerDetails() {
   const [activeTab, setActiveTab] = useState<'info' | 'loans' | 'documents'>('info');
   const [riskResult, setRiskResult] = useState<any>(null);
   const [isEvaluating, setIsEvaluating] = useState(false);
+  const [isRiskModalOpen, setIsRiskModalOpen] = useState(false);
 
   // Edit State
   const [isEditing, setIsEditing] = useState(false);
@@ -101,19 +103,21 @@ export function BorrowerDetails() {
     }
   };
 
-  const handleRiskEval = async () => {
+  const handleRiskEval = async (data: any) => {
     if (!borrower) return;
     setIsEvaluating(true);
     try {
       const result = await evaluateRisk({
-        cuit: borrower.dni, // Assuming DNI as CUIT for simplicity or separate field
-        montoSolicitado: 100000, // Example default
-        cuotaEstimada: 10000,
-        ingresoMensual: 50000
+        cuit: data.cuit,
+        montoSolicitado: data.montoSolicitado,
+        cuotaEstimada: data.cuotaEstimada,
+        ingresoMensual: data.ingresoMensual
       });
       setRiskResult(result);
+      setIsRiskModalOpen(false);
     } catch (e) {
       console.error(e);
+      addToast('Error al realizar la evaluación de riesgo', 'error');
     } finally {
       setIsEvaluating(false);
     }
@@ -275,23 +279,46 @@ export function BorrowerDetails() {
               </h3>
               <div className="flex gap-4">
                 <button 
-                  onClick={handleRiskEval}
+                  onClick={() => setIsRiskModalOpen(true)}
                   disabled={isEvaluating}
-                  className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 disabled:opacity-50"
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 disabled:opacity-50 transition-colors shadow-lg shadow-primary-500/20"
                 >
-                  {isEvaluating ? 'Evaluando...' : 'Evaluar Riesgo'}
+                  Nueva Evaluación
                 </button>
               </div>
               
               {riskResult && (
-                <div className={`p-4 rounded-lg mt-4 ${riskResult.estado === 'APROBADO' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
-                  <p className="font-bold">{riskResult.estado}</p>
-                  <p className="text-sm">{riskResult.motivo}</p>
+                <div className={`p-4 rounded-xl mt-4 border ${
+                  riskResult.estado === 'APROBADO' 
+                    ? 'bg-green-500/10 border-green-500/20 text-green-600 dark:text-green-400' 
+                    : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400'
+                }`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-bold text-lg">{riskResult.estado}</span>
+                    {riskResult.montoMaximoSugerido > 0 && (
+                      <span className="text-sm font-medium px-2 py-1 bg-surface/50 rounded-lg">
+                        Max: ${riskResult.montoMaximoSugerido?.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                  <p className="font-medium mb-2">{riskResult.motivo}</p>
+                  
+                  <div className="space-y-1 text-sm opacity-90">
+                    <p><span className="font-semibold">BCRA:</span> {riskResult.situacionBcra}</p>
+                    <p><span className="font-semibold">Detalle:</span> {riskResult.detalleRiesgo}</p>
+                  </div>
                 </div>
               )}
             </div>
           </div>
         )}
+
+        <RiskEvaluationModal
+          isOpen={isRiskModalOpen}
+          onClose={() => setIsRiskModalOpen(false)}
+          onConfirm={handleRiskEval}
+          isLoading={isEvaluating}
+        />
 
         {activeTab === 'loans' && (
            <div className="glass-panel rounded-xl overflow-hidden border border-border">

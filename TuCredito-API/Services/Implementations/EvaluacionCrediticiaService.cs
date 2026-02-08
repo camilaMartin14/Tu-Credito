@@ -16,14 +16,24 @@ namespace TuCredito.Services.Implementations;
         public async Task<EvaluacionCrediticiaResponseDTO> EvaluarRiesgoAsync(EvaluacionCrediticiaRequestDTO request)
         {
             // 1. Obtener Situación BCRA
-            var deudaResponse = await _bcraService.GetDeudasByCuitAsync(request.Cuit);
-            
-            // Si no hay respuesta o no hay deudas, asumimos Situación 1 (Normal/Sin Deudas registradas)
             int maxSituacion = 1;
-            if (deudaResponse != null && deudaResponse.Deudas != null && deudaResponse.Deudas.Any())
+            bool errorBcra = false;
+            try 
             {
-                // Tomamos la peor situación registrada
-                maxSituacion = deudaResponse.Deudas.Max(d => (int)d.Situacion);
+                var deudaResponse = await _bcraService.GetDeudasByCuitAsync(request.Cuit);
+                // Si no hay respuesta o no hay deudas, asumimos Situación 1 (Normal/Sin Deudas registradas)
+                if (deudaResponse != null && deudaResponse.Deudas != null && deudaResponse.Deudas.Any())
+                {
+                    // Tomamos la peor situación registrada
+                    maxSituacion = deudaResponse.Deudas.Max(d => (int)d.Situacion);
+                }
+            }
+            catch 
+            {
+                // Si falla BCRA, forzamos Revisión (Simulamos Situación 2 para caer en lógica de revisión)
+                // O mejor, manejamos una lógica específica de error
+                maxSituacion = 2; 
+                errorBcra = true;
             }
 
             // 2. Calcular Capacidad de Pago (si se informan ingresos)
@@ -39,11 +49,17 @@ namespace TuCredito.Services.Implementations;
 
             var response = new EvaluacionCrediticiaResponseDTO
             {
-                SituacionBcra = $"Situación {maxSituacion}"
+                SituacionBcra = errorBcra ? "Desconocida (Error BCRA)" : $"Situación {maxSituacion}"
             };
 
             // Lógica según lo definido
-            if (maxSituacion == 1) // Normal
+            if (errorBcra)
+            {
+                response.Estado = "REVISION";
+                response.Motivo = "No se pudo verificar historial crediticio (API BCRA no disponible).";
+                response.DetalleRiesgo = "Requiere validación manual de antecedentes.";
+            }
+            else if (maxSituacion == 1) // Normal
             {
                 if (capacidadPagoComprometida)
                 {

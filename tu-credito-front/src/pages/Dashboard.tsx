@@ -118,7 +118,7 @@ export function Dashboard() {
              <h3 className="text-lg font-bold text-main">Ingresos Mensuales</h3>
              <InfoTooltip content="Muestra el total de dinero recaudado por mes. Eje X: Meses del año. Eje Y: Monto total cobrado en pesos." />
           </div>
-          <div style={{ width: '100%', height: 250 }}>
+          <div className="w-full h-[250px] min-h-[250px]">
             {monthlyCollections && monthlyCollections.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthlyCollections}>
@@ -144,7 +144,7 @@ export function Dashboard() {
             <h3 className="text-lg font-bold text-main">Tendencia de Colocación</h3>
             <InfoTooltip content="Muestra el volumen de nuevos préstamos otorgados por mes. Eje X: Meses del año. Eje Y: Monto total prestado en pesos." />
           </div>
-          <div style={{ width: '100%', height: 250 }}>
+          <div className="w-full h-[250px] min-h-[250px]">
             {loansTrend && loansTrend.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={loansTrend}>
@@ -169,7 +169,7 @@ export function Dashboard() {
             <h3 className="text-lg font-bold text-main">Composición de Cartera</h3>
             <InfoTooltip content="Distribución de los préstamos activos según su estado actual (Al día, En Mora, Finalizado, etc.)." />
           </div>
-          <div style={{ width: '100%', height: 250 }}>
+          <div className="w-full h-[250px] min-h-[250px]">
             {loansByStatus && loansByStatus.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
