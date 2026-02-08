@@ -1,15 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getLoansByFilter, archiveLoan, deleteLoan } from '../services/loanService';
 import { Plus, Search, Filter, ArrowUpRight, AlertCircle, X, Download, Archive, Trash2 } from 'lucide-react';
 import { exportToPDF } from '../utils/pdfGenerator';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { LoanStatus, getLoanStatusLabel } from '../types/enums';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useToast } from '../context/ToastContext';
 
 export function Loans() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const [showFilters, setShowFilters] = useState(false);
@@ -19,6 +20,14 @@ export function Loans() {
     mesVto: 0,
     anio: 0
   });
+
+  useEffect(() => {
+    const statusParam = searchParams.get('status');
+    if (statusParam) {
+      setFilters(prev => ({ ...prev, estado: Number(statusParam) }));
+      setShowFilters(true);
+    }
+  }, [searchParams]);
   const [yearInput, setYearInput] = useState('');
   const [nameInput, setNameInput] = useState('');
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; id?: number; type: 'archive' | 'delete' }>({ isOpen: false, type: 'archive' });

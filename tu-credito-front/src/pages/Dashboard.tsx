@@ -110,7 +110,7 @@ export function Dashboard() {
             className="h-full"
             />
         </Link>
-        <Link to="/payments" className="block h-full transition-transform hover:scale-[1.02] cursor-pointer">
+        <Link to="/loans?status=1" className="block h-full transition-transform hover:scale-[1.02] cursor-pointer">
             <KPIWidget
             title="Capital Pendiente"
             value={kpis ? `$${kpis.capitalPendiente.toLocaleString()}` : '...'}
