@@ -13,6 +13,7 @@ export function Borrowers() {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilter, setActiveFilter] = useState<string>('all'); // all, active, inactive
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; dni?: number; currentStatus?: boolean }>({ isOpen: false });
@@ -59,11 +60,11 @@ export function Borrowers() {
   const getFilters = (): Partial<PrestatarioDTO> => {
     const filters: Partial<PrestatarioDTO> = {};
     
-    if (searchTerm) {
-      if (/^\d+$/.test(searchTerm)) {
-        filters.dni = Number(searchTerm);
+    if (debouncedSearchTerm) {
+      if (/^\d+$/.test(debouncedSearchTerm)) {
+        filters.dni = Number(debouncedSearchTerm);
       } else {
-        filters.nombre = searchTerm;
+        filters.nombre = debouncedSearchTerm;
       }
     }
 
@@ -75,7 +76,7 @@ export function Borrowers() {
   };
 
   const { data: borrowers, isLoading, error } = useQuery({
-    queryKey: ['borrowers', searchTerm, activeFilter],
+    queryKey: ['borrowers', debouncedSearchTerm, activeFilter],
     queryFn: () => getBorrowers(getFilters()),
     select: (data) => {
       return [...data].sort((a, b) => {
@@ -147,9 +148,14 @@ export function Borrowers() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
               <input
                 type="text"
-                placeholder="Buscar cliente por nombre o DNI..."
+                placeholder="Buscar cliente por nombre o DNI (Presione Enter)"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    setDebouncedSearchTerm(searchTerm);
+                  }
+                }}
                 className="w-full bg-surface/50 border border-border rounded-lg pl-10 pr-4 py-2 text-sm text-main placeholder-muted focus:outline-none focus:border-primary-500 transition-colors"
               />
             </div>
@@ -188,10 +194,11 @@ export function Borrowers() {
                 </div>
               </div>
               
-              {(searchTerm || activeFilter !== 'all') && (
+              {(debouncedSearchTerm || activeFilter !== 'all') && (
                  <button 
                   onClick={() => {
                     setSearchTerm('');
+                    setDebouncedSearchTerm('');
                     setActiveFilter('all');
                   }}
                   className="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 ml-auto"
