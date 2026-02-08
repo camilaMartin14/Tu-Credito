@@ -42,7 +42,7 @@ export function Register() {
           <div className="mx-auto h-16 w-16 rounded-2xl bg-gradient-to-tr from-primary-600 to-accent-pink flex items-center justify-center mb-4 shadow-lg shadow-primary-500/20">
             <span className="font-bold text-white text-3xl">T</span>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-main">Tu Credito</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-main">Tu Crédito</h1>
           <p className="mt-2 text-sm text-muted">Crea una cuenta para comenzar</p>
         </div>
         
