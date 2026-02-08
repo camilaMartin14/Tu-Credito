@@ -1,8 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace TuCredito.Models.EntidadesApisTerceros
-{
-    public class DolarOficialModel
+namespace TuCredito.Models.EntidadesApisTerceros;
+public class DolarOficialModel
     {
         [JsonPropertyName("moneda")]
         public string Currency { get; set; } = string.Empty;
@@ -19,4 +18,4 @@ namespace TuCredito.Models.EntidadesApisTerceros
         [JsonPropertyName("venta")]
         public int Sale { get; set; }
     }
-}
+

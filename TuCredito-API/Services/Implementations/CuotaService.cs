@@ -1,113 +1,224 @@
+using Microsoft.EntityFrameworkCore;
+using TuCredito.Core;
 using TuCredito.Models;
 using TuCredito.Services.Interfaces;
-using TuCredito.Repositories.Interfaces;
-using System.Globalization;
-using Microsoft.EntityFrameworkCore;
 
 namespace TuCredito.Services.Implementations
-
 {
     public class CuotaService : ICuotaService
     {
-        private readonly IPrestamoRepository _prestamo;
-        private readonly ICuotaRepository _cuota;
         private readonly TuCreditoContext _context;
 
-        public CuotaService(IPrestamoRepository prestamo, ICuotaRepository cuota, TuCreditoContext context)
+        
+        private const int ESTADO_PENDIENTE = 1;
+        private const int ESTADO_SALDADA = 2;
+
+        public CuotaService(TuCreditoContext context)
         {
-            _prestamo = prestamo;
-            _cuota = cuota;
             _context = context;
         }
-        public async Task<bool> AddCuota(Cuota cuota)
+
+        public async Task<Result<bool>> AddCuota(Cuota cuota)
         {
-            if (cuota.IdPrestamo <= 0) throw new ArgumentException("La cuota debe estar asociada a un préstamo");
-
-            var prestamo = await _prestamo.GetPrestamoById(cuota.IdPrestamo);
-            if (prestamo == null) throw new ArgumentException("El préstamo no existe");
-            
-            if (prestamo.IdEstado == 2) throw new ArgumentException("No se pueden agregar cuotas a un préstamo inactivo"); // finalizado
-            if (prestamo.IdEstado == 3) throw new ArgumentException("No se pueden agregar cuotas a un préstamo inactivo"); // eliminado
-            if (cuota.IdEstado != 1) throw new ArgumentException("Solo se pueden dar de alta cuotas en estado 'Pendiente'");
-            if (cuota.FecVto < DateTime.Now) throw new ArgumentException("La fecha de vencimiento de una nueva cuota no puede ser anterior a hoy");
-            // Lo comento por como es nuestro model, no puede ser null se pone una fecha ficticia 0001-01-01 if (cuota.FecVto == null) throw new ArgumentException("Establezca una fecha de vencimiento"); // esto vendria del metodo GenerarCtas
-            if (cuota.Interes <= 0) throw new ArgumentException("Revise el interes de la cuota"); 
-            if (cuota.Monto <= 0) throw new ArgumentException("El valor de la cuota no puede ser cero");
-            if (cuota.NroCuota <= 0) throw new ArgumentException("Ingrese un numero de cuota valido");
-
-            // CORRECCION: Inicializar SaldoPendiente
-            cuota.SaldoPendiente = cuota.Monto;
-
-            return await _cuota.AddCuota(cuota) > 0;
-        }
-
-        public async Task<List<Cuota>> GetByFiltro(int? estado, int? mesVto, string? prestatario)
-        {
-            if (estado.HasValue && estado <= 0) throw new ArgumentException("Ingrese un estado válido");
-            if (mesVto.HasValue && (mesVto < 1 || mesVto > 12)) throw new ArgumentException("El mes de vencimiento debe estar entre 1 y 12");
-            if (!string.IsNullOrWhiteSpace(prestatario) && !prestatario.All(c => char.IsLetter(c) || char.IsWhiteSpace(c))) 
-                throw new ArgumentException("El nombre del prestatario solo puede contener letras");
-            return await _cuota.GetByFiltro(estado, mesVto, prestatario);
-        }
-
-        public async Task<Cuota> GetById(int id)
-        {
-            if (id <= 0) throw new ArgumentException("Ingrese un identificador valido");
-            return await _cuota.GetById(id);
-        }
-
-        public async Task<bool> UpdateCuota(Cuota cuota)
-        {
-            var nvaCuota = await _cuota.GetById(cuota.IdCuota);
-            if (nvaCuota == null) throw new ArgumentException("La cuota no existe");
-
-            if (nvaCuota.IdEstado == 3) throw new ArgumentException("La cuota ya está saldada");
-
-            var totalPagado = cuota.Pagos.Sum(p => p.Monto);
-
-            if (totalPagado > cuota.Monto) throw new ArgumentException("El total pagado supera el monto de la cuota");
-
-            cuota.IdEstado = totalPagado == cuota.Monto ? 3 : 1;
-
-            await _cuota.UpdateCuota(cuota);
-            return true;
-        }
-
-        // CORRECCION: Método automático para detectar y actualizar cuotas en mora
-        public async Task<int> ActualizarCuotasVencidas()
-        {
-            // Buscar el ID del estado "Vencida"
-            var estadoVencida = await _context.EstadosCuotas
-                .Where(e => e.Descripcion == "Vencida")
-                .Select(e => e.IdEstado)
-                .FirstOrDefaultAsync();
-
-            if (estadoVencida == 0)
+            try
             {
-                // Fallback si no existe el estado, aunque debería
-                // Asumimos que no podemos actualizar si no sabemos el ID
-                return 0;
+                if (cuota.IdPrestamo <= 0)
+                    return Result<bool>.Failure("La cuota debe estar asociada a un préstamo.");
+
+                var prestamo = await _context.Prestamos.FindAsync(cuota.IdPrestamo);
+                if (prestamo == null)
+                    return Result<bool>.Failure("El préstamo no existe.");
+
+                if (prestamo.IdEstado == 2)
+                    return Result<bool>.Failure("No se pueden agregar cuotas a un préstamo finalizado.");
+
+                if (prestamo.IdEstado == 3)
+                    return Result<bool>.Failure("No se pueden agregar cuotas a un préstamo eliminado.");
+
+                if (cuota.IdEstado != ESTADO_PENDIENTE)
+                    return Result<bool>.Failure("Solo se pueden dar de alta cuotas en estado 'Pendiente'.");
+
+                if (cuota.FecVto.Date < DateTime.Today)
+                    return Result<bool>.Failure("La fecha de vencimiento de una nueva cuota no puede ser anterior a hoy.");
+
+                if (cuota.Interes <= 0)
+                    return Result<bool>.Failure("Revise el interés de la cuota.");
+
+                if (cuota.Monto <= 0)
+                    return Result<bool>.Failure("El monto de la cuota debe ser mayor que cero.");
+
+                if (cuota.NroCuota <= 0)
+                    return Result<bool>.Failure("Ingrese un número de cuota válido.");
+
+                // Inicializar saldo pendiente
+                cuota.SaldoPendiente = cuota.Monto;
+
+                await _context.Cuotas.AddAsync(cuota);
+                var result = await _context.SaveChangesAsync();
+
+                return Result<bool>.Success(result > 0);
             }
-
-            // Buscar cuotas pendientes (IdEstado == 1) cuya fecha de vencimiento ya pasó
-            var cuotasVencidas = await _context.Cuotas
-                .Where(c => c.IdEstado == 1 
-                         && c.FecVto < DateTime.Today)
-                .ToListAsync();
-
-            if (!cuotasVencidas.Any()) return 0;
-
-            foreach (var cuota in cuotasVencidas)
+            catch (Exception ex)
             {
-                cuota.IdEstado = estadoVencida;
+                return Result<bool>.Failure($"Error al agregar la cuota: {ex.Message}");
             }
-
-            return await _context.SaveChangesAsync();
         }
 
-        public async Task<List<Cuota>> Getall(int idPrestamo)
+        public async Task<Result<List<Cuota>>> GetByFiltro(int? estado, int? mesVto, string? prestatario, int? idPrestamo)
         {
-            return await _cuota.GetAll(idPrestamo);
+            try
+            {
+                if (estado.HasValue && estado.Value <= 0)
+                    return Result<List<Cuota>>.Failure("Ingrese un estado válido.");
+
+                if (mesVto.HasValue && (mesVto.Value < 1 || mesVto.Value > 12))
+                    return Result<List<Cuota>>.Failure("El mes de vencimiento debe estar entre 1 y 12.");
+
+                if (!string.IsNullOrWhiteSpace(prestatario) &&
+                    !prestatario.All(c => char.IsLetter(c) || char.IsWhiteSpace(c)))
+                    return Result<List<Cuota>>.Failure("El nombre del prestatario solo puede contener letras.");
+                
+                if (idPrestamo.HasValue && idPrestamo.Value <= 0)
+                     return Result<List<Cuota>>.Failure("Ingrese un ID de préstamo válido.");
+
+                var query = _context.Cuotas
+                    .Include(c => c.IdPrestamoNavigation)
+                        .ThenInclude(p => p.DniPrestatarioNavigation)
+                    .AsQueryable();
+
+                if (estado.HasValue)
+                    query = query.Where(c => c.IdEstado == estado.Value);
+
+                if (mesVto.HasValue)
+                    query = query.Where(c => c.FecVto.Month == mesVto.Value);
+
+                if (!string.IsNullOrWhiteSpace(prestatario))
+                    query = query.Where(c =>
+                        c.IdPrestamoNavigation.DniPrestatarioNavigation.Nombre.Contains(prestatario));
+                
+                if (idPrestamo.HasValue)
+                    query = query.Where(c => c.IdPrestamo == idPrestamo.Value);
+
+                var cuotas = await query.ToListAsync();
+                return Result<List<Cuota>>.Success(cuotas);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<Cuota>>.Failure($"Error al filtrar cuotas: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<Cuota>> GetById(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                    return Result<Cuota>.Failure("Ingrese un identificador válido.");
+
+                var cuota = await _context.Cuotas.FindAsync(id);
+                if (cuota == null)
+                    return Result<Cuota>.Failure("La cuota no existe.");
+
+                return Result<Cuota>.Success(cuota);
+            }
+            catch (Exception ex)
+            {
+                return Result<Cuota>.Failure($"Error al obtener la cuota: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<bool>> UpdateCuota(Cuota cuota)
+        {
+            try
+            {
+                if (cuota.IdCuota <= 0)
+                    return Result<bool>.Failure("ID de cuota inválido.");
+
+                // Traer la cuota real de BD
+                var dbCuota = await _context.Cuotas.FirstOrDefaultAsync(c => c.IdCuota == cuota.IdCuota);
+                if (dbCuota == null)
+                    return Result<bool>.Failure("La cuota no existe.");
+
+                if (dbCuota.IdEstado == ESTADO_SALDADA)
+                    return Result<bool>.Failure("La cuota ya está saldada.");
+
+                // Total pagado desde la BD (no desde lo que viene en el request)
+                var totalPagado = await _context.Pagos
+                    .Where(p => p.IdCuota == dbCuota.IdCuota)
+                    .SumAsync(p => (decimal?)p.Monto) ?? 0m;
+
+                if (totalPagado > dbCuota.Monto)
+                    return Result<bool>.Failure("El total pagado supera el monto de la cuota.");
+
+                // Actualizar saldo pendiente
+                dbCuota.SaldoPendiente = dbCuota.Monto - totalPagado;
+
+                // Actualizar estado según saldo
+                dbCuota.IdEstado = dbCuota.SaldoPendiente == 0m
+                    ? ESTADO_SALDADA
+                    : ESTADO_PENDIENTE;
+
+                _context.Cuotas.Update(dbCuota);
+                await _context.SaveChangesAsync();
+
+                return Result<bool>.Success(true);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Failure($"Error al actualizar la cuota: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<int>> ActualizarCuotasVencidas()
+        {
+            try
+            {
+                // Buscar el ID del estado "Vencida"
+                var estadoVencida = await _context.EstadosCuotas
+                    .Where(e => e.Descripcion == "Vencida")
+                    .Select(e => e.IdEstado)
+                    .FirstOrDefaultAsync();
+
+                if (estadoVencida == 0)
+                    return Result<int>.Failure("No se encontró el estado 'Vencida' en la base de datos.");
+
+                // Cuotas pendientes cuya fecha ya venció
+                var cuotasVencidas = await _context.Cuotas
+                    .Where(c => c.IdEstado == ESTADO_PENDIENTE && c.FecVto.Date < DateTime.Today)
+                    .ToListAsync();
+
+                if (!cuotasVencidas.Any())
+                    return Result<int>.Success(0);
+
+                foreach (var c in cuotasVencidas)
+                    c.IdEstado = estadoVencida;
+
+                var count = await _context.SaveChangesAsync();
+                return Result<int>.Success(count);
+            }
+            catch (Exception ex)
+            {
+                return Result<int>.Failure($"Error al actualizar cuotas vencidas: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<List<Cuota>>> Getall(int idPrestamo)
+        {
+            try
+            {
+                if (idPrestamo <= 0)
+                    return Result<List<Cuota>>.Failure("Ingrese un préstamo válido.");
+
+                var cuotas = await _context.Cuotas
+                    .Where(c => c.IdPrestamo == idPrestamo)
+                    .ToListAsync();
+
+                return Result<List<Cuota>>.Success(cuotas);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<Cuota>>.Failure($"Error al obtener cuotas: {ex.Message}");
+            }
         }
     }
 }

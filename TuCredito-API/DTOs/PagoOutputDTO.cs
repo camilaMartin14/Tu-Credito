@@ -1,5 +1,4 @@
-namespace TuCredito.DTOs
-{
+namespace TuCredito.DTOs;
     public class PagoOutputDTO
     {
         public int IdPago { get; set; }
@@ -9,4 +8,3 @@ namespace TuCredito.DTOs
         public int MedioPago { get; set; }
         public required string Estado { get; set; }
     }
-}

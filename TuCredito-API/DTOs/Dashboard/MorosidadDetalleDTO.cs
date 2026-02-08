@@ -1,5 +1,4 @@
-﻿namespace TuCredito.DTOs.Dashboard
-{
+﻿namespace TuCredito.DTOs.Dashboard;
     public class MorosidadDetalleDTO
     {
         public string Cliente { get; set; } = string.Empty;
@@ -7,4 +6,3 @@
         public int DiasAtraso { get; set; }
         public decimal MontoAdeudado { get; set; }
     }
-}

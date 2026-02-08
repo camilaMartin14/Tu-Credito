@@ -1,5 +1,4 @@
-namespace TuCredito.DTOs
-{
+namespace TuCredito.DTOs;
     public class EvaluacionCrediticiaResponseDTO
     {
         public  string Estado { get; set; } // APROBADO, RECHAZADO, REVISION
@@ -8,4 +7,3 @@ namespace TuCredito.DTOs
         public  string SituacionBcra { get; set; }
         public  string DetalleRiesgo { get; set; }
     }
-}

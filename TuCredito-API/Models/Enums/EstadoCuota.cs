@@ -1,5 +1,4 @@
-﻿namespace TuCredito.Models.Enums
-{
+﻿namespace TuCredito.Models.Enums;
     public enum EstadoCuota
     {
         
@@ -9,4 +8,3 @@
             Reprogramada = 4,
         
     }
-}

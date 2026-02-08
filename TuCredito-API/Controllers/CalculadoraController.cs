@@ -5,8 +5,7 @@ using TuCredito.Models;
 using TuCredito.Services.Implementations;
 using TuCredito.Services.Interfaces;
 
-namespace TuCredito.Controllers
-{
+namespace TuCredito.Controllers;
     [ApiController]
     [Route("api/calculator")]
     public class CalculadoraController : ControllerBase
@@ -41,4 +40,3 @@ namespace TuCredito.Controllers
             }
         }
     }
-}

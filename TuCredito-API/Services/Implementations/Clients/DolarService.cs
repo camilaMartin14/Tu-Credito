@@ -1,8 +1,7 @@
 using TuCredito.Models.EntidadesApisTerceros;
 using TuCredito.Services.Interfaces.Clients;
 
-namespace TuCredito.Services.Implementations.Clients
-{
+namespace TuCredito.Services.Implementations.Clients;
     public class DolarService : IDolarService
     {
         private readonly HttpClient _httpClient;
@@ -19,4 +18,3 @@ namespace TuCredito.Services.Implementations.Clients
             return response;
         }
     }
-}

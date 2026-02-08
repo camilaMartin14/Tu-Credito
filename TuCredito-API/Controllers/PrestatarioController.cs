@@ -5,8 +5,7 @@ using TuCredito.DTOs;
 using TuCredito.Models;
 using TuCredito.Services.Interfaces;
 
-namespace TuCredito.Controllers
-{
+namespace TuCredito.Controllers;
     [Route("api/borrowers")]
     [ApiController]
     public class PrestatarioController : ControllerBase
@@ -20,21 +19,33 @@ namespace TuCredito.Controllers
             _mapper = mapper;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Crear([FromBody] Prestatario prestatario)
-        {
-            try
-            {
-                var dni = await _service.CrearAsync(prestatario);
-                return CreatedAtAction(nameof(ObtenerPorDni), new { dni }, prestatario);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error al crear el prestatario.", error = ex.Message });
-            }
-        }
+    [HttpPost]
+    public async Task<IActionResult> Crear([FromBody] PrestatarioDTO dto)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-        [HttpGet("{dni:int}")]
+        try
+        {
+            var prestatario = _mapper.Map<Prestatario>(dto);
+            
+            var dni = await _service.CrearAsync(prestatario);
+
+            var salida = _mapper.Map<PrestatarioDTO>(prestatario);
+
+            return CreatedAtAction(nameof(ObtenerPorDni), new { dni }, salida);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error al crear el prestatario.", error = ex.Message });
+        }
+    }
+
+    [HttpGet("{dni:int}")]
         public async Task<IActionResult> ObtenerPorDni(int dni)
         {
             try
@@ -54,11 +65,23 @@ namespace TuCredito.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ObtenerConFiltros([FromQuery] PrestatarioDTO filtro)
+        public async Task<IActionResult> ObtenerConFiltros([FromQuery] PrestatarioSearchDTO filtro)
         {
             try
             {
-                var lista = await _service.ObtenerConFiltrosAsync(filtro);
+                // Map FilterDTO to PrestatarioDTO manually or via AutoMapper if configured
+                var dto = new PrestatarioDTO
+                {
+                    Dni = filtro.Dni,
+                    Nombre = filtro.Nombre,
+                    Apellido = filtro.Apellido,
+                    Telefono = filtro.Telefono,
+                    Domicilio = filtro.Domicilio,
+                    Correo = filtro.Correo,
+                    EsActivo = filtro.EsActivo
+                };
+
+                var lista = await _service.ObtenerConFiltrosAsync(dto);
                 var dtos = _mapper.Map<List<PrestatarioDTO>>(lista);
                 return Ok(dtos);
             }
@@ -107,4 +130,3 @@ namespace TuCredito.Controllers
             }
         }
     }
-}

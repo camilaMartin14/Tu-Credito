@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace TuCredito.Security
-{
+namespace TuCredito.Security;
     public class PasswordHasher
     {
         private static readonly PasswordHasher<object> _hasher = new();
@@ -17,4 +16,3 @@ namespace TuCredito.Security
             return result == PasswordVerificationResult.Success;
         }
     }
-}

@@ -3,8 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TuCredito.Models.EntidadesApisTerceros;
 using TuCredito.Services.Interfaces.Clients;
 
-namespace TuCredito.Controllers
-{
+namespace TuCredito.Controllers;
     [Route("api/dollar")]
     [ApiController]
     public class DolarController : ControllerBase
@@ -29,4 +28,3 @@ namespace TuCredito.Controllers
             }
         }
     }
-}

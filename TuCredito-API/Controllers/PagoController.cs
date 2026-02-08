@@ -5,8 +5,7 @@ using TuCredito.Models;
 using TuCredito.Services.Implementations;
 using TuCredito.Services.Interfaces;
 
-namespace TuCredito.Controllers
-{
+namespace TuCredito.Controllers;
     [Route("api/payments")]
     [ApiController]
     public class PagoController : ControllerBase
@@ -26,7 +25,8 @@ namespace TuCredito.Controllers
             try
             {
                 var pagos = await _service.GetAllPagos();
-                return Ok(pagos);
+                var dtos = _mapper.Map<List<PagoOutputDTO>>(pagos);
+                return Ok(dtos);
             }
             catch (Exception ex)
             {
@@ -59,11 +59,9 @@ namespace TuCredito.Controllers
             try
             {
                 var pagos = await _service.GetPagoConFiltro(nombre, mes);
-                if (pagos == null) return NotFound(new { message = "No se encontraron pagos con los filtros indicados" });
-                if ((!string.IsNullOrWhiteSpace(nombre) || mes.HasValue) && !pagos.Any())
-                {
-                    return NotFound(new{message = "No se encontraron pagos con los filtros ingresados"});
-                }
+                // Si no hay resultados, retornamos lista vacía en lugar de 404
+                if (pagos == null) return Ok(new List<PagoOutputDTO>());
+                
                 return Ok(pagos);
             }
             catch (ArgumentException ex)
@@ -145,4 +143,3 @@ namespace TuCredito.Controllers
             }
         }
     }
-}

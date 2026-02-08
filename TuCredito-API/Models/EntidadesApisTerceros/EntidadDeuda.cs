@@ -1,7 +1,6 @@
 using TuCredito.Models.Enums;
 
-namespace TuCredito.Models.EntidadesApisTerceros
-{
+namespace TuCredito.Models.EntidadesApisTerceros;
     public class EntidadDeuda
     {
         public string? Entidad { get; set; }
@@ -9,4 +8,3 @@ namespace TuCredito.Models.EntidadesApisTerceros
         public decimal Monto { get; set; }
         public int DiasAtraso { get; set; }
     }
-}

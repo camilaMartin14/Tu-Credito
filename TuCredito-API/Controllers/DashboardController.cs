@@ -3,8 +3,7 @@ using TuCredito.Services.Interfaces;
 using TuCredito.DTOs;
 using TuCredito.DTOs.Dashboard;
 
-namespace TuCredito.Controllers
-{
+namespace TuCredito.Controllers;
     [Route("api/dashboard")]
     [ApiController]
     public class DashboardController : ControllerBase
@@ -17,16 +16,58 @@ namespace TuCredito.Controllers
         }
 
         [HttpGet("kpis")]
-        public async Task<ActionResult<DashboardKpisDTO>> GetKpis()
+        public async Task<ActionResult<DashboardKpisDTO>> GetKpis([FromQuery] DateTime? from, [FromQuery] DateTime? to)
         {
             try
             {
-                var kpis = await _dashboardService.GetKpisAsync();
+                var kpis = await _dashboardService.GetKpisAsync(from, to);
                 return Ok(kpis);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "Error al obtener KPIs.", error = ex.Message });
+            }
+        }
+
+        [HttpGet("cash-flow-projection")]
+        public async Task<ActionResult<List<GraficoDatoDTO>>> GetProyeccionFlujoCaja()
+        {
+            try
+            {
+                var result = await _dashboardService.GetProyeccionFlujoCajaAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener proyección de flujo de caja.", error = ex.Message });
+            }
+        }
+
+        [HttpGet("loans-trend")]
+        public async Task<ActionResult<List<SerieTiempoDTO>>> GetEvolucionColocacion([FromQuery] DateTime? from, [FromQuery] DateTime? to)
+        {
+            try
+            {
+                var result = await _dashboardService.GetEvolucionColocacionAsync(from, to);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener evolución de colocación.", error = ex.Message });
+            }
+        }
+
+        [HttpGet("risk-composition")]
+        public async Task<ActionResult<List<GraficoDatoDTO>>> GetComposicionRiesgo()
+        {
+            try
+            {
+                var result = await _dashboardService.GetComposicionRiesgoAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener composición de riesgo.", error = ex.Message });
             }
         }
 
@@ -45,11 +86,11 @@ namespace TuCredito.Controllers
         }
 
         [HttpGet("monthly-collections")]
-        public async Task<ActionResult<List<SerieTiempoDTO>>> GetFlujoCobranzas()
+        public async Task<ActionResult<List<SerieTiempoDTO>>> GetFlujoCobranzas([FromQuery] DateTime? from, [FromQuery] DateTime? to)
         {
             try
             {
-                var result = await _dashboardService.GetFlujoCobranzasAsync();
+                var result = await _dashboardService.GetFlujoCobranzasAsync(from, to);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -83,6 +124,20 @@ namespace TuCredito.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "Error al obtener cuotas a vencer.", error = ex.Message });
+            }
+        }
+
+        [HttpGet("recent-transactions")]
+        public async Task<ActionResult<List<TransactionDTO>>> GetRecentTransactions()
+        {
+            try
+            {
+                var result = await _dashboardService.GetRecentTransactionsAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener transacciones recientes.", error = ex.Message });
             }
         }
 
@@ -129,4 +184,3 @@ namespace TuCredito.Controllers
             }
         }
     }
-}

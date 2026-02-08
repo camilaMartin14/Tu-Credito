@@ -1,8 +1,6 @@
-using TuCredito.Models;
 using TuCredito.Models.Enums;
 
-namespace TuCredito.DTOs
-{
+namespace TuCredito.DTOs;
     public class CuotaOutputDTO
     {
         public int Monto { get; set; }
@@ -11,4 +9,3 @@ namespace TuCredito.DTOs
         public EstadoCuota Estado { get; set; }
         public bool EstaVencida {  get; set; }
     }
-}

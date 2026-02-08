@@ -1,7 +1,6 @@
 ﻿using TuCredito.DTOs;
 
-namespace TuCredito.Controllers
-{
+namespace TuCredito.Controllers;
     public class SimulacionPrestamoOutputDTO
     {
         public decimal MontoCuota { get; set; }
@@ -13,4 +12,3 @@ namespace TuCredito.Controllers
         public decimal? NuevoTotalAPagar { get; set; }
         public decimal? AhorroPorPagoAnticipado { get; set; }
     }
-}

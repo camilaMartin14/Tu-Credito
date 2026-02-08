@@ -4,8 +4,7 @@ using TuCredito.DTOs.Documentos;
 using TuCredito.MinIO;
 using TuCredito.Services.Interfaces;
 
-namespace TuCredito.Controllers
-{
+namespace TuCredito.Controllers;
     [Route("api/documents")]
     [ApiController]
     public class DocumentosController : ControllerBase
@@ -78,4 +77,3 @@ namespace TuCredito.Controllers
             }
         }
     }
-}

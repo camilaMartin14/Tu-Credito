@@ -1,8 +1,7 @@
 ﻿using TuCredito.DTOs;
 using TuCredito.Models;
 
-namespace TuCredito.Services.Interfaces
-{
+namespace TuCredito.Services.Interfaces;
     public interface IPrestamistaService
     {
         Task<Prestamista?> LoginAsync(string email, string contrasenia);
@@ -12,4 +11,3 @@ namespace TuCredito.Services.Interfaces
         Task<int> ObtenerIdUsuarioLogueado();
         Task<bool> UpdatePerfilAsync(int id, PrestamistaUpdateDTO dto);
     }
-}

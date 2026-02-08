@@ -1,15 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
 using TuCredito.Interceptors;
 using TuCredito.MinIO;
 using TuCredito.Models;
-using TuCredito.Profiles;
-using TuCredito.Repositories.Implementations;
-using TuCredito.Repositories.Interfaces;
 using TuCredito.Security;
 using TuCredito.Services.Implementations;
 using TuCredito.Services.Implementations.Clients;
@@ -73,12 +69,15 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-// Registramos el documento OpenAPI "v1" (título y versión) para que Swagger UI
-// pueda obtener una definición válida  y renderizar la API. --> Esto lo tuve q hacer por el cambio de version de swashbuckle
+
 options.SwaggerDoc("v1", new OpenApiInfo
 {
     Title = "TuCredito",
@@ -101,19 +100,16 @@ options.SwaggerDoc("v1", new OpenApiInfo
     });
 });
 
-builder.Services.AddDbContext<TuCreditoContext>(options =>
+builder.Services.AddDbContext<TuCreditoContext>((sp, options) =>
+{
+    var interceptor = sp.GetRequiredService<AuditInterceptor>();
     options.UseSqlServer(
         //builder.Configuration.GetConnectionString("AylenConnection")
         builder.Configuration.GetConnectionString("CamilaConnection")
     )
-);
+    .AddInterceptors(interceptor);
+});
 
-builder.Services.AddScoped<IPrestamoRepository, PrestamoRepository>();
-builder.Services.AddScoped<IPrestatarioRepository, PrestatarioRepository>();
-builder.Services.AddScoped<IPrestamistaRepository, PrestamistaRepository>();
-builder.Services.AddScoped<ICuotaRepository, CuotaRepository>();
-builder.Services.AddScoped<IPagoRepository, PagoRepository>();
-builder.Services.AddScoped<IDocumentoRepository, DocumentoRepository>();
 builder.Services.AddScoped<IPrestamoService, PrestamoService>();
 builder.Services.AddScoped<IPrestatarioService, PrestatarioService>();
 builder.Services.AddScoped<IPrestamistaService, PrestamistaService>();
@@ -123,6 +119,8 @@ builder.Services.AddScoped<IPagoService, PagoService>();
 builder.Services.AddScoped<ICalculadoraService, CalculadoraService>();
 builder.Services.AddScoped<IDolarService, DolarService>();
 builder.Services.AddScoped<IEvaluacionCrediticiaService, EvaluacionCrediticiaService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 builder.Services.AddHttpClient<IBcraDeudoresService, BcraDeudoresService>((sp, client) =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
@@ -140,7 +138,8 @@ builder.Services.AddScoped<JwtTokenGenerator>();
 
 builder.Services.AddAutoMapper(cfg => { }, AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddScoped<IFileStorage, MinioFileStorage>();
+builder.Services.AddScoped<IFileStorage, LocalFileStorage>();
+//builder.Services.AddScoped<IFileStorage, MinioFileStorage>();
 builder.Services.AddScoped<IDocumentoService, DocumentoService>();
 builder.Services.AddScoped<AuditInterceptor>();
 
@@ -153,10 +152,26 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+// Ensure Database Created
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<TuCreditoContext>();
+        context.Database.EnsureCreated();
+        Console.WriteLine("✅ Database ensured created.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ An error occurred creating the DB: {ex.Message}");
+    }
+}
 
 app.Run();
