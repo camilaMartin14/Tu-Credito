@@ -110,6 +110,17 @@ namespace TuCredito.Services.Implementations
             var prestamista = await _context.Prestamistas.FirstOrDefaultAsync(p => p.Id == id);
             if (prestamista == null) throw new ArgumentException("Prestamista no encontrado.");
 
+            // GUARD: PROTECCIÓN CUENTA DEMO
+            if (prestamista.Usuario.ToLower() == "demo")
+            {
+                if (!string.IsNullOrWhiteSpace(dto.NuevaContrasenia) || 
+                    (!string.IsNullOrWhiteSpace(dto.Email) && dto.Email != prestamista.Correo) ||
+                    (!string.IsNullOrWhiteSpace(dto.Usuario) && dto.Usuario != prestamista.Usuario))
+                {
+                    throw new InvalidOperationException("No se permite modificar credenciales en la cuenta DEMO.");
+                }
+            }
+
             // Validar duplicados si quiere cambiar correo/usuario
             if (!string.IsNullOrWhiteSpace(dto.Email) && dto.Email != prestamista.Correo)
             {
