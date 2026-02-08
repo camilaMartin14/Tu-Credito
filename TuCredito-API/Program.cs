@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
+using TuCredito.Data;
 using TuCredito.Interceptors;
 using TuCredito.MinIO;
 using TuCredito.Models;
@@ -103,11 +104,24 @@ options.SwaggerDoc("v1", new OpenApiInfo
 builder.Services.AddDbContext<TuCreditoContext>((sp, options) =>
 {
     var interceptor = sp.GetRequiredService<AuditInterceptor>();
-    options.UseSqlServer(
-        //builder.Configuration.GetConnectionString("AylenConnection")
-        builder.Configuration.GetConnectionString("CamilaConnection")
-    )
-    .AddInterceptors(interceptor);
+    
+    // Check for Environment Variable (Render/Neon usually sets DATABASE_URL or similar)
+    var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") 
+                           ?? builder.Configuration.GetConnectionString("DefaultConnection")
+                           ?? builder.Configuration.GetConnectionString("CamilaConnection");
+
+    var dbProvider = Environment.GetEnvironmentVariable("DB_PROVIDER") ?? "SqlServer";
+
+    if (dbProvider.Equals("Postgres", StringComparison.OrdinalIgnoreCase))
+    {
+        options.UseNpgsql(connectionString)
+               .AddInterceptors(interceptor);
+    }
+    else
+    {
+        options.UseSqlServer(connectionString)
+               .AddInterceptors(interceptor);
+    }
 });
 
 builder.Services.AddScoped<IPrestamoService, PrestamoService>();
@@ -158,15 +172,15 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// Ensure Database Created
+// Ensure Database Created and Seeded
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<TuCreditoContext>();
-        context.Database.EnsureCreated();
-        Console.WriteLine("✅ Database ensured created.");
+        DbInitializer.Initialize(context);
+        Console.WriteLine("✅ Database ensured created and seeded.");
     }
     catch (Exception ex)
     {

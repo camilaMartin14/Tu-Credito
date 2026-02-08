@@ -1,7 +1,7 @@
-CREATE DATABASE TuCredito14;
+CREATE DATABASE TuCredito;
 GO
 
-USE TuCredito14;
+USE TuCredito;
 GO
 
 CREATE TABLE Estados_Prestamos (
@@ -271,10 +271,6 @@ VALUES
 INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, saldo, Estado, Monto, Observaciones)
 VALUES
 (4, '2024-06-14', 1, 0, 'Registrado', 55000.00, 'Pago en término');
-GO
-
-
-USE TuCredito14;
 GO
 
 -- Actualizar Garantes
