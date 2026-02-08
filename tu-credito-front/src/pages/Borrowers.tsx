@@ -276,7 +276,7 @@ export function Borrowers() {
                         Ver Perfil
                     </button>
                     <button 
-                        onClick={() => navigate(`/loans?dni=${borrower.dni}`)}
+                        onClick={() => navigate(`/borrowers/${borrower.dni}?tab=loans`)}
                         className="text-sm font-medium text-muted hover:text-main"
                     >
                         Historial

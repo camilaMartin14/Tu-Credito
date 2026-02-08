@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getBorrowerByDni, updateBorrower } from '../services/borrowerService';
 import { getLoans } from '../services/loanService';
@@ -18,11 +18,25 @@ import { DocumentUploadModal } from '../components/documents/DocumentUploadModal
 export function BorrowerDetails() {
   const { dni } = useParams<{ dni: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const borrowerDni = parseInt(dni || '0');
   const queryClient = useQueryClient();
   const { addToast } = useToast();
 
-  const [activeTab, setActiveTab] = useState<'info' | 'loans' | 'documents'>('info');
+  const validTabs = ['info', 'loans', 'documents'];
+  const tabParam = searchParams.get('tab');
+  const initialTab = validTabs.includes(tabParam || '') ? (tabParam as 'info' | 'loans' | 'documents') : 'info';
+
+  const [activeTab, setActiveTab] = useState<'info' | 'loans' | 'documents'>(initialTab);
+  
+  // Update tab if URL changes (optional, but good for back button)
+  useEffect(() => {
+    const currentTab = searchParams.get('tab');
+    if (currentTab && validTabs.includes(currentTab)) {
+        setActiveTab(currentTab as any);
+    }
+  }, [searchParams]);
+
   const [riskResult, setRiskResult] = useState<any>(null);
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [isRiskModalOpen, setIsRiskModalOpen] = useState(false);
