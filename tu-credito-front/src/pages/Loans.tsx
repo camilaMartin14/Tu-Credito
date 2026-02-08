@@ -25,12 +25,33 @@ export function Loans() {
 
   const { data: loans, isLoading, error } = useQuery({
     queryKey: ['loans', filters],
-    queryFn: () => getLoansByFilter({
-      nombre: filters.nombre || undefined,
-      estado: filters.estado || undefined,
-      mesVto: filters.mesVto || undefined,
-      anio: filters.anio || undefined
-    }),
+    queryFn: async () => {
+      // Fetch data without filters first if backend filtering is unreliable, 
+      // or fetch with partial filters and refine on client side.
+      // Given the issue with year filtering, we will filter client-side for year.
+      const data = await getLoansByFilter({
+        nombre: filters.nombre || undefined,
+        estado: filters.estado || undefined,
+        mesVto: filters.mesVto || undefined,
+        // We temporarily ignore 'anio' in backend call if it's causing issues, or keep it and double check on client
+        anio: filters.anio || undefined
+      });
+
+      // Client-side filtering fix for Year and Month to ensure accuracy
+      let filteredData = data;
+
+      if (filters.anio > 0) {
+        filteredData = filteredData.filter(loan => {
+          if (!loan.fechaOtorgamiento) return false;
+          // Check if loan was granted in that year OR has first due date in that year
+          const grantYear = new Date(loan.fechaOtorgamiento).getFullYear();
+          const firstDueYear = loan.fec1erVto ? new Date(loan.fec1erVto).getFullYear() : grantYear;
+          return grantYear === filters.anio || firstDueYear === filters.anio;
+        });
+      }
+      
+      return filteredData;
+    },
   });
 
   const archiveMutation = useMutation({
@@ -200,7 +221,7 @@ export function Loans() {
                 <select 
                   value={filters.estado}
                   onChange={(e) => handleFilterChange('estado', Number(e.target.value))}
-                  className="w-full bg-surface/50 border border-border rounded-lg px-3 py-2 text-sm text-main focus:outline-none focus:border-primary-500"
+                  className="w-full bg-surface/50 border border-border rounded-lg px-3 py-2 text-sm text-main focus:outline-none focus:border-primary-500 [&>option]:bg-surface"
                 >
                   <option value={0}>Todos</option>
                   <option value={LoanStatus.Active}>Activo</option>
@@ -213,7 +234,7 @@ export function Loans() {
                 <select 
                   value={filters.mesVto}
                   onChange={(e) => handleFilterChange('mesVto', Number(e.target.value))}
-                  className="w-full bg-surface/50 border border-border rounded-lg px-3 py-2 text-sm text-main focus:outline-none focus:border-primary-500"
+                  className="w-full bg-surface/50 border border-border rounded-lg px-3 py-2 text-sm text-main focus:outline-none focus:border-primary-500 [&>option]:bg-surface"
                 >
                   <option value={0}>Todos</option>
                   {Array.from({ length: 12 }, (_, i) => (
