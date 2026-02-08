@@ -71,7 +71,7 @@ export function PaymentModal({ isOpen, onClose, installment }: PaymentModalProps
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-[#1a1f2e] border border-border rounded-xl w-full max-w-md shadow-2xl animate-in zoom-in-95">
+      <div className="bg-surface border border-border rounded-xl w-full max-w-md shadow-2xl animate-in zoom-in-95">
         <div className="flex items-center justify-between p-4 border-b border-border">
           <h2 className="text-lg font-semibold text-main">Registrar Pago - Cuota #{installment.nroCuota}</h2>
           <button onClick={onClose} className="text-muted hover:text-main transition-colors">
@@ -90,7 +90,7 @@ export function PaymentModal({ isOpen, onClose, installment }: PaymentModalProps
                 required
                 value={formData.monto}
                 onChange={(e) => setFormData({ ...formData, monto: Number(e.target.value) })}
-                className="w-full bg-surface/50 border border-border rounded-lg pl-10 pr-4 py-2 text-main focus:border-primary-500 focus:outline-none"
+                className="w-full bg-surfaceHighlight border border-border rounded-lg pl-10 pr-4 py-2 text-main focus:border-primary-500 focus:outline-none"
               />
             </div>
             <p className="text-xs text-muted">
@@ -107,7 +107,7 @@ export function PaymentModal({ isOpen, onClose, installment }: PaymentModalProps
                 required
                 value={formData.fechaPago}
                 onChange={(e) => setFormData({ ...formData, fechaPago: e.target.value })}
-                className="w-full bg-surface/50 border border-border rounded-lg pl-10 pr-4 py-2 text-main focus:border-primary-500 focus:outline-none"
+                className="w-full bg-surfaceHighlight border border-border rounded-lg pl-10 pr-4 py-2 text-main focus:border-primary-500 focus:outline-none"
               />
             </div>
           </div>
@@ -119,7 +119,7 @@ export function PaymentModal({ isOpen, onClose, installment }: PaymentModalProps
               <select
                 value={formData.idMedioPago}
                 onChange={(e) => setFormData({ ...formData, idMedioPago: Number(e.target.value) })}
-                className="w-full bg-surface/50 border border-border rounded-lg pl-10 pr-4 py-2 text-main focus:border-primary-500 focus:outline-none appearance-none"
+                className="w-full bg-surfaceHighlight border border-border rounded-lg pl-10 pr-4 py-2 text-main focus:border-primary-500 focus:outline-none appearance-none"
               >
                 <option value={PaymentMethod.Transfer}>{getPaymentMethodLabel(PaymentMethod.Transfer)}</option>
                 <option value={PaymentMethod.Cash}>{getPaymentMethodLabel(PaymentMethod.Cash)}</option>
@@ -139,7 +139,7 @@ export function PaymentModal({ isOpen, onClose, installment }: PaymentModalProps
                   step="0.01"
                   value={formData.descuento}
                   onChange={(e) => setFormData({ ...formData, descuento: Number(e.target.value) })}
-                  className="w-full bg-surface/50 border border-border rounded-lg pl-10 pr-4 py-2 text-main focus:border-primary-500 focus:outline-none"
+                  className="w-full bg-surfaceHighlight border border-border rounded-lg pl-10 pr-4 py-2 text-main focus:border-primary-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -152,7 +152,7 @@ export function PaymentModal({ isOpen, onClose, installment }: PaymentModalProps
                   step="0.01"
                   value={formData.recargo}
                   onChange={(e) => setFormData({ ...formData, recargo: Number(e.target.value) })}
-                  className="w-full bg-surface/50 border border-border rounded-lg pl-10 pr-4 py-2 text-main focus:border-primary-500 focus:outline-none"
+                  className="w-full bg-surfaceHighlight border border-border rounded-lg pl-10 pr-4 py-2 text-main focus:border-primary-500 focus:outline-none"
                 />
               </div>
             </div>

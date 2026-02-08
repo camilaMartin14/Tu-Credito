@@ -138,7 +138,8 @@ builder.Services.AddScoped<JwtTokenGenerator>();
 
 builder.Services.AddAutoMapper(cfg => { }, AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddScoped<IFileStorage, MinioFileStorage>();
+builder.Services.AddScoped<IFileStorage, LocalFileStorage>();
+//builder.Services.AddScoped<IFileStorage, MinioFileStorage>();
 builder.Services.AddScoped<IDocumentoService, DocumentoService>();
 builder.Services.AddScoped<AuditInterceptor>();
 

@@ -1,13 +1,18 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getPayments, getPaymentsByFilter, updatePaymentStatus } from '../services/paymentService';
-import { Search, Filter, Download, AlertCircle, CheckCircle2, X, Ban } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Search, Filter, Download, AlertCircle, CheckCircle2, X, Ban, Plus } from 'lucide-react';
 import { PaymentMethod, getPaymentMethodLabel } from '../types/enums';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { exportToPDF } from '../utils/pdfGenerator';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useToast } from '../context/ToastContext';
+
+import { PaymentModal } from '../components/payments/PaymentModal';
+import { NewPaymentModal } from '../components/payments/NewPaymentModal';
+import { Cuota } from '../types';
 
 export function Payments() {
   const queryClient = useQueryClient();
@@ -16,6 +21,9 @@ export function Payments() {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState<number | undefined>(undefined);
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; id?: number; newStatus?: string }>({ isOpen: false });
+  const [isNewPaymentModalOpen, setIsNewPaymentModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [selectedInstallment, setSelectedInstallment] = useState<Cuota | null>(null);
 
   const { data: payments, isLoading, error } = useQuery({
     queryKey: ['payments', searchTerm, selectedMonth],
@@ -93,13 +101,22 @@ export function Payments() {
           <h1 className="text-2xl font-bold text-main">Pagos</h1>
           <p className="text-muted">Historial de transacciones y pagos recibidos</p>
         </div>
-        <button 
-          onClick={handleExport}
-          className="flex items-center gap-2 bg-surfaceHighlight hover:bg-border text-main px-4 py-2 rounded-lg transition-colors border border-border"
-        >
-          <Download className="h-4 w-4" />
-          Exportar
-        </button>
+        <div className="flex gap-3">
+          <button 
+            onClick={() => setIsNewPaymentModalOpen(true)}
+            className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg transition-colors shadow-lg shadow-primary-500/20"
+          >
+            <Plus className="h-4 w-4" />
+            Nuevo Pago
+          </button>
+          <button 
+            onClick={handleExport}
+            className="flex items-center gap-2 bg-surfaceHighlight hover:bg-border text-main px-4 py-2 rounded-lg transition-colors border border-border"
+          >
+            <Download className="h-4 w-4" />
+            Exportar
+          </button>
+        </div>
       </div>
 
       <div className="glass-panel rounded-xl overflow-hidden border border-border">
@@ -183,7 +200,7 @@ export function Payments() {
                   </td>
                   <td className="px-6 py-4 text-muted">{getPaymentMethodLabel(payment.medioPago as PaymentMethod)}</td>
                   <td className="px-6 py-4">
-                     <StatusBadge variant={payment.estado === 'Registrado' ? 'success' : 'default'}>
+                     <StatusBadge variant={(payment.estado === 'Registrado' || payment.estado === 'Aprobado') ? 'success' : 'default'}>
                         <CheckCircle2 className="h-3 w-3" /> {payment.estado}
                      </StatusBadge>
                   </td>
@@ -215,6 +232,25 @@ export function Payments() {
         cancelText="Cancelar"
         variant="warning"
         isLoading={updateStatusMutation.isPending}
+      />
+
+      <NewPaymentModal
+        isOpen={isNewPaymentModalOpen}
+        onClose={() => setIsNewPaymentModalOpen(false)}
+        onInstallmentSelect={(installment) => {
+          setSelectedInstallment(installment);
+          setIsNewPaymentModalOpen(false);
+          setIsPaymentModalOpen(true);
+        }}
+      />
+
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => {
+          setIsPaymentModalOpen(false);
+          setSelectedInstallment(null);
+        }}
+        installment={selectedInstallment}
       />
     </div>
   );

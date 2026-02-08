@@ -12,7 +12,7 @@ namespace TuCredito.Services.Implementations
         private readonly IMapper _mapper;
 
         private const int CUOTA_PENDIENTE = 1;
-        private const int CUOTA_SALDADA = 3;
+        private const int CUOTA_SALDADA = 2;
 
         private const int PRESTAMO_ACTIVO = 1;
         private const int PRESTAMO_FINALIZADO = 2;
@@ -28,10 +28,10 @@ namespace TuCredito.Services.Implementations
 
         public async Task<List<Pago>> GetAllPagos()
         {
-            // “Registrado” NO debería venir del front, es un estado del sistema.
+            // Retornamos todos los pagos para el historial, el front se encarga de mostrar el estado
             return await _context.Pagos
                 .Include(p => p.IdCuotaNavigation)
-                .Where(p => p.Estado == PAGO_REGISTRADO)
+                .OrderByDescending(p => p.FecPago)
                 .ToListAsync();
         }
 
