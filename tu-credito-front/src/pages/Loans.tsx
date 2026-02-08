@@ -185,6 +185,18 @@ export function Loans() {
         </div>
       </div>
 
+      {searchParams.get('view') === 'history' && (
+        <div className="bg-primary-500/10 border border-primary-500/20 rounded-xl p-4 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
+          <Info className="h-5 w-5 text-primary-600 dark:text-primary-400 shrink-0 mt-0.5" />
+          <div>
+            <h3 className="text-sm font-medium text-primary-800 dark:text-primary-300">Total Prestado Histórico</h3>
+            <p className="text-sm text-primary-700 dark:text-primary-200 mt-1">
+              Esta lista representa todos los préstamos otorgados históricamente. La suma total de los montos otorgados aquí corresponde al KPI "Total Prestado Histórico".
+            </p>
+          </div>
+        </div>
+      )}
+
       {filters.estado === LoanStatus.Active && (
         <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-start gap-3">
           <Info className="h-5 w-5 text-blue-400 shrink-0 mt-0.5" />

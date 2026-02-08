@@ -188,7 +188,9 @@ export function LoanDetails() {
               <tbody className="divide-y divide-border">
                 {installments?.map((cuota) => (
                   <tr key={cuota.idCuota} className="hover:bg-surfaceHighlight/50 transition-colors">
-                    <td className="px-6 py-4 font-medium text-main">{cuota.nroCuota}</td>
+                    <td className="px-6 py-4 font-medium text-main">
+                      {cuota.nroCuota.toString().padStart(2, '0')}/{loan.cantidadCtas}
+                    </td>
                     <td className="px-6 py-4 text-muted">{formatDate(cuota.fecVto)}</td>
                     <td className="px-6 py-4 text-main">{formatCurrency(cuota.monto)}</td>
                     <td className="px-6 py-4 text-main">{cuota.saldoPendiente ? formatCurrency(cuota.saldoPendiente) : '-'}</td>

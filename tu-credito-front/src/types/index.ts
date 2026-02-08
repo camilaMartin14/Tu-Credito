@@ -63,6 +63,7 @@ export interface PagoInputDTO {
 export interface PagoOutputDTO {
   idPago: number;
   nroCuota: number;
+  cantidadTotalCuotas?: number;
   monto: number;
   fecPago: string;
   medioPago: number;

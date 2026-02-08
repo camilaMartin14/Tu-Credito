@@ -9,6 +9,7 @@ namespace TuCredito.Profiles;
         {
             CreateMap<Pago, PagoOutputDTO>()
                  .ForMember(dest => dest.NroCuota, opt => opt.MapFrom(src => src.IdCuotaNavigation.NroCuota))
+                 .ForMember(dest => dest.CantidadTotalCuotas, opt => opt.MapFrom(src => src.IdCuotaNavigation.IdPrestamoNavigation.CantidadCtas))
                  .ForMember(dest => dest.MedioPago, opt => opt.MapFrom(src => src.IdMedioPago))
                  .ForMember(dest => dest.NombreCliente, opt => opt.MapFrom(src => src.IdCuotaNavigation.IdPrestamoNavigation.DniPrestatarioNavigation.Nombre))
                  .ForMember(dest => dest.ApellidoCliente, opt => opt.MapFrom(src => src.IdCuotaNavigation.IdPrestamoNavigation.DniPrestatarioNavigation.Apellido))

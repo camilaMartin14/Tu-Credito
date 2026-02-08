@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getPayments, getPaymentsByFilter, updatePaymentStatus } from '../services/paymentService';
-import { Link, useNavigate } from 'react-router-dom';
-import { Search, Filter, Download, AlertCircle, CheckCircle2, X, Ban, Plus } from 'lucide-react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Search, Filter, Download, AlertCircle, CheckCircle2, X, Ban, Plus, Info } from 'lucide-react';
 import { PaymentMethod, getPaymentMethodLabel } from '../types/enums';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import { StatusBadge } from '../components/ui/StatusBadge';
@@ -16,6 +16,7 @@ import { Cuota } from '../types';
 
 export function Payments() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
@@ -120,6 +121,18 @@ export function Payments() {
         </div>
       </div>
 
+      {searchParams.get('view') === 'profitability' && (
+        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
+          <Info className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+          <div>
+            <h3 className="text-sm font-medium text-emerald-800 dark:text-emerald-300">Flujo de Rentabilidad</h3>
+            <p className="text-sm text-emerald-700 dark:text-emerald-200 mt-1">
+              Este historial de pagos es la base de tu rentabilidad. Cada pago incluye una porción de intereses que, sumada, genera el margen de ganancia global de tu negocio.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="glass-panel rounded-xl overflow-hidden border border-border">
         <div className="p-4 border-b border-border space-y-4">
           <div className="flex items-center justify-between gap-4">
@@ -206,14 +219,16 @@ export function Payments() {
                         : 'N/A'}
                     </button>
                   </td>
-                  <td className="px-6 py-4 text-muted">#{payment.nroCuota}</td>
+                  <td className="px-6 py-4 text-muted">
+                    {payment.nroCuota.toString().padStart(2, '0')}/{payment.cantidadTotalCuotas || '-'}
+                  </td>
                   <td className="px-6 py-4 text-main font-semibold">{formatCurrency(payment.monto || 0)}</td>
                   <td className="px-6 py-4 text-muted">
                     {formatDate(payment.fecPago)}
                   </td>
                   <td className="px-6 py-4 text-muted">{getPaymentMethodLabel(payment.medioPago as PaymentMethod)}</td>
                   <td className="px-6 py-4">
-                     <StatusBadge variant={(payment.estado === 'Registrado' || payment.estado === 'Aprobado') ? 'success' : 'default'}>
+                     <StatusBadge variant={payment.estado === 'Aprobado' ? 'success' : 'default'}>
                         <CheckCircle2 className="h-3 w-3" /> {payment.estado}
                      </StatusBadge>
                   </td>

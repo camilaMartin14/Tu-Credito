@@ -18,7 +18,7 @@ namespace TuCredito.Services.Implementations
         private const int PRESTAMO_FINALIZADO = 2;
         private const int PRESTAMO_ELIMINADO = 3;
 
-        private const string PAGO_REGISTRADO = "Registrado";
+        private const string PAGO_REGISTRADO = "Aprobado";
 
         public PagoService(TuCreditoContext context, IMapper mapper)
         {

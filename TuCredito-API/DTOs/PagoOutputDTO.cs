@@ -3,6 +3,7 @@ namespace TuCredito.DTOs;
     {
         public int IdPago { get; set; }
         public int NroCuota { get; set; }
+        public int CantidadTotalCuotas { get; set; }
         public decimal Monto { get; set; }
         public DateTime FecPago { get; set; }
         public int MedioPago { get; set; }

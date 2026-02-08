@@ -74,7 +74,7 @@ export function Dashboard() {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <Link to="/loans" className="block h-full transition-transform hover:scale-[1.02] cursor-pointer">
+        <Link to="/loans?view=history" className="block h-full transition-transform hover:scale-[1.02] cursor-pointer">
             <KPIWidget
             title="Total Prestado Histórico"
             value={kpis ? `$${kpis.totalPrestadoHistorico.toLocaleString()}` : '...'}
@@ -98,7 +98,7 @@ export function Dashboard() {
             className="h-full"
             />
         </Link>
-        <Link to="/loans" className="block h-full transition-transform hover:scale-[1.02] cursor-pointer">
+        <Link to="/payments?view=profitability" className="block h-full transition-transform hover:scale-[1.02] cursor-pointer">
             <KPIWidget
             title="Rentabilidad"
             value={kpis ? `${kpis.rentabilidad}%` : '...'}
