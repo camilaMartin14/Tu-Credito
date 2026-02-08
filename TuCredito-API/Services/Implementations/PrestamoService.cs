@@ -51,9 +51,6 @@ namespace TuCredito.Services.Implementations
 
         public async Task<List<PrestamoDTO>> GetPrestamoConFiltro(string? nombre, int? estado, int? mesVto, int? anio)
         {
-            if (!string.IsNullOrWhiteSpace(nombre) && nombre.Any(char.IsDigit))
-                throw new ArgumentException("El nombre solo puede contener letras");
-
             // El estado lo manejaría con un combo box desde el front
             if (mesVto.HasValue && (mesVto.Value > 12 || mesVto.Value < 1))
                 throw new ArgumentException("El mes debe estar contenido entre 1 y 12");
@@ -71,7 +68,12 @@ namespace TuCredito.Services.Implementations
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(nombre))
-                query = query.Where(p => p.DniPrestatarioNavigation.Nombre.Contains(nombre));
+            {
+                query = query.Where(p => 
+                    p.DniPrestatarioNavigation.Nombre.Contains(nombre) || 
+                    p.DniPrestatarioNavigation.Apellido.Contains(nombre) ||
+                    p.DniPrestatario.ToString().Contains(nombre));
+            }
 
             if (estado.HasValue)
                 query = query.Where(p => p.IdEstado == estado.Value);

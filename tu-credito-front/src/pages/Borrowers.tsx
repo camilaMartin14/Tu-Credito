@@ -62,11 +62,7 @@ export function Borrowers() {
     const filters: Partial<PrestatarioDTO> = {};
     
     if (debouncedSearchTerm) {
-      if (/^\d+$/.test(debouncedSearchTerm)) {
-        filters.dni = Number(debouncedSearchTerm);
-      } else {
-        filters.nombre = debouncedSearchTerm;
-      }
+      filters.nombre = debouncedSearchTerm;
     }
 
     if (activeFilter !== 'all') {

@@ -121,11 +121,18 @@ namespace TuCredito.Services.Implementations
             var query = _context.Prestatarios.AsQueryable();
 
             
+            // Si viene DNI exacto, filtramos por él (prioridad alta)
             if (filtro.Dni.HasValue && filtro.Dni.Value > 0)
                 query = query.Where(p => p.Dni == filtro.Dni.Value);
 
+            // El campo Nombre se usa como búsqueda genérica (Nombre, Apellido o parcial de DNI)
             if (!string.IsNullOrWhiteSpace(filtro.Nombre))
-                query = query.Where(p => p.Nombre.Contains(filtro.Nombre));
+            {
+                query = query.Where(p => 
+                    p.Nombre.Contains(filtro.Nombre) || 
+                    p.Apellido.Contains(filtro.Nombre) ||
+                    p.Dni.ToString().Contains(filtro.Nombre));
+            }
 
             if (filtro.EsActivo.HasValue)
                 query = query.Where(p => p.EsActivo == filtro.EsActivo.Value);
