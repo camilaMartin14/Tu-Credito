@@ -5,7 +5,7 @@ import { getBorrowerByDni, updateBorrower } from '../services/borrowerService';
 import { getLoans } from '../services/loanService';
 import { getDocuments, uploadDocument, deleteDocument, downloadDocument, viewDocument } from '../services/documentService';
 import { evaluateRisk } from '../services/evaluationService';
-import { ArrowLeft, User, FileText, Shield, Upload, Trash2, Download, Edit, Save, X, Eye } from 'lucide-react';
+import { ArrowLeft, User, Users, FileText, Shield, Upload, Trash2, Download, Edit, Save, X, Eye } from 'lucide-react';
 import { DocumentoDTO, PrestatarioDTO } from '../types';
 import { getLoanStatusLabel } from '../types/enums';
 import { StatusBadge } from '../components/ui/StatusBadge';
@@ -329,6 +329,25 @@ export function BorrowerDetails() {
                 </div>
               )}
             </div>
+
+            <div className="glass-panel p-6 rounded-xl border border-border space-y-4">
+               <h3 className="font-semibold text-lg text-main flex items-center gap-2">
+                 <Users className="h-5 w-5 text-primary-500" /> Datos del Garante
+               </h3>
+               {(borrower.garanteNombre || borrower.garanteDni) ? (
+                 <div className="space-y-2 text-sm">
+                   <p><span className="text-muted">Nombre:</span> {borrower.garanteNombre} {borrower.garanteApellido}</p>
+                   <p><span className="text-muted">DNI:</span> {borrower.garanteDni}</p>
+                   {borrower.garanteCorreo && <p><span className="text-muted">Email:</span> {borrower.garanteCorreo}</p>}
+                   {borrower.garanteTelefono && <p><span className="text-muted">Teléfono:</span> {borrower.garanteTelefono}</p>}
+                   {borrower.garanteDomicilio && <p><span className="text-muted">Dirección:</span> {borrower.garanteDomicilio}</p>}
+                 </div>
+               ) : (
+                 <div className="flex flex-col items-center justify-center py-4 text-muted">
+                   <p className="italic">No hay garante asignado</p>
+                 </div>
+               )}
+             </div>
           </div>
         )}
 
