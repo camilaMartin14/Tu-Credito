@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getLoansByFilter, archiveLoan, deleteLoan } from '../services/loanService';
-import { Plus, Search, Filter, ArrowUpRight, AlertCircle, X, Download, Archive, Trash2 } from 'lucide-react';
+import { Plus, Search, Filter, ArrowUpRight, AlertCircle, X, Download, Archive, Trash2, Info } from 'lucide-react';
 import { exportToPDF } from '../utils/pdfGenerator';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { LoanStatus, getLoanStatusLabel } from '../types/enums';
@@ -184,6 +184,19 @@ export function Loans() {
           </div>
         </div>
       </div>
+
+      {filters.estado === LoanStatus.Active && (
+        <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-start gap-3">
+          <Info className="h-5 w-5 text-blue-400 shrink-0 mt-0.5" />
+          <div>
+            <h3 className="text-sm font-medium text-blue-400">Préstamos con Capital Pendiente</h3>
+            <p className="text-sm text-blue-400/80 mt-1">
+              Estos son los préstamos que actualmente se encuentran activos y tienen cuotas pendientes de pago. 
+              El "Capital Pendiente" es la suma de los saldos restantes de estos préstamos.
+            </p>
+          </div>
+        </div>
+      )}
 
       <ConfirmationModal
         isOpen={confirmModal.isOpen}
