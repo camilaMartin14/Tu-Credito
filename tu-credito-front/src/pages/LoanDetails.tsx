@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getLoanById, getLoanSummary } from '../services/loanService';
+import { getLoanById, getLoanSummary, deleteLoan } from '../services/loanService';
 import { getInstallments } from '../services/installmentService';
-import { ArrowLeft, Calendar, PieChart, AlertCircle, Clock, CreditCard } from 'lucide-react';
+import { ArrowLeft, Calendar, PieChart, AlertCircle, Clock, CreditCard, Trash2 } from 'lucide-react';
 import { Cuota } from '../types';
 import { LoanStatus, InstallmentStatus, getLoanStatusLabel, getInstallmentStatusLabel } from '../types/enums';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import { PaymentModal } from '../components/payments/PaymentModal';
+import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useToast } from '../context/ToastContext';
 
 export function LoanDetails() {
@@ -20,6 +21,18 @@ export function LoanDetails() {
 
   const [selectedInstallment, setSelectedInstallment] = useState<Cuota | null>(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteLoan,
+    onSuccess: () => {
+      addToast('Préstamo eliminado correctamente', 'success');
+      navigate('/loans');
+    },
+    onError: () => {
+      addToast('Error al eliminar el préstamo', 'error');
+    }
+  });
 
   const { data: loan, isLoading: isLoadingLoan } = useQuery({
     queryKey: ['loan', loanId],
@@ -77,6 +90,16 @@ export function LoanDetails() {
             <p className="text-muted">Detalles y plan de cuotas</p>
           </div>
         </div>
+        
+        {(loan.idEstado === LoanStatus.Active || loan.idEstado === LoanStatus.Finished) && (
+          <button
+            onClick={() => setIsDeleteModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-colors border border-red-500/20"
+          >
+            <Trash2 className="h-4 w-4" />
+            Eliminar
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -215,6 +238,18 @@ export function LoanDetails() {
           setSelectedInstallment(null);
         }}
         installment={selectedInstallment}
+      />
+
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => deleteMutation.mutate(loanId)}
+        title="Eliminar Préstamo - ¡Acción Peligrosa!"
+        message="¡Atención! Si desea archivar el préstamo, debe marcar todas sus cuotas como pagadas. Solo elimine el préstamo si fue creado por error con datos incorrectos. Esta acción es irreversible."
+        confirmText="Eliminar definitivamente"
+        cancelText="Cancelar"
+        variant="danger"
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );

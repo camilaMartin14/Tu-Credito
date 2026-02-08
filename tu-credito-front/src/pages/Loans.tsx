@@ -30,7 +30,7 @@ export function Loans() {
   }, [searchParams]);
   const [yearInput, setYearInput] = useState('');
   const [nameInput, setNameInput] = useState('');
-  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; id?: number; type: 'archive' | 'delete' }>({ isOpen: false, type: 'archive' });
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; id?: number }>({ isOpen: false });
 
   // Debounce search input could be better, but for now direct state update
   // Ideally use a debounce hook or library
@@ -66,18 +66,6 @@ export function Loans() {
     },
   });
 
-  const archiveMutation = useMutation({
-    mutationFn: (id: number) => archiveLoan(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['loans'] });
-      addToast('Préstamo finalizado/archivado correctamente', 'success');
-      setConfirmModal({ ...confirmModal, isOpen: false });
-    },
-    onError: () => {
-      addToast('Error al archivar el préstamo', 'error');
-    }
-  });
-
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteLoan(id),
     onSuccess: () => {
@@ -90,21 +78,13 @@ export function Loans() {
     }
   });
 
-  const handleArchive = (id: number) => {
-    setConfirmModal({ isOpen: true, id, type: 'archive' });
-  };
-
   const handleDelete = (id: number) => {
-    setConfirmModal({ isOpen: true, id, type: 'delete' });
+    setConfirmModal({ isOpen: true, id });
   };
 
   const onConfirmAction = () => {
     if (confirmModal.id) {
-      if (confirmModal.type === 'archive') {
-        archiveMutation.mutate(confirmModal.id);
-      } else {
-        deleteMutation.mutate(confirmModal.id);
-      }
+      deleteMutation.mutate(confirmModal.id);
     }
   };
 
@@ -214,14 +194,12 @@ export function Loans() {
         isOpen={confirmModal.isOpen}
         onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
         onConfirm={onConfirmAction}
-        title={confirmModal.type === 'archive' ? "Archivar Préstamo" : "Eliminar Préstamo"}
-        message={confirmModal.type === 'archive' 
-          ? "¿Estás seguro de que deseas finalizar/archivar este préstamo? Esta acción no se puede deshacer."
-          : "¿Estás seguro de que deseas eliminar este préstamo? Esta acción no se puede deshacer."}
-        confirmText={confirmModal.type === 'archive' ? "Archivar" : "Eliminar"}
+        title="Eliminar Préstamo - ¡Acción Peligrosa!"
+        message="¡Atención! Si desea archivar el préstamo, debe marcar todas sus cuotas como pagadas. Solo elimine el préstamo si fue creado por error con datos incorrectos. Esta acción es irreversible."
+        confirmText="Eliminar definitivamente"
         cancelText="Cancelar"
-        variant={confirmModal.type === 'archive' ? "warning" : "danger"}
-        isLoading={archiveMutation.isPending || deleteMutation.isPending}
+        variant="danger"
+        isLoading={deleteMutation.isPending}
       />
       <div className="glass-panel rounded-xl overflow-hidden border border-border">
         <div className="p-4 border-b border-border flex flex-col gap-4">
@@ -358,15 +336,6 @@ export function Loans() {
                       >
                         Ver detalles
                       </Link>
-                      {(loan.idEstado === 1) && (
-                        <button
-                          onClick={() => handleArchive(loan.idPrestamo || 0)}
-                          className="text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/10 p-1.5 rounded-lg transition-colors"
-                          title="Finalizar/Archivar Préstamo"
-                        >
-                          <Archive className="h-4 w-4" />
-                        </button>
-                      )}
                       {(loan.idEstado === 1 || loan.idEstado === 2) && (
                         <button
                           onClick={() => handleDelete(loan.idPrestamo || 0)}
