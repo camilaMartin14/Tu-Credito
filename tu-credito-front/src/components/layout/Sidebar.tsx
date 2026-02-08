@@ -23,7 +23,7 @@ export function Sidebar() {
                 <span className="font-bold text-white text-lg">T</span>
             </div>
             <div>
-                <h1 className="text-xl font-bold tracking-tight text-main">Tu Credito</h1>
+                <h1 className="text-xl font-bold tracking-tight text-main">Tu Crédito</h1>
             </div>
         </div>
       </div>

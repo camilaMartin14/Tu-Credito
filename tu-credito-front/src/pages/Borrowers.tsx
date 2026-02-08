@@ -62,11 +62,7 @@ export function Borrowers() {
     const filters: Partial<PrestatarioDTO> = {};
     
     if (debouncedSearchTerm) {
-      if (/^\d+$/.test(debouncedSearchTerm)) {
-        filters.dni = Number(debouncedSearchTerm);
-      } else {
-        filters.nombre = debouncedSearchTerm;
-      }
+      filters.nombre = debouncedSearchTerm;
     }
 
     if (activeFilter !== 'all') {
@@ -280,7 +276,7 @@ export function Borrowers() {
                         Ver Perfil
                     </button>
                     <button 
-                        onClick={() => navigate(`/loans?dni=${borrower.dni}`)}
+                        onClick={() => navigate(`/borrowers/${borrower.dni}?tab=loans`)}
                         className="text-sm font-medium text-muted hover:text-main"
                     >
                         Historial

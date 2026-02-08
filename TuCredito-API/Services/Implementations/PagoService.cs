@@ -18,7 +18,7 @@ namespace TuCredito.Services.Implementations
         private const int PRESTAMO_FINALIZADO = 2;
         private const int PRESTAMO_ELIMINADO = 3;
 
-        private const string PAGO_REGISTRADO = "Registrado";
+        private const string PAGO_REGISTRADO = "Aprobado";
 
         public PagoService(TuCreditoContext context, IMapper mapper)
         {
@@ -31,6 +31,8 @@ namespace TuCredito.Services.Implementations
             // Retornamos todos los pagos para el historial, el front se encarga de mostrar el estado
             return await _context.Pagos
                 .Include(p => p.IdCuotaNavigation)
+                    .ThenInclude(c => c.IdPrestamoNavigation)
+                        .ThenInclude(pr => pr.DniPrestatarioNavigation)
                 .OrderByDescending(p => p.FecPago)
                 .ToListAsync();
         }
@@ -47,9 +49,6 @@ namespace TuCredito.Services.Implementations
 
         public async Task<List<PagoOutputDTO>> GetPagoConFiltro(string? nombre, int? mes)
         {
-            if (!string.IsNullOrWhiteSpace(nombre) && nombre.Any(char.IsDigit))
-                throw new ArgumentException("El nombre solo puede contener letras.");
-
             if (mes.HasValue && (mes.Value < 1 || mes.Value > 12))
                 throw new ArgumentException("El mes debe estar entre 1 y 12.");
 
@@ -63,7 +62,9 @@ namespace TuCredito.Services.Implementations
             if (!string.IsNullOrWhiteSpace(nombre))
             {
                 query = query.Where(p =>
-                    p.IdCuotaNavigation.IdPrestamoNavigation.DniPrestatarioNavigation.Nombre.Contains(nombre));
+                    p.IdCuotaNavigation.IdPrestamoNavigation.DniPrestatarioNavigation.Nombre.Contains(nombre) ||
+                    p.IdCuotaNavigation.IdPrestamoNavigation.DniPrestatarioNavigation.Apellido.Contains(nombre) ||
+                    p.IdCuotaNavigation.IdPrestamoNavigation.DniPrestatario.ToString().Contains(nombre));
             }
 
             if (mes.HasValue)

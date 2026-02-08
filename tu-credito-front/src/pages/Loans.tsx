@@ -1,15 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getLoansByFilter, archiveLoan, deleteLoan } from '../services/loanService';
-import { Plus, Search, Filter, ArrowUpRight, AlertCircle, X, Download, Archive, Trash2 } from 'lucide-react';
+import { Plus, Search, Filter, ArrowUpRight, AlertCircle, X, Download, Archive, Trash2, Info, FileSpreadsheet } from 'lucide-react';
 import { exportToPDF } from '../utils/pdfGenerator';
-import { Link, useNavigate } from 'react-router-dom';
+import { exportToExcel } from '../utils/excelGenerator';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { LoanStatus, getLoanStatusLabel } from '../types/enums';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useToast } from '../context/ToastContext';
 
 export function Loans() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const [showFilters, setShowFilters] = useState(false);
@@ -19,9 +21,17 @@ export function Loans() {
     mesVto: 0,
     anio: 0
   });
+
+  useEffect(() => {
+    const statusParam = searchParams.get('status');
+    if (statusParam) {
+      setFilters(prev => ({ ...prev, estado: Number(statusParam) }));
+      setShowFilters(true);
+    }
+  }, [searchParams]);
   const [yearInput, setYearInput] = useState('');
   const [nameInput, setNameInput] = useState('');
-  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; id?: number; type: 'archive' | 'delete' }>({ isOpen: false, type: 'archive' });
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; id?: number }>({ isOpen: false });
 
   // Debounce search input could be better, but for now direct state update
   // Ideally use a debounce hook or library
@@ -57,18 +67,6 @@ export function Loans() {
     },
   });
 
-  const archiveMutation = useMutation({
-    mutationFn: (id: number) => archiveLoan(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['loans'] });
-      addToast('Préstamo finalizado/archivado correctamente', 'success');
-      setConfirmModal({ ...confirmModal, isOpen: false });
-    },
-    onError: () => {
-      addToast('Error al archivar el préstamo', 'error');
-    }
-  });
-
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteLoan(id),
     onSuccess: () => {
@@ -81,21 +79,13 @@ export function Loans() {
     }
   });
 
-  const handleArchive = (id: number) => {
-    setConfirmModal({ isOpen: true, id, type: 'archive' });
-  };
-
   const handleDelete = (id: number) => {
-    setConfirmModal({ isOpen: true, id, type: 'delete' });
+    setConfirmModal({ isOpen: true, id });
   };
 
   const onConfirmAction = () => {
     if (confirmModal.id) {
-      if (confirmModal.type === 'archive') {
-        archiveMutation.mutate(confirmModal.id);
-      } else {
-        deleteMutation.mutate(confirmModal.id);
-      }
+      deleteMutation.mutate(confirmModal.id);
     }
   };
 
@@ -113,6 +103,19 @@ export function Loans() {
     ]);
 
     exportToPDF('Reporte de Préstamos', headers, data, 'prestamos');
+  };
+
+  const handleExportExcel = () => {
+    if (!loans) return;
+    const data = loans.map(loan => ({
+      ID: loan.idPrestamo?.toString() || '-',
+      Cliente: loan.nombrePrestatario || '',
+      Monto: loan.montoOtorgado || 0,
+      Tasa: loan.tasaInteres || 0,
+      Fecha: loan.fechaOtorgamiento ? new Date(loan.fechaOtorgamiento).toLocaleDateString() : '-',
+      Estado: getLoanStatusLabel(loan.idEstado)
+    }));
+    exportToExcel(data, 'Reporte de Préstamos');
   };
 
   const handleFilterChange = (key: string, value: string | number) => {
@@ -147,6 +150,14 @@ export function Loans() {
           <p className="text-muted">Gestiona y visualiza todos los préstamos activos</p>
         </div>
         <div className="flex gap-2">
+            <button
+              onClick={handleExportExcel}
+              className="flex items-center gap-2 bg-green-600/10 hover:bg-green-600/20 text-green-600 px-4 py-2 rounded-lg transition-colors border border-green-600/20"
+              title="Exportar a Excel"
+            >
+              <FileSpreadsheet className="h-5 w-5" />
+              <span className="hidden sm:inline">Excel</span>
+            </button>
             <button 
             onClick={handleExport}
             className="flex items-center gap-2 bg-surfaceHighlight hover:bg-border text-main px-4 py-2 rounded-lg transition-colors border border-border"
@@ -176,18 +187,41 @@ export function Loans() {
         </div>
       </div>
 
+      {searchParams.get('view') === 'history' && (
+        <div className="bg-primary-500/10 border border-primary-500/20 rounded-xl p-4 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
+          <Info className="h-5 w-5 text-primary-600 dark:text-primary-400 shrink-0 mt-0.5" />
+          <div>
+            <h3 className="text-sm font-medium text-primary-800 dark:text-primary-300">Total Prestado Histórico</h3>
+            <p className="text-sm text-primary-700 dark:text-primary-200 mt-1">
+              Esta lista representa todos los préstamos otorgados históricamente. La suma total de los montos otorgados aquí corresponde al KPI "Total Prestado Histórico".
+            </p>
+          </div>
+        </div>
+      )}
+
+      {filters.estado === LoanStatus.Active && (
+        <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-start gap-3">
+          <Info className="h-5 w-5 text-blue-400 shrink-0 mt-0.5" />
+          <div>
+            <h3 className="text-sm font-medium text-blue-400">Préstamos con Capital Pendiente</h3>
+            <p className="text-sm text-blue-400/80 mt-1">
+              Estos son los préstamos que actualmente se encuentran activos y tienen cuotas pendientes de pago. 
+              El "Capital Pendiente" es la suma de los saldos restantes de estos préstamos.
+            </p>
+          </div>
+        </div>
+      )}
+
       <ConfirmationModal
         isOpen={confirmModal.isOpen}
         onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
         onConfirm={onConfirmAction}
-        title={confirmModal.type === 'archive' ? "Archivar Préstamo" : "Eliminar Préstamo"}
-        message={confirmModal.type === 'archive' 
-          ? "¿Estás seguro de que deseas finalizar/archivar este préstamo? Esta acción no se puede deshacer."
-          : "¿Estás seguro de que deseas eliminar este préstamo? Esta acción no se puede deshacer."}
-        confirmText={confirmModal.type === 'archive' ? "Archivar" : "Eliminar"}
+        title="Eliminar Préstamo - ¡Acción Peligrosa!"
+        message="¡Atención! Si desea archivar el préstamo, debe marcar todas sus cuotas como pagadas. Solo elimine el préstamo si fue creado por error con datos incorrectos. Esta acción es irreversible."
+        confirmText="Eliminar definitivamente"
         cancelText="Cancelar"
-        variant={confirmModal.type === 'archive' ? "warning" : "danger"}
-        isLoading={archiveMutation.isPending || deleteMutation.isPending}
+        variant="danger"
+        isLoading={deleteMutation.isPending}
       />
       <div className="glass-panel rounded-xl overflow-hidden border border-border">
         <div className="p-4 border-b border-border flex flex-col gap-4">
@@ -196,7 +230,7 @@ export function Loans() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
               <input
                 type="text"
-                placeholder="Buscar por cliente..."
+                placeholder="Buscar por cliente o DNI..."
                 value={nameInput}
                 onChange={(e) => setNameInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -324,15 +358,6 @@ export function Loans() {
                       >
                         Ver detalles
                       </Link>
-                      {(loan.idEstado === 1) && (
-                        <button
-                          onClick={() => handleArchive(loan.idPrestamo || 0)}
-                          className="text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/10 p-1.5 rounded-lg transition-colors"
-                          title="Finalizar/Archivar Préstamo"
-                        >
-                          <Archive className="h-4 w-4" />
-                        </button>
-                      )}
                       {(loan.idEstado === 1 || loan.idEstado === 2) && (
                         <button
                           onClick={() => handleDelete(loan.idPrestamo || 0)}

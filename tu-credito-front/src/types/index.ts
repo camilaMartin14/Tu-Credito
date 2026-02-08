@@ -63,10 +63,14 @@ export interface PagoInputDTO {
 export interface PagoOutputDTO {
   idPago: number;
   nroCuota: number;
+  cantidadTotalCuotas?: number;
   monto: number;
   fecPago: string;
   medioPago: number;
   estado: string;
+  nombreCliente?: string;
+  apellidoCliente?: string;
+  dniCliente?: number;
 }
 
 export interface DashboardKpisDTO {
@@ -85,6 +89,7 @@ export interface SimulacionPrestamoEntryDTO {
   interesMensual: number; // Tasa
   fechaInicio?: string;
   redondeoMultiplo?: number;
+  idSistAmortizacion?: number;
 }
 
 export interface CuotaSimuladaDTO {

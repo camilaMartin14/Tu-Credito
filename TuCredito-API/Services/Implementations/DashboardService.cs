@@ -106,7 +106,7 @@ namespace TuCredito.Services.Implementations;
                 
                 result.Add(new GraficoDatoDTO 
                 { 
-                    Etiqueta = $"Semana {i + 1}", 
+                    Etiqueta = $"Semana del {startWeek:dd/MM}", 
                     Valor = sum 
                 });
             }

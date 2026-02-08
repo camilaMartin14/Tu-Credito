@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createPayment } from '../../services/paymentService';
+import { createPayment, registerAdvancePayment } from '../../services/paymentService';
 import { Cuota, PagoInputDTO } from '../../types';
 import { useToast } from '../../context/ToastContext';
-import { X, DollarSign, Calendar, CreditCard, Percent, Save } from 'lucide-react';
+import { X, DollarSign, Calendar, CreditCard, Percent, Save, Zap } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 
 import { PaymentMethod, getPaymentMethodLabel } from '../../types/enums';
@@ -12,9 +12,10 @@ interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
   installment: Cuota | null;
+  isAdvance?: boolean;
 }
 
-export function PaymentModal({ isOpen, onClose, installment }: PaymentModalProps) {
+export function PaymentModal({ isOpen, onClose, installment, isAdvance = false }: PaymentModalProps) {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   
@@ -40,9 +41,9 @@ export function PaymentModal({ isOpen, onClose, installment }: PaymentModalProps
   }, [installment]);
 
   const mutation = useMutation({
-    mutationFn: createPayment,
+    mutationFn: (data: PagoInputDTO) => isAdvance ? registerAdvancePayment(data) : createPayment(data),
     onSuccess: () => {
-      addToast('Pago registrado exitosamente', 'success');
+      addToast(isAdvance ? 'Pago anticipado registrado correctamente' : 'Pago registrado exitosamente', 'success');
       queryClient.invalidateQueries({ queryKey: ['installments'] });
       queryClient.invalidateQueries({ queryKey: ['loanSummary'] });
       queryClient.invalidateQueries({ queryKey: ['payments'] });
@@ -73,13 +74,23 @@ export function PaymentModal({ isOpen, onClose, installment }: PaymentModalProps
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-surface border border-border rounded-xl w-full max-w-md shadow-2xl animate-in zoom-in-95">
         <div className="flex items-center justify-between p-4 border-b border-border">
-          <h2 className="text-lg font-semibold text-main">Registrar Pago - Cuota #{installment.nroCuota}</h2>
+          <div className="flex items-center gap-2">
+            {isAdvance && <Zap className="h-5 w-5 text-yellow-500" />}
+            <h2 className="text-lg font-semibold text-main">
+              {isAdvance ? 'Pago Anticipado' : 'Registrar Pago'} - Cuota #{installment.nroCuota}
+            </h2>
+          </div>
           <button onClick={onClose} className="text-muted hover:text-main transition-colors">
             <X className="h-5 w-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {isAdvance && (
+            <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-sm text-yellow-500 mb-4">
+              Estás adelantando la última cuota pendiente. Esto ayuda a reducir el plazo de tu préstamo.
+            </div>
+          )}
           <div className="space-y-2">
             <label className="text-sm font-medium text-muted">Monto a Pagar</label>
             <div className="relative">

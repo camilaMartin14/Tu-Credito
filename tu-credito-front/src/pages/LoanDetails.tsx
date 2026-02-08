@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getLoanById, getLoanSummary, archiveLoan } from '../services/loanService';
+import { getLoanById, getLoanSummary, deleteLoan } from '../services/loanService';
 import { getInstallments } from '../services/installmentService';
-import { ArrowLeft, Calendar, PieChart, AlertCircle, Clock, Archive, CreditCard } from 'lucide-react';
+import { ArrowLeft, Calendar, PieChart, AlertCircle, Clock, CreditCard, Trash2, Zap } from 'lucide-react';
 import { Cuota } from '../types';
 import { LoanStatus, InstallmentStatus, getLoanStatusLabel, getInstallmentStatusLabel } from '../types/enums';
 import { StatusBadge } from '../components/ui/StatusBadge';
@@ -21,7 +21,19 @@ export function LoanDetails() {
 
   const [selectedInstallment, setSelectedInstallment] = useState<Cuota | null>(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
+  const [isAdvancePayment, setIsAdvancePayment] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteLoan,
+    onSuccess: () => {
+      addToast('Préstamo eliminado correctamente', 'success');
+      navigate('/loans');
+    },
+    onError: () => {
+      addToast('Error al eliminar el préstamo', 'error');
+    }
+  });
 
   const { data: loan, isLoading: isLoadingLoan } = useQuery({
     queryKey: ['loan', loanId],
@@ -41,18 +53,8 @@ export function LoanDetails() {
     enabled: !!loanId,
   });
 
-  const archiveMutation = useMutation({
-    mutationFn: archiveLoan,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['loan', loanId] });
-      queryClient.invalidateQueries({ queryKey: ['loans'] });
-      addToast('Préstamo finalizado correctamente', 'success');
-      setIsArchiveModalOpen(false);
-    },
-    onError: (error: any) => {
-      addToast(error.response?.data?.message || 'Error al finalizar el préstamo', 'error');
-    }
-  });
+  const lastPendingInstallment = installments?.filter(i => i.idEstado === InstallmentStatus.Pending)
+    .sort((a, b) => b.nroCuota - a.nroCuota)[0];
 
   if (isLoadingLoan || isLoadingInstallments || isLoadingSummary) {
     return (
@@ -92,15 +94,32 @@ export function LoanDetails() {
             <p className="text-muted">Detalles y plan de cuotas</p>
           </div>
         </div>
-        {loan.idEstado === LoanStatus.Active && (
-          <button
-            onClick={() => setIsArchiveModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-surfaceHighlight hover:bg-surfaceHighlight/80 text-muted hover:text-main rounded-lg transition-colors border border-border"
-          >
-            <Archive className="h-4 w-4" />
-            Finalizar
-          </button>
-        )}
+        
+        <div className="flex items-center gap-4">
+          {(loan.idEstado === LoanStatus.Active && lastPendingInstallment) && (
+            <button
+              onClick={() => {
+                setSelectedInstallment(lastPendingInstallment);
+                setIsAdvancePayment(true);
+                setIsPaymentModalOpen(true);
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500 rounded-lg transition-colors border border-yellow-500/20"
+            >
+              <Zap className="h-4 w-4" />
+              Adelantar Cuota
+            </button>
+          )}
+
+          {(loan.idEstado === LoanStatus.Active || loan.idEstado === LoanStatus.Finished) && (
+            <button
+              onClick={() => setIsDeleteModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-colors border border-red-500/20"
+            >
+              <Trash2 className="h-4 w-4" />
+              Eliminar
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -153,7 +172,7 @@ export function LoanDetails() {
                   <span className="text-main font-medium">{summary.cantidadCuotasOriginales}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted">Cuotas Efectivas</span>
+                  <span className="text-muted">Cuotas Pagadas</span>
                   <span className="text-main font-medium">{summary.cantidadCuotasEfectivas}</span>
                 </div>
                 <div className="flex justify-between">
@@ -188,7 +207,9 @@ export function LoanDetails() {
               <tbody className="divide-y divide-border">
                 {installments?.map((cuota) => (
                   <tr key={cuota.idCuota} className="hover:bg-surfaceHighlight/50 transition-colors">
-                    <td className="px-6 py-4 font-medium text-main">{cuota.nroCuota}</td>
+                    <td className="px-6 py-4 font-medium text-main">
+                      {cuota.nroCuota.toString().padStart(2, '0')}/{loan.cantidadCtas}
+                    </td>
                     <td className="px-6 py-4 text-muted">{formatDate(cuota.fecVto)}</td>
                     <td className="px-6 py-4 text-main">{formatCurrency(cuota.monto)}</td>
                     <td className="px-6 py-4 text-main">{cuota.saldoPendiente ? formatCurrency(cuota.saldoPendiente) : '-'}</td>
@@ -235,20 +256,22 @@ export function LoanDetails() {
         onClose={() => {
           setIsPaymentModalOpen(false);
           setSelectedInstallment(null);
+          setIsAdvancePayment(false);
         }}
         installment={selectedInstallment}
+        isAdvance={isAdvancePayment}
       />
 
       <ConfirmationModal
-        isOpen={isArchiveModalOpen}
-        onClose={() => setIsArchiveModalOpen(false)}
-        onConfirm={() => archiveMutation.mutate(loanId)}
-        title="Finalizar Préstamo"
-        message="¿Está seguro que desea finalizar este préstamo? Esta acción no se puede deshacer."
-        confirmText="Finalizar"
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => deleteMutation.mutate(loanId)}
+        title="Eliminar Préstamo - ¡Acción Peligrosa!"
+        message="¡Atención! Si desea archivar el préstamo, debe marcar todas sus cuotas como pagadas. Solo elimine el préstamo si fue creado por error con datos incorrectos. Esta acción es irreversible."
+        confirmText="Eliminar definitivamente"
         cancelText="Cancelar"
-        variant="warning"
-        isLoading={archiveMutation.isPending}
+        variant="danger"
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );

@@ -73,10 +73,6 @@ namespace TuCredito.Services.Implementations
 
                 if (mesVto.HasValue && (mesVto.Value < 1 || mesVto.Value > 12))
                     return Result<List<Cuota>>.Failure("El mes de vencimiento debe estar entre 1 y 12.");
-
-                if (!string.IsNullOrWhiteSpace(prestatario) &&
-                    !prestatario.All(c => char.IsLetter(c) || char.IsWhiteSpace(c)))
-                    return Result<List<Cuota>>.Failure("El nombre del prestatario solo puede contener letras.");
                 
                 if (idPrestamo.HasValue && idPrestamo.Value <= 0)
                      return Result<List<Cuota>>.Failure("Ingrese un ID de préstamo válido.");
@@ -94,7 +90,9 @@ namespace TuCredito.Services.Implementations
 
                 if (!string.IsNullOrWhiteSpace(prestatario))
                     query = query.Where(c =>
-                        c.IdPrestamoNavigation.DniPrestatarioNavigation.Nombre.Contains(prestatario));
+                        c.IdPrestamoNavigation.DniPrestatarioNavigation.Nombre.Contains(prestatario) ||
+                        c.IdPrestamoNavigation.DniPrestatarioNavigation.Apellido.Contains(prestatario) ||
+                        c.IdPrestamoNavigation.DniPrestatario.ToString().Contains(prestatario));
                 
                 if (idPrestamo.HasValue)
                     query = query.Where(c => c.IdPrestamo == idPrestamo.Value);

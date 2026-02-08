@@ -16,5 +16,8 @@ namespace TuCredito.Controllers;
         public decimal InteresMensual { get; set; }  //  (ej: 0.05 = 5%)
 
         public DateTime? FechaInicio { get; set; }    
-        public int? RedondeoMultiplo { get; set; } 
+        public int? RedondeoMultiplo { get; set; }
+        
+        // 1: Directo (Flat), 2: Francés, 3: Alemán, 4: Americano
+        public int IdSistAmortizacion { get; set; } = 1; 
     }

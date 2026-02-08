@@ -11,6 +11,11 @@ export const createPayment = async (data: PagoInputDTO): Promise<any> => {
   return response.data;
 };
 
+export const registerAdvancePayment = async (data: PagoInputDTO): Promise<any> => {
+  const response = await api.post('/payments/advance', data);
+  return response.data;
+};
+
 export const getPaymentById = async (id: number): Promise<PagoOutputDTO> => {
   const response = await api.get(`/payments/${id}`);
   return response.data;
