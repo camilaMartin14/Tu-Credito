@@ -34,6 +34,16 @@ namespace TuCredito.Services.Implementations
             if (!allowedTypes.Contains(request.Archivo.ContentType.ToLower()))
                 throw new ArgumentException("Formato de archivo no válido. Solo PDF, JPEG y PNG.");
 
+            // GUARD: PROTECCIÓN CUENTA DEMO (Max 10 archivos)
+            // Asumimos que podemos verificar el usuario actual via context o el ID pasado en el request si es confiable.
+            // Para demo rápida, verificamos si el usuario "subidor" es el demo (ID 1).
+            if (request.UsuarioId == 1) // ID 1 es demo según seed_data
+            {
+                var count = await _context.Documentos.CountAsync(d => d.SubidoPor == 1 && d.Activo);
+                if (count >= 10)
+                    throw new InvalidOperationException("La cuenta DEMO ha alcanzado el límite de archivos (10).");
+            }
+
             await ValidarEntidadAsync(request.EntidadTipo, request.EntidadId);
 
             var ruta = $"{request.EntidadTipo.ToLower()}/" +

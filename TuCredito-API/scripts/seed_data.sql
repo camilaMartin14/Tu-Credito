@@ -2,7 +2,7 @@
 -- Fecha Base simulada: 2026-02-05
 -- Ejecutar en SQL Server
 
-USE TuCreditoDB;
+USE TuCredito14;
 GO
 
 -- 1. LIMPIEZA DE DATOS
@@ -58,7 +58,8 @@ SET IDENTITY_INSERT MediosDePago OFF;
 -- 3. USUARIOS Y ACTORES
 ---------------------------------------------------
 INSERT INTO Prestamistas (usuario, contraseniaHash, nombre, apellido, correo, esActivo) VALUES 
-('admin', 'AQAAAAEAACcQAAAAEH8J...', 'Admin', 'General', 'admin@tucredito.com', 1);
+('demo', 'AQAAAAIAAYagAAAAEGFF3lpqazHBXTkRe0B04cMQ7LcTpdBLR8g52s/2y/LriCUC7sDYlhlu2DpM2/R05w==', 'Usuario', 'Demo', 'demo@tucredito.com', 1),
+('admin', 'AQAAAAIAAYagAAAAEGFF3lpqazHBXTkRe0B04cMQ7LcTpdBLR8g52s/2y/LriCUC7sDYlhlu2DpM2/R05w==', 'Admin', 'General', 'admin@tucredito.com', 1);
 
 INSERT INTO Garantes (nombre, apellido, telefono, domicilio, correo, esActivo) VALUES 
 ('Roberto', 'Sanchez', '11111111', 'Calle 1', 'roberto@mail.com', 1),
