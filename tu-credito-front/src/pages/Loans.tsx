@@ -19,6 +19,7 @@ export function Loans() {
     anio: 0
   });
   const [yearInput, setYearInput] = useState('');
+  const [nameInput, setNameInput] = useState('');
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; id?: number; type: 'archive' | 'delete' }>({ isOpen: false, type: 'archive' });
 
   // Debounce search input could be better, but for now direct state update
@@ -125,15 +126,8 @@ export function Loans() {
       anio: 0
     });
     setYearInput('');
+    setNameInput('');
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
-      </div>
-    );
-  }
 
   if (error) {
     return (
@@ -202,8 +196,13 @@ export function Loans() {
               <input
                 type="text"
                 placeholder="Buscar por cliente..."
-                value={filters.nombre}
-                onChange={(e) => handleFilterChange('nombre', e.target.value)}
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleFilterChange('nombre', nameInput);
+                  }
+                }}
                 className="w-full bg-surface/50 border border-border rounded-lg pl-10 pr-4 py-2 text-sm text-main placeholder-muted focus:outline-none focus:border-primary-500 transition-colors"
               />
             </div>
@@ -273,6 +272,11 @@ export function Loans() {
         </div>
 
         <div className="overflow-x-auto">
+          {isLoading ? (
+             <div className="flex items-center justify-center h-64">
+               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+             </div>
+          ) : (
           <table className="w-full text-left text-sm">
             <thead className="bg-surfaceHighlight text-muted">
               <tr>
@@ -343,6 +347,7 @@ export function Loans() {
               )}
             </tbody>
           </table>
+          )}
         </div>
       </div>
     </div>
