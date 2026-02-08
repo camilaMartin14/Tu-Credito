@@ -4,17 +4,24 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { simulateLoan, createLoan } from '../services/loanService';
 import { getBorrowers } from '../services/borrowerService';
 import { SimulacionPrestamoEntryDTO } from '../types';
-import { Calculator as CalculatorIcon, DollarSign, Calendar, Percent, User, X, Check, Search, CalendarDays } from 'lucide-react';
+import { Calculator as CalculatorIcon, DollarSign, Calendar, Percent, User, X, Check, Search, CalendarDays, BookOpen, ChevronUp, ChevronDown } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import { LoanStatus } from '../types/enums';
 
 export function Calculator() {
-  const { register, handleSubmit, getValues } = useForm<SimulacionPrestamoEntryDTO>();
+  const { register, handleSubmit, getValues } = useForm<SimulacionPrestamoEntryDTO>({
+    defaultValues: {
+      idSistAmortizacion: 1
+    }
+  });
   const [result, setResult] = useState<any>(null);
   const [simulationParams, setSimulationParams] = useState<SimulacionPrestamoEntryDTO | null>(null);
   const { addToast } = useToast();
   const queryClient = useQueryClient();
+
+  // Collapsible Guide State
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,7 +70,8 @@ export function Calculator() {
         montoPrestamo: Number(data.montoPrestamo),
         interesMensual: Number(data.interesMensual),
         cantidadCuotas: Number(data.cantidadCuotas),
-        fechaInicio: new Date().toISOString()
+        fechaInicio: new Date().toISOString(),
+        idSistAmortizacion: Number(data.idSistAmortizacion)
     };
     setSimulationParams(payload);
     mutation.mutate(payload);
@@ -81,7 +89,7 @@ export function Calculator() {
       idEstado: LoanStatus.Active,
       fechaOtorgamiento: new Date(creationData.fechaOtorgamiento).toISOString(),
       fec1erVto: new Date(creationData.fec1erVto).toISOString(),
-      idSistAmortizacion: 1, // Francés por defecto
+      idSistAmortizacion: simulationParams.idSistAmortizacion || 1, 
     });
   };
 
@@ -108,15 +116,15 @@ export function Calculator() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-main mb-2">Simulador de Préstamos</h1>
         <p className="text-muted">Calcula las cuotas y el plan de pagos estimado</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Formulario */}
-        <div className="md:col-span-1 glass-panel p-6 rounded-2xl border border-border h-fit">
+        <div className="lg:col-span-4 glass-panel p-6 rounded-2xl border border-border h-fit">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-muted mb-1">Monto del Préstamo</label>
@@ -158,6 +166,22 @@ export function Calculator() {
               </div>
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-muted mb-1">Sistema de Amortización</label>
+              <div className="relative">
+                <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
+                <select
+                  {...register('idSistAmortizacion')}
+                  className="w-full bg-surface/50 border border-border rounded-lg pl-10 pr-4 py-2.5 text-main focus:outline-none focus:border-primary-500 transition-colors appearance-none"
+                >
+                    <option value="1">Directo (Tasa Plana)</option>
+                    <option value="2">Francés (Cuota Fija)</option>
+                    <option value="3">Alemán (Amort. Fija)</option>
+                    <option value="4">Americano (Solo Interés)</option>
+                </select>
+              </div>
+            </div>
+
             <button
               type="submit"
               disabled={mutation.isPending}
@@ -171,10 +195,41 @@ export function Calculator() {
               )}
             </button>
           </form>
+
+            <div className="mt-6 pt-6 border-t border-border">
+                <button 
+                    type="button"
+                    onClick={() => setIsGuideOpen(!isGuideOpen)}
+                    className="flex items-center justify-between w-full text-sm font-medium text-main mb-3 hover:text-primary-500 transition-colors group"
+                >
+                    <div className="flex items-center gap-2">
+                        <BookOpen className="h-4 w-4 text-primary-500 group-hover:scale-110 transition-transform" />
+                        Guía de Sistemas
+                    </div>
+                    {isGuideOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </button>
+                
+                {isGuideOpen && (
+                    <div className="space-y-3 text-xs text-muted animate-in fade-in slide-in-from-top-2">
+                        <div className="p-3 bg-surfaceHighlight/30 rounded-lg border border-border/50">
+                            <span className="font-bold text-main block mb-1">Francés</span>
+                            Cuota constante. Al principio pagas más interés y menos capital. Ideal para cuotas fijas.
+                        </div>
+                        <div className="p-3 bg-surfaceHighlight/30 rounded-lg border border-border/50">
+                            <span className="font-bold text-main block mb-1">Alemán</span>
+                            Amortización de capital constante. La cuota disminuye con el tiempo. Pagas menos intereses totales.
+                        </div>
+                        <div className="p-3 bg-surfaceHighlight/30 rounded-lg border border-border/50">
+                            <span className="font-bold text-main block mb-1">Americano</span>
+                            Pagas solo intereses durante el plazo. El capital se devuelve todo junto al final.
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
 
         {/* Resultados */}
-        <div className="md:col-span-2 space-y-6">
+        <div className="lg:col-span-8 space-y-6">
           {result ? (
             <div className="glass-panel p-6 rounded-2xl border border-border animate-in fade-in slide-in-from-bottom-4 duration-500">
                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

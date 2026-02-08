@@ -89,6 +89,7 @@ export interface SimulacionPrestamoEntryDTO {
   interesMensual: number; // Tasa
   fechaInicio?: string;
   redondeoMultiplo?: number;
+  idSistAmortizacion?: number;
 }
 
 export interface CuotaSimuladaDTO {

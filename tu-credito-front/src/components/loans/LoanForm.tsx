@@ -103,6 +103,7 @@ export function LoanForm() {
       cantidadCuotas: Number(data.cantidadCtas),
       interesMensual: Number(data.tasaInteres),
       fechaInicio: new Date(data.fechaOtorgamiento).toISOString(),
+      idSistAmortizacion: Number(data.idSistAmortizacion)
     });
   };
 
@@ -223,10 +224,10 @@ export function LoanForm() {
                 {...register('idSistAmortizacion', { valueAsNumber: true })}
                 className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200 [&>option]:bg-surface"
               >
-                <option value={1}>Francés</option>
-                <option value={2}>Alemán</option>
-                <option value={3}>Americano</option>
-                <option value={4}>Personal</option>
+                <option value={1}>Directo (Tasa Plana)</option>
+                <option value={2}>Francés (Cuota Fija)</option>
+                <option value={3}>Alemán (Amort. Fija)</option>
+                <option value={4}>Americano (Solo Interés)</option>
               </select>
             </div>
           </div>

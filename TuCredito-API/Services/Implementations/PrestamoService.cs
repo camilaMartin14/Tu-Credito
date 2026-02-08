@@ -210,7 +210,8 @@ namespace TuCredito.Services.Implementations
                 MontoPrestamo = prestamo.MontoOtorgado,
                 CantidadCuotas = prestamo.CantidadCtas,
                 InteresMensual = prestamo.TasaInteres,
-                FechaInicio = prestamo.FechaOtorgamiento
+                FechaInicio = prestamo.FechaOtorgamiento,
+                IdSistAmortizacion = prestamo.IdSistAmortizacion
             });
 
             prestamo.Cuota ??= new List<Cuota>();
@@ -221,6 +222,7 @@ namespace TuCredito.Services.Implementations
                 {
                     NroCuota = cuotaSimulada.NumeroCuota,
                     Monto = cuotaSimulada.Monto,
+                    Interes = cuotaSimulada.Interes,
                     SaldoPendiente = cuotaSimulada.Monto,
                     IdEstado = 1, // 1 = Pendiente
                     FecVto = cuotaSimulada.FechaVencimiento

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getLoansByFilter, archiveLoan, deleteLoan } from '../services/loanService';
-import { Plus, Search, Filter, ArrowUpRight, AlertCircle, X, Download, Archive, Trash2, Info } from 'lucide-react';
+import { Plus, Search, Filter, ArrowUpRight, AlertCircle, X, Download, Archive, Trash2, Info, FileSpreadsheet } from 'lucide-react';
 import { exportToPDF } from '../utils/pdfGenerator';
+import { exportToExcel } from '../utils/excelGenerator';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { LoanStatus, getLoanStatusLabel } from '../types/enums';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
@@ -104,6 +105,19 @@ export function Loans() {
     exportToPDF('Reporte de Préstamos', headers, data, 'prestamos');
   };
 
+  const handleExportExcel = () => {
+    if (!loans) return;
+    const data = loans.map(loan => ({
+      ID: loan.idPrestamo?.toString() || '-',
+      Cliente: loan.nombrePrestatario || '',
+      Monto: loan.montoOtorgado || 0,
+      Tasa: loan.tasaInteres || 0,
+      Fecha: loan.fechaOtorgamiento ? new Date(loan.fechaOtorgamiento).toLocaleDateString() : '-',
+      Estado: getLoanStatusLabel(loan.idEstado)
+    }));
+    exportToExcel(data, 'Reporte de Préstamos');
+  };
+
   const handleFilterChange = (key: string, value: string | number) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
@@ -136,6 +150,14 @@ export function Loans() {
           <p className="text-muted">Gestiona y visualiza todos los préstamos activos</p>
         </div>
         <div className="flex gap-2">
+            <button
+              onClick={handleExportExcel}
+              className="flex items-center gap-2 bg-green-600/10 hover:bg-green-600/20 text-green-600 px-4 py-2 rounded-lg transition-colors border border-green-600/20"
+              title="Exportar a Excel"
+            >
+              <FileSpreadsheet className="h-5 w-5" />
+              <span className="hidden sm:inline">Excel</span>
+            </button>
             <button 
             onClick={handleExport}
             className="flex items-center gap-2 bg-surfaceHighlight hover:bg-border text-main px-4 py-2 rounded-lg transition-colors border border-border"

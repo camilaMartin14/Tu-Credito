@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getPayments, getPaymentsByFilter, updatePaymentStatus } from '../services/paymentService';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Search, Filter, Download, AlertCircle, CheckCircle2, X, Ban, Plus, Info } from 'lucide-react';
+import { Search, Filter, Download, AlertCircle, CheckCircle2, X, Ban, Plus, Info, FileSpreadsheet } from 'lucide-react';
 import { PaymentMethod, getPaymentMethodLabel } from '../types/enums';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { exportToPDF } from '../utils/pdfGenerator';
+import { exportToExcel } from '../utils/excelGenerator';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useToast } from '../context/ToastContext';
 
@@ -79,6 +80,21 @@ export function Payments() {
     exportToPDF('Reporte de Pagos', headers, data, 'pagos');
   };
 
+  const handleExportExcel = () => {
+    if (!payments) return;
+    
+    const data = payments.map(payment => ({
+      ID: payment.idPago,
+      Cuota: payment.nroCuota,
+      Monto: payment.monto,
+      Fecha: payment.fecPago ? new Date(payment.fecPago).toLocaleDateString() : '-',
+      Medio: getPaymentMethodLabel(payment.medioPago),
+      Estado: payment.estado
+    }));
+
+    exportToExcel(data, 'Reporte_Pagos', 'Pagos');
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -108,8 +124,16 @@ export function Payments() {
             onClick={() => setIsNewPaymentModalOpen(true)}
             className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg transition-colors shadow-lg shadow-primary-500/20"
           >
-            <Plus className="h-4 w-4" />
-            Nuevo Pago
+            <Plus className="h-5 w-5" />
+            <span className="hidden sm:inline">Registrar Pago</span>
+          </button>
+          <button
+            onClick={handleExportExcel}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600/10 hover:bg-green-600/20 text-green-600 rounded-lg transition-colors border border-green-600/20"
+            title="Exportar a Excel"
+          >
+            <FileSpreadsheet className="h-5 w-5" />
+            <span className="hidden sm:inline">Excel</span>
           </button>
           <button 
             onClick={handleExport}

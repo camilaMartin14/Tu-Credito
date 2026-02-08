@@ -16,7 +16,8 @@ import {
   getLoansByStatus,
   getMonthlyCollections,
   getUpcomingInstallments,
-  getRecentTransactions
+  getRecentTransactions,
+  getCashFlowProjection
 } from '../services/dashboardService';
 import { Link } from 'react-router-dom';
 
@@ -50,6 +51,7 @@ export function Dashboard() {
   const { data: monthlyCollections } = useQuery({ queryKey: ['monthlyCollections'], queryFn: getMonthlyCollections });
   const { data: upcomingInstallments } = useQuery({ queryKey: ['upcomingInstallments'], queryFn: getUpcomingInstallments });
   const { data: recentTransactions } = useQuery({ queryKey: ['recentTransactions'], queryFn: getRecentTransactions });
+  const { data: cashFlowProjection } = useQuery({ queryKey: ['cashFlowProjection'], queryFn: getCashFlowProjection });
 
   return (
     <div className="space-y-8">
@@ -122,15 +124,76 @@ export function Dashboard() {
         </Link>
       </div>
 
-      {/* Charts Row 1 */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Monthly Collections (Bar Chart) */}
-        <div className="glass-panel rounded-2xl p-6 relative z-10 overflow-visible">
-          <div className="flex items-center mb-6">
-             <h3 className="text-lg font-bold text-main">Ingresos Mensuales</h3>
-             <InfoTooltip content="Muestra el total de dinero recaudado por mes. Eje X: Meses del año. Eje Y: Monto total cobrado en pesos." />
+      {/* Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Cash Flow Projection Chart */}
+        <div className="bg-surface border border-border rounded-xl p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-6">
+                <div>
+                    <div className="flex items-center gap-2">
+                        <h3 className="text-lg font-semibold text-main">Proyección de Flujo de Caja</h3>
+                        <InfoTooltip content="Proyección de ingresos basada en las cuotas a cobrar durante las próximas 4 semanas." />
+                    </div>
+                    <p className="text-sm text-muted">Ingresos estimados próximos 30 días</p>
+                </div>
+                <div className="p-2 bg-green-500/10 rounded-lg">
+                    <TrendingUp className="h-5 w-5 text-green-500" />
+                </div>
+            </div>
+            <div className="h-[300px]">
+                {cashFlowProjection && cashFlowProjection.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={cashFlowProjection} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={THEME_COLORS.grid} />
+                            <XAxis 
+                                dataKey="etiqueta" 
+                                axisLine={false} 
+                                tickLine={false} 
+                                tick={{ fill: axisColor, fontSize: 12 }} 
+                                dy={10}
+                            />
+                            <YAxis 
+                                axisLine={false} 
+                                tickLine={false} 
+                                tick={{ fill: axisColor, fontSize: 12 }} 
+                                tickFormatter={(value) => `$${value/1000}k`}
+                            />
+                            <Tooltip 
+                                contentStyle={{ 
+                                    backgroundColor: THEME_COLORS.tooltipBg, 
+                                    borderColor: THEME_COLORS.tooltipBorder, 
+                                    color: THEME_COLORS.text,
+                                    borderRadius: '8px'
+                                }}
+                                formatter={(value: any) => [`$${Number(value).toLocaleString()}`, 'Monto Estimado']}
+                                labelStyle={{ color: THEME_COLORS.text }}
+                            />
+                            <Bar 
+                                dataKey="valor" 
+                                fill="#10B981" 
+                                radius={[4, 4, 0, 0]} 
+                                barSize={40}
+                            />
+                        </BarChart>
+                    </ResponsiveContainer>
+                ) : (
+                    <ChartEmptyState message="No hay proyecciones disponibles" />
+                )}
+            </div>
+        </div>
+
+        {/* Monthly Collections Chart */}
+        <div className="bg-surface border border-border rounded-xl p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+             <div className="flex items-center gap-2">
+                <h3 className="text-lg font-bold text-main">Ingresos Mensuales</h3>
+                <InfoTooltip content="Muestra el total de dinero recaudado por mes. Eje X: Meses del año. Eje Y: Monto total cobrado en pesos." />
+             </div>
+             <p className="text-sm text-muted">Histórico de recaudación anual</p>
+            </div>
           </div>
-          <div className="w-full h-[250px] min-h-[250px]">
+          <div className="h-[300px]">
             {monthlyCollections && monthlyCollections.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthlyCollections}>
@@ -152,11 +215,16 @@ export function Dashboard() {
 
         {/* Loans Trend (Line Chart) */}
         <div className="glass-panel rounded-2xl p-6 relative z-10 overflow-visible">
-          <div className="flex items-center mb-6">
-            <h3 className="text-lg font-bold text-main">Tendencia de Colocación</h3>
-            <InfoTooltip content="Muestra el volumen de nuevos préstamos otorgados por mes. Eje X: Meses del año. Eje Y: Monto total prestado en pesos." />
+          <div className="flex items-center justify-between mb-6">
+            <div>
+                <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-bold text-main">Tendencia de Colocación</h3>
+                    <InfoTooltip content="Muestra el volumen de nuevos préstamos otorgados por mes. Eje X: Meses del año. Eje Y: Monto total prestado en pesos." />
+                </div>
+                <p className="text-sm text-muted">Evolución de préstamos otorgados</p>
+            </div>
           </div>
-          <div className="w-full h-[250px] min-h-[250px]">
+          <div className="h-[300px]">
             {loansTrend && loansTrend.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={loansTrend}>
@@ -177,11 +245,16 @@ export function Dashboard() {
 
         {/* Loans By Status (Pie Chart) - Moved here */}
         <div className="glass-panel rounded-2xl p-6 relative z-10 overflow-visible">
-          <div className="flex items-center mb-6">
-            <h3 className="text-lg font-bold text-main">Composición de Cartera</h3>
-            <InfoTooltip content="Distribución de los préstamos activos según su estado actual (Al día, En Mora, Finalizado, etc.)." />
+          <div className="flex items-center justify-between mb-6">
+            <div>
+                <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-bold text-main">Composición de Cartera</h3>
+                    <InfoTooltip content="Distribución de los préstamos activos según su estado actual (Al día, En Mora, Finalizado, etc.)." />
+                </div>
+                <p className="text-sm text-muted">Estado actual de préstamos activos</p>
+            </div>
           </div>
-          <div className="w-full h-[250px] min-h-[250px]">
+          <div className="h-[300px]">
             {loansByStatus && loansByStatus.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -286,8 +359,8 @@ export function Dashboard() {
                     recentTransactions.map((tx, i) => (
                         <div key={i} className="flex items-center justify-between p-3 rounded-xl hover:bg-surfaceHighlight/50 transition-colors border border-transparent hover:border-border">
                             <div className="flex items-center gap-3">
-                                <div className={`p-2 rounded-full ${tx.type === 'Prestamo' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-blue-500/10 text-blue-500'}`}>
-                                    {tx.type === 'Prestamo' ? <FileText className="h-4 w-4" /> : <DollarSign className="h-4 w-4" />}
+                                <div className={`p-2 rounded-full ${tx.type === 'Pago' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
+                                    {tx.type === 'Pago' ? <DollarSign className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-main">{tx.entityName}</p>
@@ -295,8 +368,8 @@ export function Dashboard() {
                                 </div>
                             </div>
                             <div className="text-right">
-                                <p className={`text-sm font-bold ${tx.type === 'Prestamo' ? 'text-emerald-500' : 'text-blue-500'}`}>
-                                    {tx.type === 'Prestamo' ? '+' : '+'}{formatCurrency(tx.amount)}
+                                <p className={`text-sm font-bold ${tx.type === 'Pago' ? 'text-emerald-500' : 'text-rose-500'}`}>
+                                    {tx.type === 'Pago' ? '+' : '-'} {formatCurrency(tx.amount)}
                                 </p>
                                 <p className="text-xs text-muted">{tx.status}</p>
                             </div>
