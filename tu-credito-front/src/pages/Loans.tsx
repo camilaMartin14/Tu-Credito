@@ -18,6 +18,7 @@ export function Loans() {
     mesVto: 0,
     anio: 0
   });
+  const [yearInput, setYearInput] = useState('');
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; id?: number; type: 'archive' | 'delete' }>({ isOpen: false, type: 'archive' });
 
   // Debounce search input could be better, but for now direct state update
@@ -123,6 +124,7 @@ export function Loans() {
       mesVto: 0,
       anio: 0
     });
+    setYearInput('');
   };
 
   if (isLoading) {
@@ -247,8 +249,13 @@ export function Loans() {
                 <input 
                   type="number"
                   placeholder="Ej. 2024"
-                  value={filters.anio || ''}
-                  onChange={(e) => handleFilterChange('anio', Number(e.target.value))}
+                  value={yearInput}
+                  onChange={(e) => setYearInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleFilterChange('anio', Number(yearInput));
+                    }
+                  }}
                   className="w-full bg-surface/50 border border-border rounded-lg px-3 py-2 text-sm text-main focus:outline-none focus:border-primary-500"
                 />
               </div>
