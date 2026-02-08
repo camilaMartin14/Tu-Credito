@@ -74,7 +74,7 @@ export function Dashboard() {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <Link to="/loans" className="block transition-transform hover:scale-[1.02] cursor-pointer">
+        <Link to="/loans" className="block h-full transition-transform hover:scale-[1.02] cursor-pointer">
             <KPIWidget
             title="Total Prestado Histórico"
             value={kpis ? `$${kpis.totalPrestadoHistorico.toLocaleString()}` : '...'}
@@ -83,9 +83,10 @@ export function Dashboard() {
             trendUp={true}
             iconColor="bg-primary-500/10 text-primary-400"
             description="Suma total acumulada de todos los préstamos otorgados desde el inicio de operaciones."
+            className="h-full"
             />
         </Link>
-        <Link to="/borrowers" className="block transition-transform hover:scale-[1.02] cursor-pointer">
+        <Link to="/borrowers" className="block h-full transition-transform hover:scale-[1.02] cursor-pointer">
             <KPIWidget
             title="Morosidad"
             value={kpis ? `${kpis.porcentajeMorosidad}%` : '...'}
@@ -94,9 +95,10 @@ export function Dashboard() {
             trendUp={true}
             iconColor="bg-red-500/10 text-red-400"
             description="Porcentaje de clientes con cuotas vencidas (más de 1 día de retraso) respecto al total de clientes activos."
+            className="h-full"
             />
         </Link>
-        <Link to="/loans" className="block transition-transform hover:scale-[1.02] cursor-pointer">
+        <Link to="/loans" className="block h-full transition-transform hover:scale-[1.02] cursor-pointer">
             <KPIWidget
             title="Rentabilidad"
             value={kpis ? `${kpis.rentabilidad}%` : '...'}
@@ -105,15 +107,17 @@ export function Dashboard() {
             trendUp={true}
             iconColor="bg-emerald-500/10 text-emerald-400"
             description="Margen de ganancia calculado sobre los intereses generados vs el capital prestado."
+            className="h-full"
             />
         </Link>
-        <Link to="/payments" className="block transition-transform hover:scale-[1.02] cursor-pointer">
+        <Link to="/payments" className="block h-full transition-transform hover:scale-[1.02] cursor-pointer">
             <KPIWidget
             title="Capital Pendiente"
             value={kpis ? `$${kpis.capitalPendiente.toLocaleString()}` : '...'}
             icon={Users}
             iconColor="bg-blue-500/10 text-blue-400"
             description="Monto total de dinero que aún está pendiente de cobro (Capital + Intereses por vencer)."
+            className="h-full"
             />
         </Link>
       </div>
