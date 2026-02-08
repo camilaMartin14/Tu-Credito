@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getLoanById, getLoanSummary, archiveLoan } from '../services/loanService';
+import { getLoanById, getLoanSummary } from '../services/loanService';
 import { getInstallments } from '../services/installmentService';
-import { ArrowLeft, Calendar, PieChart, AlertCircle, Clock, Archive, CreditCard } from 'lucide-react';
+import { ArrowLeft, Calendar, PieChart, AlertCircle, Clock, CreditCard } from 'lucide-react';
 import { Cuota } from '../types';
 import { LoanStatus, InstallmentStatus, getLoanStatusLabel, getInstallmentStatusLabel } from '../types/enums';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import { PaymentModal } from '../components/payments/PaymentModal';
-import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useToast } from '../context/ToastContext';
 
 export function LoanDetails() {
@@ -21,7 +20,6 @@ export function LoanDetails() {
 
   const [selectedInstallment, setSelectedInstallment] = useState<Cuota | null>(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
 
   const { data: loan, isLoading: isLoadingLoan } = useQuery({
     queryKey: ['loan', loanId],
@@ -39,19 +37,6 @@ export function LoanDetails() {
     queryKey: ['installments', loanId],
     queryFn: () => getInstallments({ idPrestamo: loanId }),
     enabled: !!loanId,
-  });
-
-  const archiveMutation = useMutation({
-    mutationFn: archiveLoan,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['loan', loanId] });
-      queryClient.invalidateQueries({ queryKey: ['loans'] });
-      addToast('Préstamo finalizado correctamente', 'success');
-      setIsArchiveModalOpen(false);
-    },
-    onError: (error: any) => {
-      addToast(error.response?.data?.message || 'Error al finalizar el préstamo', 'error');
-    }
   });
 
   if (isLoadingLoan || isLoadingInstallments || isLoadingSummary) {
@@ -92,15 +77,6 @@ export function LoanDetails() {
             <p className="text-muted">Detalles y plan de cuotas</p>
           </div>
         </div>
-        {loan.idEstado === LoanStatus.Active && (
-          <button
-            onClick={() => setIsArchiveModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-surfaceHighlight hover:bg-surfaceHighlight/80 text-muted hover:text-main rounded-lg transition-colors border border-border"
-          >
-            <Archive className="h-4 w-4" />
-            Finalizar
-          </button>
-        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -153,7 +129,7 @@ export function LoanDetails() {
                   <span className="text-main font-medium">{summary.cantidadCuotasOriginales}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted">Cuotas Efectivas</span>
+                  <span className="text-muted">Cuotas Pagadas</span>
                   <span className="text-main font-medium">{summary.cantidadCuotasEfectivas}</span>
                 </div>
                 <div className="flex justify-between">
@@ -239,18 +215,6 @@ export function LoanDetails() {
           setSelectedInstallment(null);
         }}
         installment={selectedInstallment}
-      />
-
-      <ConfirmationModal
-        isOpen={isArchiveModalOpen}
-        onClose={() => setIsArchiveModalOpen(false)}
-        onConfirm={() => archiveMutation.mutate(loanId)}
-        title="Finalizar Préstamo"
-        message="¿Está seguro que desea finalizar este préstamo? Esta acción no se puede deshacer."
-        confirmText="Finalizar"
-        cancelText="Cancelar"
-        variant="warning"
-        isLoading={archiveMutation.isPending}
       />
     </div>
   );
