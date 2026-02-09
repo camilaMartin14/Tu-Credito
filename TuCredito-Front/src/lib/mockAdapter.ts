@@ -5,11 +5,7 @@ import {
   PagoOutputDTO, 
   DashboardKpisDTO,
   CuotaVencerDTO,
-  GraficoDatoDTO,
-  SerieTiempoDTO,
   TransactionDTO,
-  MorosidadDetalleDTO,
-  AnalistaTasaDTO
 } from '../types';
 
 const SEED_BORROWERS: PrestatarioDTO[] = [
@@ -397,13 +393,32 @@ const SEED_PAYMENTS: PagoOutputDTO[] = [
 ];
 
 // --- HELPERS ---
-const getStorage = <T>(key: string, seed: T): T => {
-  const stored = localStorage.getItem(`demo_${key}`);
-  if (!stored) {
-    localStorage.setItem(`demo_${key}`, JSON.stringify(seed));
-    return seed;
+const getStorage = <T>(key: string, seed: T[], idKey: string): T[] => {
+  const storedJson = localStorage.getItem(`demo_${key}`);
+  let stored: T[] = [];
+  
+  if (storedJson) {
+    stored = JSON.parse(storedJson);
   }
-  return JSON.parse(stored);
+
+  // Merge seed data with stored data (prefer stored modifications, add new seeds)
+  const storedMap = new Map(stored.map((item: any) => [item[idKey], item]));
+  let hasChanges = false;
+
+  seed.forEach((item: any) => {
+    if (!storedMap.has(item[idKey])) {
+      storedMap.set(item[idKey], item);
+      hasChanges = true;
+    }
+  });
+
+  const merged = Array.from(storedMap.values());
+  
+  if (hasChanges || !storedJson) {
+    localStorage.setItem(`demo_${key}`, JSON.stringify(merged));
+  }
+  
+  return merged;
 };
 
 const setStorage = <T>(key: string, data: T) => {
@@ -420,21 +435,24 @@ export const mockAdapter = async (config: InternalAxiosRequestConfig): Promise<A
       let status = 200;
 
       try {
-        const borrowers = getStorage<PrestatarioDTO[]>('borrowers', SEED_BORROWERS);
-        const loans = getStorage<PrestamoDTO[]>('loans', SEED_LOANS);
-        const payments = getStorage<PagoOutputDTO[]>('payments', SEED_PAYMENTS);
+        const borrowers = getStorage<PrestatarioDTO>('borrowers', SEED_BORROWERS, 'dni');
+        const loans = getStorage<PrestamoDTO>('loans', SEED_LOANS, 'idPrestamo');
+        const payments = getStorage<PagoOutputDTO>('payments', SEED_PAYMENTS, 'idPago');
 
         // --- DASHBOARD ROUTES ---
         if (url?.includes('/dashboard/kpis') && method === 'get') {
           const totalPrestado = loans.reduce((acc, l) => acc + l.montoOtorgado, 0);
+          const totalCobrado = payments.reduce((acc, p) => acc + p.monto, 0);
+          const capitalPendiente = totalPrestado - totalCobrado; // Simplificado
+          
           const kpis: DashboardKpisDTO = {
             totalPrestadoHistorico: totalPrestado,
-            capitalPendiente: totalPrestado * 0.7,
-            totalCobrado: totalPrestado * 0.3,
-            totalInteresCobrado: totalPrestado * 0.05,
-            totalEnMora: 0,
-            porcentajeMorosidad: 0,
-            rentabilidad: 15
+            capitalPendiente: capitalPendiente > 0 ? capitalPendiente : 0,
+            totalCobrado: totalCobrado,
+            totalInteresCobrado: totalCobrado * 0.15, // Estimado
+            totalEnMora: loans.filter(l => l.idEstado === 3).reduce((acc, l) => acc + l.montoOtorgado, 0), // 3 = Mora
+            porcentajeMorosidad: 5, // Calcular real si es posible
+            rentabilidad: 18.5
           };
           responseData = kpis;
         }
@@ -471,35 +489,76 @@ export const mockAdapter = async (config: InternalAxiosRequestConfig): Promise<A
             responseData = last6Months;
           }
           else if (url.includes('loans-trend')) {
-             const last6Months = Array.from({ length: 6 }, (_, i) => {
-              const d = new Date();
-              d.setMonth(d.getMonth() - (5 - i));
-              return { anio: d.getFullYear(), mes: d.getMonth() + 1, valor: Math.floor(Math.random() * 200000) + 100000 };
-            });
-            responseData = last6Months;
+             const last6Months = [];
+             const now = new Date();
+             for (let i = 5; i >= 0; i--) {
+               const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+               const month = d.getMonth() + 1;
+               const year = d.getFullYear();
+               
+               const total = loans
+                 .filter(l => {
+                    const lDate = new Date(l.fechaOtorgamiento);
+                    return lDate.getMonth() + 1 === month && lDate.getFullYear() === year;
+                 })
+                 .reduce((acc, l) => acc + l.montoOtorgado, 0);
+                 
+               last6Months.push({ anio: year, mes: month, valor: total > 0 ? total : Math.floor(Math.random() * 50000) + 10000 }); // Fallback random si es 0 para que no se vea vacío en demo
+             }
+             responseData = last6Months;
           }
           else if (url.includes('risk-composition')) {
+            // Calcular score basado en historial (simulado)
             responseData = [
-              { etiqueta: 'Bajo Riesgo', valor: 65 },
-              { etiqueta: 'Riesgo Medio', valor: 25 },
-              { etiqueta: 'Alto Riesgo', valor: 10 }
+              { etiqueta: 'Bajo Riesgo', valor: loans.filter(l => l.montoOtorgado < 50000).length },
+              { etiqueta: 'Riesgo Medio', valor: loans.filter(l => l.montoOtorgado >= 50000 && l.montoOtorgado < 150000).length },
+              { etiqueta: 'Alto Riesgo', valor: loans.filter(l => l.montoOtorgado >= 150000).length }
             ];
           }
           else if (url.includes('loans-by-status')) {
-            responseData = [ 
-              { etiqueta: 'Al día', valor: 120 },
-              { etiqueta: 'Atrasado', valor: 15 },
-              { etiqueta: 'En Mora', valor: 5 },
-              { etiqueta: 'Finalizado', valor: 45 }
-            ];
+            // 1: Pendiente, 2: Activo, 3: Mora, 4: Finalizado
+            const counts = { 1: 0, 2: 0, 3: 0, 4: 0 };
+            loans.forEach(l => {
+                const status = l.idEstado as 1 | 2 | 3 | 4;
+                if (counts[status] !== undefined) counts[status]++;
+                else counts[1]++; // Default
+            });
+
+            // Si todos son 1 (pendiente), simular distribución para demo visual
+            if (counts[1] === loans.length && loans.length > 5) {
+                 responseData = [ 
+                  { etiqueta: 'Al día', valor: Math.floor(loans.length * 0.6) },
+                  { etiqueta: 'Atrasado', valor: Math.floor(loans.length * 0.2) },
+                  { etiqueta: 'En Mora', valor: Math.floor(loans.length * 0.1) },
+                  { etiqueta: 'Finalizado', valor: loans.length - Math.floor(loans.length * 0.9) }
+                ];
+            } else {
+                responseData = [ 
+                  { etiqueta: 'Pendiente', valor: counts[1] },
+                  { etiqueta: 'Activo', valor: counts[2] },
+                  { etiqueta: 'En Mora', valor: counts[3] },
+                  { etiqueta: 'Finalizado', valor: counts[4] }
+                ];
+            }
           }
           else if (url.includes('monthly-collections')) {
-             const last6Months = Array.from({ length: 6 }, (_, i) => {
-              const d = new Date();
-              d.setMonth(d.getMonth() - (5 - i));
-              return { anio: d.getFullYear(), mes: d.getMonth() + 1, valor: Math.floor(Math.random() * 80000) + 30000 };
-            });
-            responseData = last6Months;
+             const last6Months = [];
+             const now = new Date();
+             for (let i = 5; i >= 0; i--) {
+               const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+               const month = d.getMonth() + 1;
+               const year = d.getFullYear();
+               
+               const total = payments
+                 .filter(p => {
+                    const pDate = new Date(p.fecPago);
+                    return pDate.getMonth() + 1 === month && pDate.getFullYear() === year;
+                 })
+                 .reduce((acc, p) => acc + p.monto, 0);
+                 
+               last6Months.push({ anio: year, mes: month, valor: total > 0 ? total : Math.floor(Math.random() * 20000) + 5000 });
+             }
+             responseData = last6Months;
           }
           else if (url.includes('delinquency')) {
              responseData = [
