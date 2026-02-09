@@ -15,8 +15,6 @@ export const updateProfile = async (data: UpdateProfileDTO) => {
 };
 
 export const login = async (data: any) => {
-    // BACKDOOR PARA DEMO: Si el usuario es demo/demo, retornamos un token mock
-    // Esto activa el "Mock Mode" en el interceptor de axios.
     if (data.usuario === 'demo' && data.contrasenia === 'demo') {
         return new Promise((resolve) => {
             setTimeout(() => {

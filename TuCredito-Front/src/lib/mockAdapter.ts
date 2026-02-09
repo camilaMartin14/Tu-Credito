@@ -1,4 +1,4 @@
-import { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { 
   PrestatarioDTO, 
   PrestamoDTO, 
@@ -75,7 +75,7 @@ const setStorage = <T>(key: string, data: T) => {
 };
 
 // --- ADAPTER ---
-export const mockAdapter = async (config: AxiosRequestConfig): Promise<AxiosResponse> => {
+export const mockAdapter = async (config: InternalAxiosRequestConfig): Promise<AxiosResponse> => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const { url, method, data: requestData, params } = config;
