@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { mockAdapter } from './mockAdapter';
 
 // En desarrollo, usamos dinámicamente el hostname actual (localhost o IP de red)
 // para que funcione tanto en PC como en dispositivos móviles conectados a la misma red.
@@ -24,6 +25,14 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
+    
+    // MODO DEMO: Si detectamos el token de demo, interceptamos la request con nuestro adaptador mock
+    // Esto permite que el usuario demo funcione en CUALQUIER entorno (Vercel, localhost, móvil)
+    // sin necesidad de conexión real al backend ni base de datos.
+    if (token === 'mock-token-demo-123456') {
+      config.adapter = mockAdapter;
+    }
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
