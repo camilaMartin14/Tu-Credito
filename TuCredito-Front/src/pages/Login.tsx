@@ -166,15 +166,6 @@ export function Login() {
            </div>
 
            <div className="mt-8 pt-6 border-t border-border/40">
-              <a 
-                href="https://expo.dev/artifacts/eas/h74tF7oTb3QqH6M5AgDU86.apk"
-                className="flex items-center justify-center gap-3 w-full p-3 rounded-xl border-2 border-dashed border-primary-200 bg-primary-50/30 text-primary-700 font-semibold hover:bg-primary-50 hover:border-primary-300 transition-all group"
-              >
-                <div className="bg-primary-100 p-2 rounded-lg group-hover:bg-primary-200 transition-colors">
-                  <Download className="w-5 h-5 text-primary-600" />
-                </div>
-                <span>Descargar App Android</span>
-              </a>
            </div>
         </div>
       </div>

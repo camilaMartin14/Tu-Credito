@@ -462,15 +462,80 @@ export const mockAdapter = async (config: InternalAxiosRequestConfig): Promise<A
         }
         else if (url?.includes('/dashboard') && method === 'get') {
           // Generic empty/mock response for other dashboard widgets to prevent crashes
-          if (url.includes('cash-flow')) responseData = [];
-          else if (url.includes('loans-trend')) responseData = [];
-          else if (url.includes('risk-composition')) responseData = [];
-          else if (url.includes('loans-by-status')) responseData = [ { etiqueta: 'Al día', valor: 100 } ];
-          else if (url.includes('monthly-collections')) responseData = [];
-          else if (url.includes('delinquency')) responseData = [];
-          else if (url.includes('customer-ranking')) responseData = [];
-          else if (url.includes('rate-analysis')) responseData = { tasaPromedioGlobal: 5, distribucionPorRango: [] };
-          else if (url.includes('balance-evolution')) responseData = [];
+          if (url.includes('cash-flow')) {
+            const last6Months = Array.from({ length: 6 }, (_, i) => {
+              const d = new Date();
+              d.setMonth(d.getMonth() - (5 - i));
+              return { anio: d.getFullYear(), mes: d.getMonth() + 1, valor: Math.floor(Math.random() * 50000) + 20000 };
+            });
+            responseData = last6Months;
+          }
+          else if (url.includes('loans-trend')) {
+             const last6Months = Array.from({ length: 6 }, (_, i) => {
+              const d = new Date();
+              d.setMonth(d.getMonth() - (5 - i));
+              return { anio: d.getFullYear(), mes: d.getMonth() + 1, valor: Math.floor(Math.random() * 200000) + 100000 };
+            });
+            responseData = last6Months;
+          }
+          else if (url.includes('risk-composition')) {
+            responseData = [
+              { etiqueta: 'Bajo Riesgo', valor: 65 },
+              { etiqueta: 'Riesgo Medio', valor: 25 },
+              { etiqueta: 'Alto Riesgo', valor: 10 }
+            ];
+          }
+          else if (url.includes('loans-by-status')) {
+            responseData = [ 
+              { etiqueta: 'Al día', valor: 120 },
+              { etiqueta: 'Atrasado', valor: 15 },
+              { etiqueta: 'En Mora', valor: 5 },
+              { etiqueta: 'Finalizado', valor: 45 }
+            ];
+          }
+          else if (url.includes('monthly-collections')) {
+             const last6Months = Array.from({ length: 6 }, (_, i) => {
+              const d = new Date();
+              d.setMonth(d.getMonth() - (5 - i));
+              return { anio: d.getFullYear(), mes: d.getMonth() + 1, valor: Math.floor(Math.random() * 80000) + 30000 };
+            });
+            responseData = last6Months;
+          }
+          else if (url.includes('delinquency')) {
+             responseData = [
+               { cliente: 'Carlos López', fechaVencimiento: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), diasAtraso: 5, montoAdeudado: 5500 },
+               { cliente: 'María Gómez', fechaVencimiento: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(), diasAtraso: 15, montoAdeudado: 12000 },
+               { cliente: 'Pedro Sánchez', fechaVencimiento: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), diasAtraso: 2, montoAdeudado: 3200 },
+               { cliente: 'Diego Torres', fechaVencimiento: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(), diasAtraso: 45, montoAdeudado: 25000 }
+             ];
+          }
+          else if (url.includes('customer-ranking')) {
+            responseData = [
+              { etiqueta: 'Juan Pérez', valor: 150000 },
+              { etiqueta: 'Ana Martínez', valor: 125000 },
+              { etiqueta: 'Miguel Rodríguez', valor: 100000 },
+              { etiqueta: 'Lucía Fernández', valor: 95000 },
+              { etiqueta: 'Diego Torres', valor: 80000 }
+            ];
+          }
+          else if (url.includes('rate-analysis')) {
+            responseData = { 
+              tasaPromedioGlobal: 6.2, 
+              distribucionPorRango: [
+                { etiqueta: '0-5%', valor: 20 },
+                { etiqueta: '5-10%', valor: 50 },
+                { etiqueta: '10-15%', valor: 30 }
+              ] 
+            };
+          }
+          else if (url.includes('balance-evolution')) {
+             const last6Months = Array.from({ length: 6 }, (_, i) => {
+              const d = new Date();
+              d.setMonth(d.getMonth() - (5 - i));
+              return { anio: d.getFullYear(), mes: d.getMonth() + 1, valor: Math.floor(Math.random() * 500000) + 1000000 };
+            });
+            responseData = last6Months;
+          }
           else responseData = [];
         }
 
