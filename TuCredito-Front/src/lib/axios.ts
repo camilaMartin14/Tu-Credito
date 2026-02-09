@@ -1,12 +1,18 @@
 import axios from 'axios';
 
+// En desarrollo, usamos dinámicamente el hostname actual (localhost o IP de red)
+// para que funcione tanto en PC como en dispositivos móviles conectados a la misma red.
 const isDev = import.meta.env.DEV;
 const hostname = window.location.hostname;
+// Puerto por defecto de tu backend .NET
 const apiPort = '5134'; 
+
+// URL de producción en Render
+const PROD_API_URL = 'https://tu-credito-api.onrender.com/api';
 
 const baseURL = isDev 
   ? `http://${hostname}:${apiPort}/api` 
-  : (import.meta.env.VITE_API_URL || 'http://localhost:5134/api');
+  : (import.meta.env.VITE_API_URL || PROD_API_URL);
 
 const api = axios.create({
   baseURL,
