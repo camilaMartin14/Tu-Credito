@@ -199,7 +199,7 @@ export function LoanForm() {
               {errors.montoOtorgado && <p className="mt-1 text-xs text-red-400">{errors.montoOtorgado.message}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-muted">Tasa Interés (%)</label>
+              <label className="block text-sm font-medium text-muted">Tasa Interés Mensual (%)</label>
               <input
                 type="number"
                 step="0.1"

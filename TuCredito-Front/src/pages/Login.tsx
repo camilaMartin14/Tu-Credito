@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useAuth } from '../context/AuthContext';
 import { login as loginService } from '../services/authService';
 import { useNavigate, Link } from 'react-router-dom';
-import { Loader2, Eye, EyeOff, ShieldCheck, PieChart, Download } from 'lucide-react';
+import { Loader2, Eye, EyeOff, ShieldCheck, PieChart } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 
 export function Login() {
@@ -163,9 +163,6 @@ export function Login() {
                    Regístrate
                  </Link>
               </p>
-           </div>
-
-           <div className="mt-8 pt-6 border-t border-border/40">
            </div>
         </div>
       </div>
