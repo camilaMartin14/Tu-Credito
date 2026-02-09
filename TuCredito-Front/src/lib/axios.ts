@@ -4,7 +4,6 @@ const isDev = import.meta.env.DEV;
 const hostname = window.location.hostname;
 const apiPort = '5134'; 
 
-// URL de producción en Render
 const PROD_API_URL = 'https://tu-credito-api.onrender.com/api';
 
 const baseURL = isDev 

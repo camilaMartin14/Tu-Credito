@@ -50,7 +50,6 @@ namespace TuCredito.Services.Implementations
                 if (cuota.NroCuota <= 0)
                     return Result<bool>.Failure("Ingrese un número de cuota válido.");
 
-                // Inicializar saldo pendiente
                 cuota.SaldoPendiente = cuota.Monto;
 
                 await _context.Cuotas.AddAsync(cuota);

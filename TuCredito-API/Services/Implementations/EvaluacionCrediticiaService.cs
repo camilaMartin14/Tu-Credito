@@ -15,28 +15,22 @@ namespace TuCredito.Services.Implementations;
 
         public async Task<EvaluacionCrediticiaResponseDTO> EvaluarRiesgoAsync(EvaluacionCrediticiaRequestDTO request)
         {
-            // 1. Obtener Situación BCRA
             int maxSituacion = 1;
             bool errorBcra = false;
             try 
             {
                 var deudaResponse = await _bcraService.GetDeudasByCuitAsync(request.Cuit);
-                // Si no hay respuesta o no hay deudas, asumimos Situación 1 (Normal/Sin Deudas registradas)
                 if (deudaResponse != null && deudaResponse.Deudas != null && deudaResponse.Deudas.Any())
                 {
-                    // Tomamos la peor situación registrada
                     maxSituacion = deudaResponse.Deudas.Max(d => (int)d.Situacion);
                 }
             }
             catch 
             {
-                // Si falla BCRA, forzamos Revisión (Simulamos Situación 2 para caer en lógica de revisión)
-                // O mejor, manejamos una lógica específica de error
                 maxSituacion = 2; 
                 errorBcra = true;
             }
 
-            // 2. Calcular Capacidad de Pago (si se informan ingresos)
             bool capacidadPagoComprometida = false;
             if (request.IngresoMensual.HasValue && request.IngresoMensual.Value > 0)
             {
@@ -52,14 +46,13 @@ namespace TuCredito.Services.Implementations;
                 SituacionBcra = errorBcra ? "Desconocida (Error BCRA)" : $"Situación {maxSituacion}"
             };
 
-            // Lógica según lo definido
             if (errorBcra)
             {
                 response.Estado = "REVISION";
                 response.Motivo = "No se pudo verificar historial crediticio (API BCRA no disponible).";
                 response.DetalleRiesgo = "Requiere validación manual de antecedentes.";
             }
-            else if (maxSituacion == 1) // Normal
+            else if (maxSituacion == 1)
             {
                 if (capacidadPagoComprometida)
                 {
@@ -67,12 +60,10 @@ namespace TuCredito.Services.Implementations;
                     response.Motivo = "La cuota supera el 30% de los ingresos declarados.";
                     response.DetalleRiesgo = "Voluntad de pago ALTA, Capacidad de pago BAJA.";
                     
-                    // Sugerencia: Calcular monto para que la cuota sea el 30%
                     if (request.IngresoMensual.HasValue)
                     {
                          var cuotaObjetivo = request.IngresoMensual.Value * 0.30m;
                          
-                         // MontoSugerido = (MontoSolicitado * CuotaObjetivo) / CuotaActual
                          if (request.CuotaEstimada > 0)
                          {
                             response.MontoMaximoSugerido = Math.Round((request.MontoSolicitado * cuotaObjetivo) / request.CuotaEstimada, 2);
@@ -86,7 +77,7 @@ namespace TuCredito.Services.Implementations;
                     response.DetalleRiesgo = "Riesgo Bajo.";
                 }
             }
-            else if (maxSituacion == 2) // Riesgo Bajo / Seguimiento Especial
+            else if (maxSituacion == 2)
             {
                 if (capacidadPagoComprometida)
                 {
@@ -96,7 +87,6 @@ namespace TuCredito.Services.Implementations;
                 }
                 else
                 {
-                    // Si no declara ingresos, Sit 2 es riesgoso -> RECHAZADO según matriz "Sin Ingresos"
                     if (!request.IngresoMensual.HasValue)
                     {
                         response.Estado = "RECHAZADO";

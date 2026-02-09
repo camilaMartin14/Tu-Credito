@@ -24,9 +24,6 @@ namespace TuCredito.Data
                 new EstadosPrestamo { IdEstado = 3, Descripcion = "Eliminado" },
                 new EstadosPrestamo { IdEstado = 4, Descripcion = "Archivado" }
             };
-            // Use explicit SQL identity insert strategy or just add them if the provider supports identity insert on add
-            // For simplicity in EF Core, if we want specific IDs, we can just add them. 
-            // SQL Server requires Identity Insert ON, Postgres usually handles it if you provide the value.
             context.EstadosPrestamos.AddRange(estadosPrestamos);
             context.SaveChanges();
 
@@ -63,7 +60,6 @@ namespace TuCredito.Data
             context.SaveChanges();
 
             // 5. Prestamistas
-            // Note: Password hash from original seed
             var prestamistas = new Prestamista[]
             {
                 new Prestamista { 
@@ -97,7 +93,6 @@ namespace TuCredito.Data
             context.SaveChanges();
 
             // 7. Prestatarios
-            // We need to fetch references to link FKs correctly if we didn't force IDs
             var g1 = context.Garantes.Local.FirstOrDefault(g => g.Nombre == "Roberto");
             var g2 = context.Garantes.Local.FirstOrDefault(g => g.Nombre == "Lucia");
             var g3 = context.Garantes.Local.FirstOrDefault(g => g.Nombre == "Carlos");
@@ -118,7 +113,7 @@ namespace TuCredito.Data
             context.Prestatarios.AddRange(prestatarios);
             context.SaveChanges();
 
-            // 8. Prestamos (Sample data logic)
+            // 8. Prestamos
             var p1 = context.Prestatarios.Local.FirstOrDefault(p => p.Dni == 10000001);
             var prestamista = context.Prestamistas.Local.FirstOrDefault(p => p.Usuario == "demo");
 

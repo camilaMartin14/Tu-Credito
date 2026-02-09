@@ -59,7 +59,6 @@ namespace TuCredito.Controllers;
             try
             {
                 var pagos = await _service.GetPagoConFiltro(nombre, mes);
-                // Si no hay resultados, retornamos lista vacía en lugar de 404
                 if (pagos == null) return Ok(new List<PagoOutputDTO>());
                 
                 return Ok(pagos);

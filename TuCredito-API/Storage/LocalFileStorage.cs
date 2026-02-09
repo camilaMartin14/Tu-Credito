@@ -8,7 +8,6 @@ public class LocalFileStorage : IFileStorage
 
     public LocalFileStorage(IConfiguration config)
     {
-        // Use a local folder, default to "Uploads" in the current directory
         _basePath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
         if (!Directory.Exists(_basePath))
         {

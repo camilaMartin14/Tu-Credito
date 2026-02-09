@@ -25,7 +25,6 @@ namespace TuCredito.Services.Implementations
             if (string.IsNullOrWhiteSpace(request.TipoDocumento)) throw new ArgumentException("El tipo de documento es obligatorio.");
             if (request.Archivo == null || request.Archivo.Length == 0) throw new ArgumentException("El archivo es obligatorio.");
 
-            // Validaciones adicionales
             const long MAX_SIZE = 5 * 1024 * 1024; // 5MB
             if (request.Archivo.Length > MAX_SIZE)
                 throw new ArgumentException("El archivo excede el tamaño máximo permitido (5MB).");
@@ -34,9 +33,6 @@ namespace TuCredito.Services.Implementations
             if (!allowedTypes.Contains(request.Archivo.ContentType.ToLower()))
                 throw new ArgumentException("Formato de archivo no válido. Solo PDF, JPEG y PNG.");
 
-            // GUARD: PROTECCIÓN CUENTA DEMO (Max 10 archivos)
-            // Asumimos que podemos verificar el usuario actual via context o el ID pasado en el request si es confiable.
-            // Para demo rápida, verificamos si el usuario "subidor" es el demo (ID 1).
             if (request.UsuarioId == 1) // ID 1 es demo según seed_data
             {
                 var count = await _context.Documentos.CountAsync(d => d.SubidoPor == 1 && d.Activo);

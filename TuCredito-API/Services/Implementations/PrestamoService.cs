@@ -51,14 +51,13 @@ namespace TuCredito.Services.Implementations
 
         public async Task<List<PrestamoDTO>> GetPrestamoConFiltro(string? nombre, int? estado, int? mesVto, int? anio)
         {
-            // El estado lo manejaría con un combo box desde el front
             if (mesVto.HasValue && (mesVto.Value > 12 || mesVto.Value < 1))
                 throw new ArgumentException("El mes debe estar contenido entre 1 y 12");
 
             if (estado.HasValue && estado.Value == 2 && mesVto.HasValue && anio.HasValue)
             {
-                var fechaFiltro = new DateTime(anio.Value, mesVto.Value, 1); // construye una fecha
-                if (fechaFiltro > DateTime.Today) // y la compara con el día de hoy
+                var fechaFiltro = new DateTime(anio.Value, mesVto.Value, 1);
+                if (fechaFiltro > DateTime.Today)
                     throw new ArgumentException("Solo se pueden consultar cuotas posteriores para préstamos activos");
             }
 
@@ -90,10 +89,8 @@ namespace TuCredito.Services.Implementations
         }
         
 
-        // Generar las cuotas en la entidad antes de persistir todo junto
         public async Task<bool> PostPrestamo(PrestamoDTO nvoPrestamo)
         {
-            // Validaciones sobre el DTO
             if (nvoPrestamo.MontoOtorgado <= 0)
                 throw new ArgumentException("El monto debe ser mayor que cero");
 
@@ -103,10 +100,6 @@ namespace TuCredito.Services.Implementations
             if (nvoPrestamo.CantidadCtas <= 0)
                 throw new ArgumentException("Ingrese un número de cuotas válido");
 
-            // Validación de negocio: el prestatario debe existir
-            // Ajustá el nombre de DbSet/propiedad si en tu modelo se llama distinto:
-            //   - _context.Prestatarios
-            //   - propiedad DNI: Dni / DniPrestatario / etc.
             var existePrestatario = await _context.Prestatarios
                 .AnyAsync(p => p.Dni == nvoPrestamo.DniPrestatario);
 
@@ -115,16 +108,12 @@ namespace TuCredito.Services.Implementations
 
             var entidad = _mapper.Map<Prestamo>(nvoPrestamo);
 
-            // Setear prestamista desde sesión/usuario logueado
             entidad.IdPrestamista = await _prestamista.ObtenerIdUsuarioLogueado();
 
-            // Inicializar SaldoRestante con el monto otorgado
             entidad.SaldoRestante = entidad.MontoOtorgado;
 
-            // Calcular FechaFinEstimada automáticamente basada en la cantidad de cuotas
             entidad.FechaFinEstimada = entidad.FechaOtorgamiento.AddMonths(entidad.CantidadCtas);
 
-            // Validaciones sobre la entidad
             if (entidad.FechaOtorgamiento > DateTime.Now)
                 throw new ArgumentException("La fecha de otorgamiento no puede ser futura");
 
@@ -146,7 +135,6 @@ namespace TuCredito.Services.Implementations
             if (entidad.TasaInteres <= 0)
                 throw new ArgumentException("Ingrese una tasa de interés");
 
-            // Asegurar colección inicializada
             entidad.Cuota ??= new List<Cuota>();
 
             GenerarCuotas(entidad);
@@ -170,7 +158,7 @@ namespace TuCredito.Services.Implementations
 
             if (await TienePagosPendientes(id)) throw new ArgumentException("No se pueden finalizar préstamos que aún tengan pagos pendientes");
 
-            prestamo.IdEstado = 2; // 1 activo, 2 finalizado, 3 eliminado (según tu comentario)
+            prestamo.IdEstado = 2;
             await _context.SaveChangesAsync();
 
             return true;
@@ -185,7 +173,7 @@ namespace TuCredito.Services.Implementations
 
             if (prestamo.IdEstado == 3) throw new ArgumentException("El préstamo ya se encuentra eliminado");
 
-            prestamo.IdEstado = 3; // 1 activo, 2 finalizado, 3 eliminado
+            prestamo.IdEstado = 3;
             await _context.SaveChangesAsync();
 
             return true;
@@ -193,8 +181,6 @@ namespace TuCredito.Services.Implementations
 
         private async Task<bool> TienePagosPendientes(int idPrestamo)
         {
-            // “Pendiente” = suma de pagos de una cuota < monto de cuota
-            // El cast (decimal?) evita problemas si no hay pagos (Sum null -> 0)
             return await _context.Cuotas
                 .Where(c => c.IdPrestamo == idPrestamo)
                 .AnyAsync(c =>

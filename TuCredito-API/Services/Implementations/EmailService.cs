@@ -29,9 +29,6 @@ namespace TuCredito.Services.Implementations
             if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(fromEmail) || string.IsNullOrEmpty(password))
             {
                 _logger.LogWarning("Email settings are not configured properly. Email to {to} with subject '{subject}' was not sent.", to, subject);
-                // In a real scenario, we might want to throw or handle this differently.
-                // For now, we simulate sending by logging.
-                _logger.LogInformation("SIMULATION: Email sent to {to} with subject {subject}", to, subject);
                 return;
             }
 

@@ -49,8 +49,5 @@ export const viewDocument = async (id: number): Promise<void> => {
   const url = window.URL.createObjectURL(blob);
   window.open(url, '_blank');
   
-  // Note: We can't immediately revoke the object URL if we open it in a new tab,
-  // as the new tab needs time to load it. Ideally, the browser handles cleanup 
-  // when the document is unloaded, or we use a timeout.
-  setTimeout(() => window.URL.revokeObjectURL(url), 60000); // Revoke after 1 minute
+  setTimeout(() => window.URL.revokeObjectURL(url), 60000);
 };

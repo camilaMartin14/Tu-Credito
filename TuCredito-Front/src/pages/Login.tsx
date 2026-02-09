@@ -34,7 +34,6 @@ export function Login() {
 
   return (
     <div className="flex min-h-screen w-full bg-background relative">
-      {/* Mobile Background Image (Visible only on mobile) */}
       <div className="absolute inset-0 lg:hidden z-0">
         <img 
           src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop" 
@@ -44,7 +43,6 @@ export function Login() {
         <div className="absolute inset-0 bg-background/85 backdrop-blur-[2px]" />
       </div>
 
-      {/* Left Side - Image & Branding (Desktop Only) */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gray-900 z-10">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-900/90 via-gray-900/80 to-black/60 z-10" />
         <img 
@@ -86,9 +84,7 @@ export function Login() {
         </div>
       </div>
 
-      {/* Right Side - Form */}
       <div className="flex-1 flex items-center justify-center p-8 relative z-10">
-         {/* Background elements for right side (subtle) - Desktop only mainly, but keeps subtle glow */}
          <div className="absolute top-0 right-0 w-full h-full overflow-hidden z-0 pointer-events-none opacity-50 lg:opacity-100">
             <div className="absolute top-[-10%] right-[-10%] w-[30%] h-[30%] bg-primary-500/5 rounded-full blur-[100px]" />
             <div className="absolute bottom-[-10%] left-[-10%] w-[20%] h-[20%] bg-accent-pink/5 rounded-full blur-[100px]" />

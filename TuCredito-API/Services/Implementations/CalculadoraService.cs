@@ -75,8 +75,6 @@ public class CalculadoraService : ICalculadoraService
         var n = entry.CantidadCuotas;
         var P = (double)entry.MontoPrestamo;
 
-        // Cuota = P * [ i * (1+i)^n ] / [ (1+i)^n - 1 ]
-        // Si tasa es 0, cuota es P/n
         decimal cuota;
         if (i == 0)
         {

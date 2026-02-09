@@ -28,7 +28,6 @@ namespace TuCredito.Services.Implementations
 
         public async Task<List<Pago>> GetAllPagos()
         {
-            // Retornamos todos los pagos para el historial, el front se encarga de mostrar el estado
             return await _context.Pagos
                 .Include(p => p.IdCuotaNavigation)
                     .ThenInclude(c => c.IdPrestamoNavigation)
@@ -88,7 +87,6 @@ namespace TuCredito.Services.Implementations
                 if (pago.Monto <= 0) throw new ArgumentException("El monto del pago debe ser mayor que cero.");
                 if (pago.Cotizacion <= 0) pago.Cotizacion = 1;
 
-                // Cargar cuota objetivo + préstamo
                 var cuotaObjetivo = await _context.Cuotas
                     .Include(c => c.IdPrestamoNavigation)
                     .FirstOrDefaultAsync(c => c.IdCuota == pago.IdCuota);
@@ -106,11 +104,8 @@ namespace TuCredito.Services.Implementations
                 if (prestamo.IdEstado == PRESTAMO_ELIMINADO)
                     throw new ArgumentException("No se pueden registrar pagos de un préstamo eliminado.");
 
-                // Saldo actual de la cuota
                 var saldoActualCuota = cuotaObjetivo.SaldoPendiente ?? cuotaObjetivo.Monto;
 
-                // Calcular cuánto reduce realmente la deuda
-                // Amortización = Lo pagado + Lo perdonado (descuento) - Lo cobrado extra (recargo)
                 var montoAmortizado = pago.Monto + pago.Descuento - pago.Recargo;
 
                 if (montoAmortizado <= 0)
@@ -120,7 +115,6 @@ namespace TuCredito.Services.Implementations
                     throw new InvalidOperationException(
                         $"El pago amortizable ({montoAmortizado}) excede el saldo pendiente de la cuota ({saldoActualCuota}).");
 
-                // Actualizar cuota
                 cuotaObjetivo.SaldoPendiente = saldoActualCuota - montoAmortizado;
 
                 if (cuotaObjetivo.SaldoPendiente <= 0)
@@ -130,10 +124,9 @@ namespace TuCredito.Services.Implementations
                 }
                 else
                 {
-                    cuotaObjetivo.IdEstado = CUOTA_PENDIENTE; // sigue pendiente (parcial)
+                    cuotaObjetivo.IdEstado = CUOTA_PENDIENTE;
                 }
 
-                // Actualizar préstamo
                 prestamo.SaldoRestante -= montoAmortizado;
 
                 if (prestamo.SaldoRestante <= 0)
@@ -149,12 +142,10 @@ namespace TuCredito.Services.Implementations
                 }
                 else
                 {
-                    // Si quedaba como finalizado por error, lo reactivamos
                     if (prestamo.IdEstado == PRESTAMO_FINALIZADO)
                         prestamo.IdEstado = PRESTAMO_ACTIVO;
                 }
 
-                // Completar pago
                 pago.Estado = PAGO_REGISTRADO;
                 pago.Saldo = cuotaObjetivo.SaldoPendiente ?? 0;
 
@@ -180,7 +171,7 @@ namespace TuCredito.Services.Implementations
             var pago = await _context.Pagos.FindAsync(id);
             if (pago == null) throw new ArgumentException("No se encontró el pago indicado.");
 
-            pago.Estado = estado; // Ideal: validar contra estados permitidos
+            pago.Estado = estado;
             await _context.SaveChangesAsync();
 
             return true;
@@ -191,7 +182,6 @@ namespace TuCredito.Services.Implementations
             if (pago == null) throw new ArgumentNullException(nameof(pago));
             if (pago.IdCuota <= 0) throw new ArgumentException("Ingrese una cuota válida.");
 
-            // Traer cuota + préstamo
             var cuota = await _context.Cuotas
                 .Include(c => c.IdPrestamoNavigation)
                 .FirstOrDefaultAsync(c => c.IdCuota == pago.IdCuota);

@@ -27,17 +27,14 @@ namespace TuCredito.Services.Implementations
             if (prestatario.Dni <= 0)
                 throw new ArgumentException("El DNI es inválido.");
 
-            // Ajustá si tu PK/unique no es DNI
             var existe = await _context.Prestatarios.AnyAsync(p => p.Dni == prestatario.Dni);
             if (existe)
                 throw new ArgumentException("Ya existe un prestatario con ese DNI.");
 
-            // Verificar si hay datos de garante y gestionarlo
             if (prestatario.IdGaranteNavigation != null)
             {
                 if (string.IsNullOrWhiteSpace(prestatario.IdGaranteNavigation.Dni))
                 {
-                    // Si el DNI del garante es vacío/nulo, descartamos el objeto vacío que crea AutoMapper
                     prestatario.IdGaranteNavigation = null;
                     prestatario.IdGarante = null;
                 }
@@ -48,15 +45,12 @@ namespace TuCredito.Services.Implementations
 
                     if (garanteExistente != null)
                     {
-                        // Asociar al existente
                         prestatario.IdGaranteNavigation = garanteExistente;
                         prestatario.IdGarante = garanteExistente.IdGarante;
                     }
                     else
                     {
-                        // Es nuevo, aseguramos que se marque como activo por defecto si no viene
                         prestatario.IdGaranteNavigation.EsActivo = true;
-                        // EF lo insertará automáticamente
                     }
                 }
             }

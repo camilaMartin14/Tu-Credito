@@ -69,7 +69,6 @@ namespace TuCredito.Controllers;
         {
             try
             {
-                // Map FilterDTO to PrestatarioDTO manually or via AutoMapper if configured
                 var dto = new PrestatarioDTO
                 {
                     Dni = filtro.Dni,

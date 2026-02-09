@@ -38,30 +38,21 @@ export function Loans() {
   const [nameInput, setNameInput] = useState('');
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; id?: number }>({ isOpen: false });
 
-  // Debounce search input could be better, but for now direct state update
-  // Ideally use a debounce hook or library
-
   const { data: loans, isLoading, error } = useQuery({
     queryKey: ['loans', filters],
     queryFn: async () => {
-      // Fetch data without filters first if backend filtering is unreliable, 
-      // or fetch with partial filters and refine on client side.
-      // Given the issue with year filtering, we will filter client-side for year.
       const data = await getLoansByFilter({
         nombre: filters.nombre || undefined,
         estado: filters.estado || undefined,
         mesVto: filters.mesVto || undefined,
-        // We temporarily ignore 'anio' in backend call if it's causing issues, or keep it and double check on client
         anio: filters.anio || undefined
       });
 
-      // Client-side filtering fix for Year and Month to ensure accuracy
       let filteredData = data;
 
       if (filters.anio > 0) {
         filteredData = filteredData.filter(loan => {
           if (!loan.fechaOtorgamiento) return false;
-          // Check if loan was granted in that year OR has first due date in that year
           const grantYear = new Date(loan.fechaOtorgamiento).getFullYear();
           const firstDueYear = loan.fec1erVto ? new Date(loan.fec1erVto).getFullYear() : grantYear;
           return grantYear === filters.anio || firstDueYear === filters.anio;
@@ -94,10 +85,6 @@ export function Loans() {
       setAlias(loanId, editingAliasValue.trim());
       addToast('Alias guardado', 'success');
     } else {
-      // If empty, maybe remove it? Or just keep it empty? 
-      // Let's allow empty to clear it effectively if the user wants.
-      // But useLoanAliases removeAlias might be better if we had it exposed.
-      // For now setAlias with empty string works.
       setAlias(loanId, '');
     }
     setEditingAliasId(null);
