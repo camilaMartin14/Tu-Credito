@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../context/AuthContext';
-import api from '../lib/axios';
+import { login as loginService } from '../services/authService';
 import { useNavigate, Link } from 'react-router-dom';
 import { Loader2, Eye, EyeOff, ShieldCheck, PieChart } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
@@ -19,8 +19,9 @@ export function Login() {
     setIsLoading(true);
     setError('');
     try {
-      const response = await api.post('/lenders/login', data);
-      login(response.data);
+      // Use the service which includes the demo mock logic
+      const responseData = await loginService(data);
+      login(responseData);
       addToast('Sesión iniciada correctamente', 'success');
       navigate('/');
     } catch (err) {

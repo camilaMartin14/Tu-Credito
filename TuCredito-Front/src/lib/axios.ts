@@ -1,10 +1,7 @@
 import axios from 'axios';
 
-// En desarrollo, usamos dinámicamente el hostname actual (localhost o IP de red)
-// para que funcione tanto en PC como en dispositivos móviles conectados a la misma red.
 const isDev = import.meta.env.DEV;
 const hostname = window.location.hostname;
-// Puerto por defecto de tu backend .NET
 const apiPort = '5134'; 
 
 const baseURL = isDev 
@@ -35,7 +32,6 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized access (e.g., redirect to login)
       localStorage.removeItem('token');
       localStorage.removeItem('prestamista');
       window.location.href = '/login';
