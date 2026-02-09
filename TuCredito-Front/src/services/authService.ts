@@ -15,23 +15,6 @@ export const updateProfile = async (data: UpdateProfileDTO) => {
 };
 
 export const login = async (data: any) => {
-    if (data.usuario === 'demo' && data.contrasenia === 'demo') {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve({
-                    token: 'mock-token-demo-123456',
-                    prestamista: {
-                        id: 999,
-                        nombre: 'Usuario',
-                        apellido: 'Demo',
-                        usuario: 'demo',
-                        correo: 'demo@tucredito.com'
-                    }
-                });
-            }, 800);
-        });
-    }
-
     const response = await api.post('/lenders/login', data);
     return response.data;
 };

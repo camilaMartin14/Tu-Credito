@@ -19,7 +19,6 @@ export function Login() {
     setIsLoading(true);
     setError('');
     try {
-      // Use the service which includes the demo mock logic
       const responseData = await loginService(data);
       login(responseData);
       addToast('Sesión iniciada correctamente', 'success');

@@ -35,5 +35,8 @@ namespace TuCredito.DTOs;
 
         [Required(ErrorMessage = "La Tasa de Interés es obligatoria")]
         [Range(0, 1000, ErrorMessage = "La Tasa de Interés debe ser un valor positivo")]
-        public decimal TasaInteres {  get; set; }   
+        public decimal TasaInteres {  get; set; }
+
+    public string Moneda { get; set; } = "ARS";
+
     }

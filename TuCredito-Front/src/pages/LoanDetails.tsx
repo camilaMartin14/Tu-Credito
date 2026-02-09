@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getLoanById, getLoanSummary, deleteLoan } from '../services/loanService';
 import { getInstallments } from '../services/installmentService';
-import { ArrowLeft, Calendar, PieChart, AlertCircle, Clock, CreditCard, Trash2, Zap } from 'lucide-react';
+import { ArrowLeft, Calendar, PieChart, AlertCircle, Clock, CreditCard, Trash2, Zap, Edit2, Save, X } from 'lucide-react';
 import { Cuota } from '../types';
 import { LoanStatus, InstallmentStatus, getLoanStatusLabel, getInstallmentStatusLabel } from '../types/enums';
 import { StatusBadge } from '../components/ui/StatusBadge';
@@ -11,18 +11,31 @@ import { formatCurrency, formatDate } from '../utils/formatters';
 import { PaymentModal } from '../components/payments/PaymentModal';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useToast } from '../context/ToastContext';
+import { useLoanAliases } from '../hooks/useLoanAliases';
 
 export function LoanDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
+  const { getAlias, setAlias } = useLoanAliases();
   const loanId = parseInt(id || '0');
 
   const [selectedInstallment, setSelectedInstallment] = useState<Cuota | null>(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isAdvancePayment, setIsAdvancePayment] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  
+  const [isEditingAlias, setIsEditingAlias] = useState(false);
+  const [aliasInput, setAliasInput] = useState('');
+
+  const handleSaveAlias = () => {
+    if (loanId) {
+      setAlias(loanId, aliasInput);
+      setIsEditingAlias(false);
+      addToast('Alias guardado correctamente', 'success');
+    }
+  };
 
   const deleteMutation = useMutation({
     mutationFn: deleteLoan,
@@ -90,7 +103,48 @@ export function LoanDetails() {
             <ArrowLeft className="h-6 w-6" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-main">Préstamo #{loan.idPrestamo}</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-main">Préstamo #{loan.idPrestamo}</h1>
+              {isEditingAlias ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={aliasInput}
+                    onChange={(e) => setAliasInput(e.target.value)}
+                    className="bg-surface/50 border border-border rounded px-2 py-1 text-sm text-main w-40"
+                    placeholder="Alias..."
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSaveAlias();
+                      if (e.key === 'Escape') setIsEditingAlias(false);
+                    }}
+                  />
+                  <button onClick={handleSaveAlias} className="p-1 text-green-500 hover:bg-green-500/10 rounded">
+                    <Save className="h-4 w-4" />
+                  </button>
+                  <button onClick={() => setIsEditingAlias(false)} className="p-1 text-red-500 hover:bg-red-500/10 rounded">
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 cursor-pointer group" onClick={() => {
+                    setAliasInput(getAlias(loan.idPrestamo || 0));
+                    setIsEditingAlias(true);
+                  }}>
+                  {getAlias(loan.idPrestamo || 0) ? (
+                    <span className="px-2 py-0.5 rounded bg-primary-500/10 text-primary-500 text-sm font-medium italic flex items-center gap-2 hover:bg-primary-500/20 transition-colors">
+                      {getAlias(loan.idPrestamo || 0)}
+                      <Edit2 className="h-3 w-3 opacity-50 group-hover:opacity-100" />
+                    </span>
+                  ) : (
+                    <span className="text-sm text-muted hover:text-primary-500 flex items-center gap-1 transition-colors border border-dashed border-border px-2 py-0.5 rounded hover:border-primary-500/50 hover:bg-surfaceHighlight">
+                       <Edit2 className="h-3 w-3" />
+                       <span className="italic">Agregar alias</span>
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
             <p className="text-muted">Detalles y plan de cuotas</p>
           </div>
         </div>
@@ -211,8 +265,8 @@ export function LoanDetails() {
                       {cuota.nroCuota.toString().padStart(2, '0')}/{loan.cantidadCtas}
                     </td>
                     <td className="px-6 py-4 text-muted">{formatDate(cuota.fecVto)}</td>
-                    <td className="px-6 py-4 text-main">{formatCurrency(cuota.monto)}</td>
-                    <td className="px-6 py-4 text-main">{cuota.saldoPendiente ? formatCurrency(cuota.saldoPendiente) : '-'}</td>
+                    <td className="px-6 py-4 text-main">{formatCurrency(cuota.monto, loan.moneda)}</td>
+                    <td className="px-6 py-4 text-main">{cuota.saldoPendiente ? formatCurrency(cuota.saldoPendiente, loan.moneda) : '-'}</td>
                     <td className="px-6 py-4">
                       <StatusBadge variant={
                         cuota.idEstado === InstallmentStatus.Paid ? 'success' :
@@ -260,6 +314,7 @@ export function LoanDetails() {
         }}
         installment={selectedInstallment}
         isAdvance={isAdvancePayment}
+        currency={loan.moneda}
       />
 
       <ConfirmationModal

@@ -86,6 +86,7 @@ namespace TuCredito.Services.Implementations
                 if (pago == null) throw new ArgumentNullException(nameof(pago));
                 if (pago.IdCuota <= 0) throw new ArgumentException("Ingrese una cuota válida.");
                 if (pago.Monto <= 0) throw new ArgumentException("El monto del pago debe ser mayor que cero.");
+                if (pago.Cotizacion <= 0) pago.Cotizacion = 1;
 
                 // Cargar cuota objetivo + préstamo
                 var cuotaObjetivo = await _context.Cuotas

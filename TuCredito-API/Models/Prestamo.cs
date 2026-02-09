@@ -31,6 +31,8 @@ public partial class Prestamo
 
     public int IdSistAmortizacion { get; set; }
 
+    public string Moneda { get; set; } = "ARS";
+
     public virtual ICollection<Cuota> Cuota { get; set; } = new List<Cuota>();
 
     public virtual Prestatario DniPrestatarioNavigation { get; set; }

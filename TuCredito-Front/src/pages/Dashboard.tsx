@@ -63,11 +63,11 @@ export function Dashboard() {
         
         {/* Quick Actions */}
         <div className="flex gap-3">
-            <Link to="/loans" className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors shadow-lg shadow-primary-500/20 font-medium">
+            <Link to="/loans/create" className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors shadow-lg shadow-primary-500/20 font-medium">
                 <Plus className="h-4 w-4" />
                 <span>Nuevo Préstamo</span>
             </Link>
-            <Link to="/borrowers" className="flex items-center gap-2 px-4 py-2 bg-surfaceHighlight hover:bg-border text-main rounded-lg transition-colors border border-border font-medium">
+            <Link to="/borrowers/create" className="flex items-center gap-2 px-4 py-2 bg-surfaceHighlight hover:bg-border text-main rounded-lg transition-colors border border-border font-medium">
                 <UserPlus className="h-4 w-4" />
                 <span>Nuevo Cliente</span>
             </Link>

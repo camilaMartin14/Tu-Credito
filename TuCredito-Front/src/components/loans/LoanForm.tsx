@@ -12,6 +12,7 @@ import { formatCurrency, formatDate } from '../../utils/formatters';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
 
 import { useToast } from '../../context/ToastContext';
+import { useLoanAliases } from '../../hooks/useLoanAliases';
 
 import { LoanStatus } from '../../types/enums';
 
@@ -22,6 +23,7 @@ const loanSchema = z.object({
   cantidadCtas: z.number().refine((val) => !Number.isNaN(val), { message: "La cantidad de cuotas es obligatoria" }).refine((val) => val >= 1, { message: "Debe haber al menos 1 cuota" }),
   tasaInteres: z.number().refine((val) => !Number.isNaN(val), { message: "La tasa de interés es obligatoria" }).refine((val) => val >= 0, { message: "La tasa no puede ser negativa" }),
   idSistAmortizacion: z.number(),
+  moneda: z.enum(["ARS", "USD"]),
   fechaOtorgamiento: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Fecha inválida" }),
   fec1erVto: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Fecha inválida" }),
 });
@@ -30,10 +32,12 @@ type LoanFormData = z.infer<typeof loanSchema>;
 
 export function LoanForm() {
   const { addToast } = useToast();
+  const { setAlias } = useLoanAliases();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [simulation, setSimulation] = useState<SimulacionPrestamoOutputDTO | null>(null);
   const [selectedBorrowerId, setSelectedBorrowerId] = useState<string>("");
+  const [alias, setAliasInput] = useState('');
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [pendingData, setPendingData] = useState<LoanFormData | null>(null);
   
@@ -43,10 +47,13 @@ export function LoanForm() {
       idSistAmortizacion: 1,
       tasaInteres: 5,
       cantidadCtas: 12,
+      moneda: "ARS",
       fechaOtorgamiento: new Date().toISOString().split('T')[0],
       fec1erVto: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0],
     }
   });
+
+  const currency = watch('moneda');
 
   const { data: borrowers } = useQuery({
     queryKey: ['borrowers'],
@@ -76,10 +83,14 @@ export function LoanForm() {
 
   const createMutation = useMutation({
     mutationFn: createLoan,
-    onSuccess: () => {
+    onSuccess: (data: any) => {
+      if (data && data.idPrestamo && alias.trim()) {
+        setAlias(data.idPrestamo, alias.trim());
+      }
       addToast("Préstamo creado exitosamente!", 'success');
       setSimulation(null);
       reset();
+      setAliasInput('');
       setSelectedBorrowerId("");
       setIsConfirmationOpen(false);
       queryClient.invalidateQueries({ queryKey: ['loans'] });
@@ -102,16 +113,13 @@ export function LoanForm() {
       montoPrestamo: Number(data.montoOtorgado),
       cantidadCuotas: Number(data.cantidadCtas),
       interesMensual: Number(data.tasaInteres),
+      moneda: data.moneda,
       fechaInicio: new Date(data.fechaOtorgamiento).toISOString(),
       idSistAmortizacion: Number(data.idSistAmortizacion)
     });
   };
 
   const onSubmit = (data: LoanFormData) => {
-    if (!simulation) {
-        addToast("Debes simular el préstamo primero", 'warning');
-        return;
-    }
     setPendingData(data);
     setIsConfirmationOpen(true);
   };
@@ -127,6 +135,7 @@ export function LoanForm() {
         montoOtorgado: Number(pendingData.montoOtorgado),
         cantidadCtas: Number(pendingData.cantidadCtas),
         tasaInteres: Number(pendingData.tasaInteres),
+        moneda: pendingData.moneda,
         idSistAmortizacion: Number(pendingData.idSistAmortizacion),
         fechaOtorgamiento: new Date(pendingData.fechaOtorgamiento).toISOString(),
         fec1erVto: new Date(pendingData.fec1erVto).toISOString(),
@@ -186,6 +195,29 @@ export function LoanForm() {
               readOnly={!!selectedBorrowerId}
             />
             {errors.nombrePrestatario && <p className="mt-1 text-xs text-red-400">{errors.nombrePrestatario.message}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-muted">Alias (Opcional)</label>
+            <input
+              type="text"
+              value={alias}
+              onChange={(e) => setAliasInput(e.target.value)}
+              className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
+              placeholder="Ej. Préstamo Auto, Hipoteca Casa..."
+            />
+            <p className="mt-1 text-xs text-muted">Nombre corto para identificar este préstamo fácilmente (solo visible para ti).</p>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-muted">Moneda</label>
+            <select
+              {...register('moneda')}
+              className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200 [&>option]:bg-surface"
+            >
+              <option value="ARS">Peso Argentino (ARS)</option>
+              <option value="USD">Dólar Estadounidense (USD)</option>
+            </select>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -267,7 +299,7 @@ export function LoanForm() {
             </button>
             <button
               type="submit"
-              disabled={createMutation.isPending || !simulation}
+              disabled={createMutation.isPending}
               className="flex flex-1 items-center justify-center rounded-xl bg-gradient-to-r from-primary-600 to-accent-pink px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-500/25 transition-all duration-200 hover:shadow-primary-500/40 hover:scale-[1.02] disabled:opacity-50"
             >
               {createMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
@@ -285,11 +317,11 @@ export function LoanForm() {
             <div className="mb-4 grid grid-cols-2 gap-4 rounded-xl bg-surfaceHighlight/30 border border-border p-4">
               <div>
                 <span className="text-xs text-muted">Total a Pagar</span>
-                <p className="text-lg font-bold text-main">{formatCurrency(simulation.totalAPagar)}</p>
+                <p className="text-lg font-bold text-main">{formatCurrency(simulation.totalAPagar, currency)}</p>
               </div>
               <div>
                 <span className="text-xs text-muted">Total Intereses</span>
-                <p className="text-lg font-bold text-primary-400">{formatCurrency(totalInteres)}</p>
+                <p className="text-lg font-bold text-primary-400">{formatCurrency(totalInteres, currency)}</p>
               </div>
             </div>
             <div className="flex-1 overflow-auto max-h-[400px] custom-scrollbar">
@@ -307,8 +339,8 @@ export function LoanForm() {
                     <tr key={cuota.numeroCuota} className="hover:bg-surfaceHighlight/30 transition-colors">
                       <td className="px-3 py-2 text-muted">{cuota.numeroCuota}</td>
                       <td className="px-3 py-2 text-muted">{formatDate(cuota.fechaVencimiento)}</td>
-                      <td className="px-3 py-2 font-medium text-emerald-400">{formatCurrency(cuota.monto)}</td>
-                      <td className="px-3 py-2 text-muted">{formatCurrency(cuota.interes)}</td>
+                      <td className="px-3 py-2 font-medium text-emerald-400">{formatCurrency(cuota.monto, currency)}</td>
+                      <td className="px-3 py-2 text-muted">{formatCurrency(cuota.interes, currency)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -330,7 +362,7 @@ export function LoanForm() {
         onClose={() => setIsConfirmationOpen(false)}
         onConfirm={handleConfirmCreate}
         title="Confirmar Creación de Préstamo"
-        message={`¿Estás seguro que deseas crear este préstamo para ${pendingData?.nombrePrestatario} por un monto de ${formatCurrency(pendingData?.montoOtorgado || 0)}?`}
+        message={`¿Estás seguro que deseas crear este préstamo para ${pendingData?.nombrePrestatario} por un monto de ${formatCurrency(pendingData?.montoOtorgado || 0, pendingData?.moneda)}?`}
         confirmText="Crear Préstamo"
         cancelText="Cancelar"
         isLoading={createMutation.isPending}

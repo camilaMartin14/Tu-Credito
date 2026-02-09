@@ -130,7 +130,7 @@ CREATE TABLE Documentos (
     Activo BIT NOT NULL DEFAULT 1
 );
 
--- Tabla de auditor√≠a (Agregada recientemente)
+-- Tabla de auditorÌa (Agregada recientemente)
 CREATE TABLE AuditLogs (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     EntityName NVARCHAR(100) NOT NULL,
@@ -148,7 +148,7 @@ INSERT INTO Estados_Cuotas (descripcion) VALUES
 ('Vencida'),
 ('Reprogramada');
 
--- Estados de pr√©stamos
+-- Estados de prÈstamos
 INSERT INTO Estados_Prestamos (descripcion) VALUES
 ('Activo'),
 ('Finalizado'),
@@ -161,31 +161,31 @@ INSERT INTO MediosDePago (descripcion, moneda) VALUES
 ('Efectivo', 'USD'),
 ('Transferencia', 'USD');
 
--- Sistemas de amortizaci√≥n
+-- Sistemas de amortizaciÛn
 INSERT INTO SistAmortizacion (descripcion) VALUES
 ('Personal'),
-('Franc√©s'),
-('Alem√°n');
+('FrancÈs'),
+('Alem·n');
 GO
 
 -- Prestamista (FALTANTE)
 INSERT INTO Prestamistas (nombre, apellido, esActivo, correo, usuario, contraseniaHash)
 VALUES
-('Juan', 'P√©rez', 1, 'jperez@mail.com', 'admin', 'hash1234');
+('Juan', 'PÈrez', 1, 'jperez@mail.com', 'admin', 'hash1234');
 
 -- Garante
 INSERT INTO Garantes (nombre, apellido, telefono, domicilio, correo, esActivo)
 VALUES
-('Laura', 'Mart√≠nez', '3519988776', 'San Mart√≠n 890', 'lmartinez@mail.com', 1);
+('Laura', 'MartÌnez', '3519988776', 'San MartÌn 890', 'lmartinez@mail.com', 1);
 
 -- Prestatario
 INSERT INTO Prestatarios (
     DNI, nombre, apellido, telefono, domicilio, correo, esActivo, idGarante
 )
 VALUES
-(28999888, 'Diego', 'Fern√°ndez', '3514455667', 'Bv. Illia 1200', 'dfernandez@mail.com', 1, 1);
+(28999888, 'Diego', 'Fern·ndez', '3514455667', 'Bv. Illia 1200', 'dfernandez@mail.com', 1, 1);
 
--- Pr√©stamo 1
+-- PrÈstamo 1
 INSERT INTO Prestamos (
     idPrestamista,
     DNI_Prestatario,
@@ -199,95 +199,27 @@ INSERT INTO Prestamos (
     Fec_1erVto,
     idSistAmortizacion
 )
-VALUES (
-    1,
-    28999888,
-    150000.00,
-    45000.00,  -- SaldoRestante simulado
-    3,
-    1,              -- Activo
-    25.00,
-    '2024-08-15',
-    '2024-05-15',
-    '2024-06-15',
-    1               -- Personal
-);
-
--- Pr√©stamo 2 (activo)
-INSERT INTO Prestamos (
-    idPrestamista,
-    DNI_Prestatario,
-    MontoOtorgado,
-    SaldoRestante,
-    Cantidad_ctas,
-    idEstado,
-    tasaInteres,
-    fechaFinEstimada,
-    fechaOtorgamiento,
-    Fec_1erVto,
-    idSistAmortizacion
-)
-VALUES (
-    1,
-    28999888,
-    150000.00,
-    95000.00,  -- SaldoRestante simulado
-    3,
-    1,              -- Activo
-    25.00,
-    '2024-08-15',
-    '2024-05-15',
-    '2024-06-15',
-    1               -- Personal
-);
-
--- Cuotas del pr√©stamo 1
-INSERT INTO Cuotas (idPrestamo, nroCuota, Monto, Fec_Vto, idEstado, Interes, SaldoPendiente)
 VALUES
-(1, 1, 40000.00, '2024-04-10', 3, 5000.00, 0),
-(1, 2, 35000.00, '2024-05-10', 3, 4000.00, 0),
-(1, 3, 30000.00, '2024-06-10', 3, 3000.00, 0);
-
--- Cuotas del pr√©stamo 2
-INSERT INTO Cuotas (idPrestamo, nroCuota, Monto, Fec_Vto, idEstado, Interes, SaldoPendiente)
-VALUES
--- cuota pagada
-(2, 1, 55000.00, '2024-06-15', 3, 7000.00, 0),
-
--- cuota vencida
-(2, 2, 50000.00, '2024-07-15', 4, 6000.00, 50000.00),
-
--- cuota pendiente
-(2, 3, 45000.00, '2024-08-15', 1, 5000.00, 45000.00);
-
--- Pagos del pr√©stamo 1
-INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, saldo, Estado, Monto, Observaciones)
-VALUES
-(1, '2024-04-09', 1, 0, 'Registrado', 40000.00, 'Pago anticipado'),
-(2, '2024-05-10', 2, 0, 'Registrado', 35000.00, 'Pago en efectivo'),
-(3, '2024-06-10', 1, 0, 'Registrado', 30000.00, 'Pago final del pr√©stamo');
-
--- Pago del pr√©stamo 2
-INSERT INTO Pagos (idCuota, Fec_Pago, idMedioPago, saldo, Estado, Monto, Observaciones)
-VALUES
-(4, '2024-06-14', 1, 0, 'Registrado', 55000.00, 'Pago en t√©rmino');
+(1, 28999888, 50000, 50000, 12, 1, 5, '2024-12-31', '2024-01-01', '2024-02-01', 2);
 GO
 
--- Actualizar Garantes
-IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Garantes]') AND name = 'Dni')
+-- ModificaciÛn para soportar multimoneda (Path A)
+ALTER TABLE Prestamos ADD Moneda VARCHAR(3) NOT NULL DEFAULT 'ARS';
+GO
+
+
+-- Modificaciones para soportar Multimoneda (Path A)
+
+-- 1. Agregar columna Moneda a la tabla Prestamos (si no existe)
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Prestamos]') AND name = 'Moneda')
 BEGIN
-    ALTER TABLE Garantes ADD Dni VARCHAR(20) NULL;
+    ALTER TABLE Prestamos ADD Moneda VARCHAR(3) NOT NULL DEFAULT 'ARS';
 END
 GO
 
--- Actualizar Pagos
-IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Pagos]') AND name = 'Descuento')
+-- 2. Agregar columna Cotizacion a la tabla Pagos (si no existe)
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Pagos]') AND name = 'Cotizacion')
 BEGIN
-    ALTER TABLE Pagos ADD Descuento DECIMAL(12,2) NOT NULL DEFAULT 0;
-END
-
-IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Pagos]') AND name = 'Recargo')
-BEGIN
-    ALTER TABLE Pagos ADD Recargo DECIMAL(12,2) NOT NULL DEFAULT 0;
+    ALTER TABLE Pagos ADD Cotizacion DECIMAL(12,2) NOT NULL DEFAULT 1;
 END
 GO

@@ -1,20 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getLoansByFilter, archiveLoan, deleteLoan } from '../services/loanService';
-import { Plus, Search, Filter, ArrowUpRight, AlertCircle, X, Download, Archive, Trash2, Info, FileSpreadsheet } from 'lucide-react';
+import { Plus, Search, Filter, ArrowUpRight, AlertCircle, X, Download, Archive, Trash2, Info, FileSpreadsheet, Edit2, Save } from 'lucide-react';
 import { exportToPDF } from '../utils/pdfGenerator';
 import { exportToExcel } from '../utils/excelGenerator';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { LoanStatus, getLoanStatusLabel } from '../types/enums';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useToast } from '../context/ToastContext';
+import { useLoanAliases } from '../hooks/useLoanAliases';
 
 export function Loans() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const { addToast } = useToast();
+  const { getAlias, setAlias } = useLoanAliases();
   const [showFilters, setShowFilters] = useState(false);
+  const [editingAliasId, setEditingAliasId] = useState<number | null>(null);
+  const [editingAliasValue, setEditingAliasValue] = useState('');
+  
   const [filters, setFilters] = useState({
     nombre: '',
     estado: 0,
@@ -78,6 +83,25 @@ export function Loans() {
       addToast('Error al eliminar el préstamo', 'error');
     }
   });
+
+  const handleStartEditAlias = (loanId: number, currentAlias: string) => {
+    setEditingAliasId(loanId);
+    setEditingAliasValue(currentAlias);
+  };
+
+  const handleSaveAlias = (loanId: number) => {
+    if (editingAliasValue.trim()) {
+      setAlias(loanId, editingAliasValue.trim());
+      addToast('Alias guardado', 'success');
+    } else {
+      // If empty, maybe remove it? Or just keep it empty? 
+      // Let's allow empty to clear it effectively if the user wants.
+      // But useLoanAliases removeAlias might be better if we had it exposed.
+      // For now setAlias with empty string works.
+      setAlias(loanId, '');
+    }
+    setEditingAliasId(null);
+  };
 
   const handleDelete = (id: number) => {
     setConfirmModal({ isOpen: true, id });
@@ -316,6 +340,7 @@ export function Loans() {
             <thead className="bg-surfaceHighlight text-muted">
               <tr>
                 <th className="px-6 py-3 font-medium">ID</th>
+                <th className="px-6 py-3 font-medium">Alias</th>
                 <th className="px-6 py-3 font-medium">Cliente</th>
                 <th className="px-6 py-3 font-medium">Monto</th>
                 <th className="px-6 py-3 font-medium">Tasa</th>
@@ -328,6 +353,47 @@ export function Loans() {
               {loans?.map((loan) => (
                 <tr key={loan.idPrestamo} className="hover:bg-surfaceHighlight/50 transition-colors">
                   <td className="px-6 py-4 font-medium text-main">#{loan.idPrestamo}</td>
+                  <td className="px-6 py-4 text-muted italic">
+                    {editingAliasId === loan.idPrestamo ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={editingAliasValue}
+                          onChange={(e) => setEditingAliasValue(e.target.value)}
+                          className="w-24 bg-surface/50 border border-border rounded px-2 py-1 text-xs text-main"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleSaveAlias(loan.idPrestamo!);
+                            if (e.key === 'Escape') setEditingAliasId(null);
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSaveAlias(loan.idPrestamo!);
+                          }}
+                          className="text-green-500 hover:bg-green-500/10 p-1 rounded"
+                        >
+                          <Save className="h-3 w-3" />
+                        </button>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingAliasId(null);
+                          }}
+                          className="text-red-500 hover:bg-red-500/10 p-1 rounded"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 group cursor-pointer" onClick={() => handleStartEditAlias(loan.idPrestamo!, getAlias(loan.idPrestamo || 0))}>
+                        <span>{getAlias(loan.idPrestamo || 0) || '-'}</span>
+                        <Edit2 className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary-500" />
+                      </div>
+                    )}
+                  </td>
                   <td className="px-6 py-4">
                     <button
                       onClick={() => navigate(`/borrowers/${loan.dniPrestatario}`)}
@@ -373,7 +439,7 @@ export function Loans() {
               ))}
               {loans?.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-muted">
+                  <td colSpan={8} className="px-6 py-8 text-center text-muted">
                     No se encontraron préstamos con los filtros seleccionados
                   </td>
                 </tr>

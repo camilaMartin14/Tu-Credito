@@ -12,6 +12,8 @@ namespace TuCredito.DTOs;
 
         public decimal Descuento { get; set; }
         public decimal Recargo { get; set; }
+        
+        public decimal Cotizacion { get; set; } = 1;
 
         [Required(ErrorMessage = "El IdMedioPago es obligatorio")]
         public int IdMedioPago { get; set; }

@@ -10,13 +10,16 @@ import { formatCurrency, formatDate } from '../utils/formatters';
 import { LoanStatus } from '../types/enums';
 
 export function Calculator() {
-  const { register, handleSubmit, getValues } = useForm<SimulacionPrestamoEntryDTO>({
+  const { register, handleSubmit, getValues, watch } = useForm<SimulacionPrestamoEntryDTO>({
     defaultValues: {
-      idSistAmortizacion: 1
+      idSistAmortizacion: 1,
+      moneda: 'ARS'
     }
   });
   const [result, setResult] = useState<any>(null);
   const [simulationParams, setSimulationParams] = useState<SimulacionPrestamoEntryDTO | null>(null);
+  
+  const selectedCurrency = watch('moneda');
   const { addToast } = useToast();
   const queryClient = useQueryClient();
 
@@ -71,7 +74,8 @@ export function Calculator() {
         interesMensual: Number(data.interesMensual),
         cantidadCuotas: Number(data.cantidadCuotas),
         fechaInicio: new Date().toISOString(),
-        idSistAmortizacion: Number(data.idSistAmortizacion)
+        idSistAmortizacion: Number(data.idSistAmortizacion),
+        moneda: data.moneda
     };
     setSimulationParams(payload);
     mutation.mutate(payload);
@@ -90,6 +94,7 @@ export function Calculator() {
       fechaOtorgamiento: new Date(creationData.fechaOtorgamiento).toISOString(),
       fec1erVto: new Date(creationData.fec1erVto).toISOString(),
       idSistAmortizacion: simulationParams.idSistAmortizacion || 1, 
+      moneda: simulationParams.moneda || 'ARS'
     });
   };
 
@@ -126,6 +131,20 @@ export function Calculator() {
         {/* Formulario */}
         <div className="lg:col-span-4 glass-panel p-6 rounded-2xl border border-border h-fit">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-muted mb-1">Moneda</label>
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
+                <select
+                  {...register('moneda')}
+                  className="w-full bg-surface/50 border border-border rounded-lg pl-10 pr-4 py-2.5 text-main focus:outline-none focus:border-primary-500 transition-colors appearance-none"
+                >
+                  <option value="ARS">Peso Argentino (ARS)</option>
+                  <option value="USD">Dólar Estadounidense (USD)</option>
+                </select>
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-muted mb-1">Monto del Préstamo</label>
               <div className="relative">
@@ -236,19 +255,19 @@ export function Calculator() {
                   <div className="p-4 rounded-xl bg-surfaceHighlight/50 border border-border">
                      <p className="text-xs text-muted mb-1">Cuota Promedio</p>
                      <p className="text-lg font-bold text-primary-400">
-                        {formatCurrency(result.detalleCuotas.reduce((acc: number, curr: any) => acc + curr.monto, 0) / result.detalleCuotas.length)}
+                        {formatCurrency(result.detalleCuotas.reduce((acc: number, curr: any) => acc + curr.monto, 0) / result.detalleCuotas.length, simulationParams?.moneda)}
                      </p>
                   </div>
                   <div className="p-4 rounded-xl bg-surfaceHighlight/50 border border-border">
                      <p className="text-xs text-muted mb-1">Total Intereses</p>
                      <p className="text-lg font-bold text-accent-pink">
-                        {formatCurrency(result.detalleCuotas.reduce((acc: number, curr: any) => acc + curr.interes, 0))}
+                        {formatCurrency(result.detalleCuotas.reduce((acc: number, curr: any) => acc + curr.interes, 0), simulationParams?.moneda)}
                      </p>
                   </div>
                    <div className="p-4 rounded-xl bg-surfaceHighlight/50 border border-border">
                      <p className="text-xs text-muted mb-1">Total a Pagar</p>
                      <p className="text-lg font-bold text-main">
-                        {formatCurrency(result.detalleCuotas.reduce((acc: number, curr: any) => acc + curr.monto, 0))}
+                        {formatCurrency(result.detalleCuotas.reduce((acc: number, curr: any) => acc + curr.monto, 0), simulationParams?.moneda)}
                      </p>
                   </div>
                </div>
@@ -269,11 +288,11 @@ export function Calculator() {
                     {result.detalleCuotas.map((cuota: any, index: number) => (
                       <tr key={index} className="hover:bg-surfaceHighlight/30">
                         <td className="px-4 py-2.5 text-muted">{cuota.numeroCuota}</td>
-                        <td className="px-4 py-2.5 font-medium text-main">{formatCurrency(cuota.monto)}</td>
+                        <td className="px-4 py-2.5 font-medium text-main">{formatCurrency(cuota.monto, simulationParams?.moneda)}</td>
                         <td className="px-4 py-2.5 text-muted">{formatDate(cuota.fechaVencimiento)}</td>
-                        <td className="px-4 py-2.5 text-accent-pink">{formatCurrency(cuota.interes)}</td>
-                        <td className="px-4 py-2.5 text-green-400">{formatCurrency(cuota.capital)}</td>
-                        <td className="px-4 py-2.5 text-muted">{formatCurrency(Math.abs(cuota.saldoRestante))}</td>
+                        <td className="px-4 py-2.5 text-accent-pink">{formatCurrency(cuota.interes, simulationParams?.moneda)}</td>
+                        <td className="px-4 py-2.5 text-green-400">{formatCurrency(cuota.capital, simulationParams?.moneda)}</td>
+                        <td className="px-4 py-2.5 text-muted">{formatCurrency(Math.abs(cuota.saldoRestante), simulationParams?.moneda)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -387,7 +406,7 @@ export function Calculator() {
                     <div className="grid grid-cols-3 gap-4 text-sm">
                         <div>
                             <span className="text-muted block">Monto</span>
-                            <span className="text-main font-medium">{formatCurrency(simulationParams?.montoPrestamo || 0)}</span>
+                            <span className="text-main font-medium">{formatCurrency(simulationParams?.montoPrestamo || 0, simulationParams?.moneda)}</span>
                         </div>
                          <div>
                             <span className="text-muted block">Tasa</span>

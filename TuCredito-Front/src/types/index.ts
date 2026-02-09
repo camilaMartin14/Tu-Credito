@@ -49,6 +49,7 @@ export interface PrestamoDTO {
   fec1erVto: string;
   idSistAmortizacion: number; // 1: Francés, etc.
   tasaInteres: number;
+  moneda: string;
 }
 
 export interface PagoInputDTO {
@@ -58,6 +59,7 @@ export interface PagoInputDTO {
   descuento: number;
   recargo: number;
   idMedioPago: number;
+  cotizacion?: number;
 }
 
 export interface PagoOutputDTO {
@@ -90,6 +92,7 @@ export interface SimulacionPrestamoEntryDTO {
   fechaInicio?: string;
   redondeoMultiplo?: number;
   idSistAmortizacion?: number;
+  moneda?: string;
 }
 
 export interface CuotaSimuladaDTO {

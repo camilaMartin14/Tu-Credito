@@ -27,6 +27,7 @@ export function Payments() {
   const [isNewPaymentModalOpen, setIsNewPaymentModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [selectedInstallment, setSelectedInstallment] = useState<Cuota | null>(null);
+  const [selectedCurrency, setSelectedCurrency] = useState<string>('ARS');
 
   const { data: payments, isLoading, error } = useQuery({
     queryKey: ['payments', searchTerm, selectedMonth],
@@ -294,8 +295,9 @@ export function Payments() {
       <NewPaymentModal
         isOpen={isNewPaymentModalOpen}
         onClose={() => setIsNewPaymentModalOpen(false)}
-        onInstallmentSelect={(installment) => {
+        onInstallmentSelect={(installment, currency) => {
           setSelectedInstallment(installment);
+          setSelectedCurrency(currency);
           setIsNewPaymentModalOpen(false);
           setIsPaymentModalOpen(true);
         }}
@@ -308,6 +310,7 @@ export function Payments() {
           setSelectedInstallment(null);
         }}
         installment={selectedInstallment}
+        currency={selectedCurrency}
       />
     </div>
   );

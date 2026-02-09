@@ -129,7 +129,7 @@ export function Settings() {
            <div className="flex items-center justify-between py-2">
               <div>
                 <p className="font-medium text-main">Información Personal</p>
-                <p className="text-sm text-muted">Actualiza tu foto y datos personales</p>
+                <p className="text-sm text-muted">Actualiza tus datos personales</p>
               </div>
               <button 
                 onClick={() => setIsEditProfileOpen(true)}

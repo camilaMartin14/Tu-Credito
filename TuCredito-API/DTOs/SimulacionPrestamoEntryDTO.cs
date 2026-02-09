@@ -20,4 +20,6 @@ namespace TuCredito.Controllers;
         
         // 1: Directo (Flat), 2: Francés, 3: Alemán, 4: Americano
         public int IdSistAmortizacion { get; set; } = 1; 
+
+        public string Moneda { get; set; } = "ARS";
     }

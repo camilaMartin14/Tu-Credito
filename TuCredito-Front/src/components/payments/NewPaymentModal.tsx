@@ -11,7 +11,7 @@ import { formatCurrency, formatDate } from '../../utils/formatters';
 interface NewPaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onInstallmentSelect: (installment: Cuota) => void;
+  onInstallmentSelect: (installment: Cuota, currency: string) => void;
 }
 
 export function NewPaymentModal({ isOpen, onClose, onInstallmentSelect }: NewPaymentModalProps) {
@@ -160,7 +160,7 @@ export function NewPaymentModal({ isOpen, onClose, onInstallmentSelect }: NewPay
                         <div>
                           <p className="font-medium text-main">Préstamo #{loan.idPrestamo}</p>
                           <p className="text-xs text-muted">
-                            Monto: {formatCurrency(loan.montoOtorgado)} • {formatDate(loan.fechaOtorgamiento)}
+                            Monto: {formatCurrency(loan.montoOtorgado, loan.moneda)} • {formatDate(loan.fechaOtorgamiento)}
                           </p>
                         </div>
                       </div>
@@ -179,7 +179,7 @@ export function NewPaymentModal({ isOpen, onClose, onInstallmentSelect }: NewPay
                 <div>
                   <p className="text-sm font-medium text-main">Préstamo #{selectedLoan.idPrestamo}</p>
                   <p className="text-xs text-blue-400/80">
-                    {formatCurrency(selectedLoan.montoOtorgado)} - {formatDate(selectedLoan.fechaOtorgamiento)}
+                    {formatCurrency(selectedLoan.montoOtorgado, selectedLoan.moneda)} - {formatDate(selectedLoan.fechaOtorgamiento)}
                   </p>
                 </div>
               </div>
@@ -195,7 +195,7 @@ export function NewPaymentModal({ isOpen, onClose, onInstallmentSelect }: NewPay
                   {pendingInstallments?.map((installment) => (
                     <button
                       key={installment.idCuota}
-                      onClick={() => onInstallmentSelect(installment)}
+                      onClick={() => onInstallmentSelect(installment, selectedLoan.moneda)}
                       className="flex items-center justify-between p-3 rounded-lg border border-border bg-surfaceHighlight/50 hover:bg-surfaceHighlight hover:border-green-500/50 transition-all group text-left"
                     >
                       <div className="flex items-center gap-3">

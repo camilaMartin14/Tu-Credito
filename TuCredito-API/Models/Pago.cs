@@ -25,6 +25,8 @@ public partial class Pago
 
     public decimal Recargo { get; set; }
 
+    public decimal Cotizacion { get; set; }
+
     public string Observaciones { get; set; }
 
     public virtual Cuota IdCuotaNavigation { get; set; }
