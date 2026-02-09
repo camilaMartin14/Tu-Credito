@@ -6,17 +6,17 @@ import { PrestatarioDTO } from '../../types';
 import { useEffect } from 'react';
 
 const borrowerSchema = z.object({
-  dni: z.string().min(7, "DNI inválido").regex(/^\d+$/, "Solo se permiten números"),
-  nombre: z.string().min(2, "Nombre obligatorio"),
-  apellido: z.string().min(2, "Apellido obligatorio"),
-  correo: z.string().email("Email inválido").or(z.literal('')),
-  telefono: z.string().min(6, "Teléfono inválido").or(z.literal('')),
-  domicilio: z.string().min(5, "Domicilio muy corto").or(z.literal('')),
+  dni: z.string().min(7, "El DNI debe tener al menos 7 números").regex(/^\d+$/, "Solo se permiten números"),
+  nombre: z.string().min(2, "El nombre es obligatorio"),
+  apellido: z.string().min(2, "El apellido es obligatorio"),
+  correo: z.string().email("El formato del email no es válido").or(z.literal('')),
+  telefono: z.string().min(6, "El teléfono debe tener al menos 6 números").or(z.literal('')),
+  domicilio: z.string().min(5, "La dirección es demasiado corta").or(z.literal('')),
   garanteNombre: z.string().optional(),
   garanteApellido: z.string().optional(),
   garanteDni: z.string().regex(/^\d*$/, "Solo se permiten números").optional().or(z.literal('')),
   garanteTelefono: z.string().optional(),
-  garanteCorreo: z.string().email("Email inválido").optional().or(z.literal('')),
+  garanteCorreo: z.string().email("El formato del email no es válido").optional().or(z.literal('')),
   garanteDomicilio: z.string().optional(),
 });
 

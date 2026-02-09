@@ -16,14 +16,14 @@ import { useToast } from '../../context/ToastContext';
 import { LoanStatus } from '../../types/enums';
 
 const loanSchema = z.object({
-  dniPrestatario: z.string().min(7, "DNI inválido"),
-  nombrePrestatario: z.string().min(3, "El nombre es obligatorio"),
-  montoOtorgado: z.number().min(1000, "El monto mínimo es 1000"),
-  cantidadCtas: z.number().min(1, "Mínimo 1 cuota"),
-  tasaInteres: z.number().min(0, "La tasa no puede ser negativa"),
+  dniPrestatario: z.string().min(7, "El DNI debe tener al menos 7 números"),
+  nombrePrestatario: z.string().min(3, "El nombre completo es obligatorio"),
+  montoOtorgado: z.number().refine((val) => !Number.isNaN(val), { message: "El monto es obligatorio" }).refine((val) => val >= 1000, { message: "El monto mínimo es $1000" }),
+  cantidadCtas: z.number().refine((val) => !Number.isNaN(val), { message: "La cantidad de cuotas es obligatoria" }).refine((val) => val >= 1, { message: "Debe haber al menos 1 cuota" }),
+  tasaInteres: z.number().refine((val) => !Number.isNaN(val), { message: "La tasa de interés es obligatoria" }).refine((val) => val >= 0, { message: "La tasa no puede ser negativa" }),
   idSistAmortizacion: z.number(),
-  fechaOtorgamiento: z.string(), // ISO date
-  fec1erVto: z.string(), // ISO date
+  fechaOtorgamiento: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Fecha inválida" }),
+  fec1erVto: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Fecha inválida" }),
 });
 
 type LoanFormData = z.infer<typeof loanSchema>;
@@ -206,6 +206,7 @@ export function LoanForm() {
                 {...register('tasaInteres', { valueAsNumber: true })}
                 className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
               />
+              {errors.tasaInteres && <p className="mt-1 text-xs text-red-400">{errors.tasaInteres.message}</p>}
             </div>
           </div>
 
@@ -217,6 +218,7 @@ export function LoanForm() {
                 {...register('cantidadCtas', { valueAsNumber: true })}
                 className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
               />
+              {errors.cantidadCtas && <p className="mt-1 text-xs text-red-400">{errors.cantidadCtas.message}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-muted">Sistema</label>
@@ -240,6 +242,7 @@ export function LoanForm() {
                 {...register('fechaOtorgamiento')}
                 className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
               />
+              {errors.fechaOtorgamiento && <p className="mt-1 text-xs text-red-400">{errors.fechaOtorgamiento.message}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-muted">Primer Vencimiento</label>
@@ -248,6 +251,7 @@ export function LoanForm() {
                 {...register('fec1erVto')}
                 className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
               />
+              {errors.fec1erVto && <p className="mt-1 text-xs text-red-400">{errors.fec1erVto.message}</p>}
             </div>
           </div>
 

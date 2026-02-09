@@ -481,6 +481,15 @@ export const mockAdapter = async (config: InternalAxiosRequestConfig): Promise<A
         else if (url?.includes('/dashboard') && method === 'get') {
           // Generic empty/mock response for other dashboard widgets to prevent crashes
           if (url.includes('cash-flow')) {
+            // Proyección de próximas 4 semanas
+            responseData = [
+              { etiqueta: 'Semana 1', valor: Math.floor(Math.random() * 20000) + 15000 },
+              { etiqueta: 'Semana 2', valor: Math.floor(Math.random() * 25000) + 18000 },
+              { etiqueta: 'Semana 3', valor: Math.floor(Math.random() * 22000) + 16000 },
+              { etiqueta: 'Semana 4', valor: Math.floor(Math.random() * 30000) + 20000 }
+            ];
+          }
+          else if (url.includes('monthly-collections')) {
             const last6Months = Array.from({ length: 6 }, (_, i) => {
               const d = new Date();
               d.setMonth(d.getMonth() - (5 - i));
