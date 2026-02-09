@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useAuth } from '../context/AuthContext';
 import { login as loginService } from '../services/authService';
 import { useNavigate, Link } from 'react-router-dom';
-import { Loader2, Eye, EyeOff, ShieldCheck, PieChart } from 'lucide-react';
+import { Loader2, Eye, EyeOff, ShieldCheck, PieChart, Download } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 
 export function Login() {
@@ -163,6 +163,18 @@ export function Login() {
                    Regístrate
                  </Link>
               </p>
+           </div>
+
+           <div className="mt-8 pt-6 border-t border-border/40">
+              <a 
+                href="https://expo.dev/artifacts/eas/h74tF7oTb3QqH6M5AgDU86.apk"
+                className="flex items-center justify-center gap-3 w-full p-3 rounded-xl border-2 border-dashed border-primary-200 bg-primary-50/30 text-primary-700 font-semibold hover:bg-primary-50 hover:border-primary-300 transition-all group"
+              >
+                <div className="bg-primary-100 p-2 rounded-lg group-hover:bg-primary-200 transition-colors">
+                  <Download className="w-5 h-5 text-primary-600" />
+                </div>
+                <span>Descargar App Android</span>
+              </a>
            </div>
         </div>
       </div>
