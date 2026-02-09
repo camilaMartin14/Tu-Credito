@@ -1,12 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getOfficialDollar } from '../../services/dollarService';
-import { User, Moon, Sun, LogOut } from 'lucide-react';
+import { User, Moon, Sun, LogOut, Menu } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { useAuth } from '../../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 
-export function Header() {
+import { Breadcrumbs } from '../ui/Breadcrumbs';
+
+interface HeaderProps {
+  onMenuClick?: () => void;
+}
+
+export function Header({ onMenuClick }: HeaderProps) {
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -38,12 +44,20 @@ export function Header() {
   };
 
   return (
-    <header className="flex h-20 items-center justify-between px-8 py-4 relative z-20">
-      <div className="flex items-center gap-6">
-        {/* Breadcrumb or Page Title placeholder could go here */}
+    <header className="flex h-20 items-center justify-between px-4 md:px-8 py-4 relative z-20">
+      <div className="flex items-center gap-4">
+        <button 
+            onClick={onMenuClick}
+            className="md:hidden p-2 -ml-2 text-muted hover:text-main rounded-lg hover:bg-surfaceHighlight transition-colors"
+        >
+            <Menu className="h-6 w-6" />
+        </button>
+        <div className="hidden md:block">
+            <Breadcrumbs />
+        </div>
       </div>
 
-      <div className="flex items-center space-x-6">
+      <div className="flex items-center space-x-3 md:space-x-6">
         {dollar && (
           <div className="hidden md:flex items-center space-x-2 rounded-full bg-surfaceHighlight border border-border px-4 py-1.5 text-xs font-medium text-main">
             <span className="text-secondary-400">US$ Oficial:</span>

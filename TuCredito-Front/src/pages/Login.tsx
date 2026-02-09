@@ -33,9 +33,19 @@ export function Login() {
   };
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
+    <div className="flex min-h-screen w-full bg-background relative">
+      {/* Mobile Background Image (Visible only on mobile) */}
+      <div className="absolute inset-0 lg:hidden z-0">
+        <img 
+          src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop" 
+          alt="Finance Building" 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-background/85 backdrop-blur-[2px]" />
+      </div>
+
       {/* Left Side - Image & Branding (Desktop Only) */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gray-900">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gray-900 z-10">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-900/90 via-gray-900/80 to-black/60 z-10" />
         <img 
           src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop" 
@@ -53,14 +63,14 @@ export function Login() {
 
           <div className="space-y-8 max-w-xl">
             <h1 className="text-5xl font-bold leading-tight">
-              Potencia tu <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-accent-pink">Negocio Financiero</span>
+              Organiza y Escala <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-accent-pink">Tu Cartera de Préstamos</span>
             </h1>
             <p className="text-lg text-gray-300 leading-relaxed">
-              Una suite completa para la gestión de préstamos, análisis de riesgo y toma de decisiones basada en datos reales.
+              La solución definitiva para gestionar créditos, controlar vencimientos y automatizar tu flujo de trabajo en un solo lugar.
             </p>
             
-            <div className="flex gap-4 pt-4">
+            <div className="flex justify-center gap-4 pt-4">
                <div className="flex items-center gap-2 text-sm font-medium text-gray-200 bg-white/10 px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
                   <ShieldCheck className="w-4 h-4 text-primary-400" /> Seguridad Bancaria
                </div>
@@ -77,14 +87,14 @@ export function Login() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="flex-1 flex items-center justify-center p-8 relative">
-         {/* Background elements for right side (subtle) */}
-         <div className="absolute top-0 right-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+      <div className="flex-1 flex items-center justify-center p-8 relative z-10">
+         {/* Background elements for right side (subtle) - Desktop only mainly, but keeps subtle glow */}
+         <div className="absolute top-0 right-0 w-full h-full overflow-hidden z-0 pointer-events-none opacity-50 lg:opacity-100">
             <div className="absolute top-[-10%] right-[-10%] w-[30%] h-[30%] bg-primary-500/5 rounded-full blur-[100px]" />
             <div className="absolute bottom-[-10%] left-[-10%] w-[20%] h-[20%] bg-accent-pink/5 rounded-full blur-[100px]" />
          </div>
 
-        <div className="w-full max-w-[400px] space-y-8 relative z-10">
+        <div className="w-full max-w-[400px] space-y-8 relative z-10 bg-surface/50 lg:bg-transparent p-6 lg:p-0 rounded-2xl lg:rounded-none border border-border/50 lg:border-none backdrop-blur-md lg:backdrop-blur-none shadow-xl lg:shadow-none">
           <div className="text-center lg:text-left space-y-2">
             <div className="lg:hidden mx-auto h-12 w-12 rounded-xl bg-gradient-to-tr from-primary-600 to-accent-pink flex items-center justify-center mb-6 shadow-lg shadow-primary-500/20">
                <span className="font-bold text-white text-2xl">T</span>
@@ -146,13 +156,13 @@ export function Login() {
           </form>
 
           <div className="text-center pt-2">
-             <p className="text-sm text-muted">
-                ¿Aún no tienes cuenta?{' '}
-                <Link to="/register" className="font-semibold text-primary-500 hover:text-primary-600 transition-colors">
-                  Solicitar acceso
-                </Link>
-             </p>
-          </div>
+              <p className="text-sm text-muted">
+                 ¿Aún no tienes cuenta?{' '}
+                 <Link to="/register" className="font-semibold text-primary-500 hover:text-primary-600 transition-colors">
+                   Regístrate
+                 </Link>
+              </p>
+           </div>
         </div>
       </div>
     </div>
