@@ -19,7 +19,7 @@ import { LoanStatus } from '../../types/enums';
 const loanSchema = z.object({
   dniPrestatario: z.string().min(7, "El DNI debe tener al menos 7 números"),
   nombrePrestatario: z.string().min(3, "El nombre completo es obligatorio"),
-  montoOtorgado: z.number().refine((val) => !Number.isNaN(val), { message: "El monto es obligatorio" }).refine((val) => val >= 1000, { message: "El monto mínimo es $1000" }),
+  montoOtorgado: z.number().refine((val) => !Number.isNaN(val), { message: "El monto es obligatorio" }).refine((val) => val >= 50, { message: "El monto debe ser mayor o igual a 50" }),
   cantidadCtas: z.number().refine((val) => !Number.isNaN(val), { message: "La cantidad de cuotas es obligatoria" }).refine((val) => val >= 1, { message: "Debe haber al menos 1 cuota" }),
   tasaInteres: z.number().refine((val) => !Number.isNaN(val), { message: "La tasa de interés es obligatoria" }).refine((val) => val >= 0, { message: "La tasa no puede ser negativa" }),
   idSistAmortizacion: z.number(),

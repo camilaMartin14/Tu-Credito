@@ -103,7 +103,7 @@ export function Loans() {
   const handleExport = () => {
     if (!loans) return;
 
-    const headers = ['ID', 'Cliente', 'Monto', 'Tasa %', 'Fecha', 'Estado'];
+    const headers = ['ID', 'Cliente', 'Monto', 'Tasa %', 'Fecha Otorgamiento', 'Estado'];
     const data = loans.map(loan => [
       loan.idPrestamo?.toString() || '-',
       loan.nombrePrestatario || '',
@@ -123,7 +123,7 @@ export function Loans() {
       Cliente: loan.nombrePrestatario || '',
       Monto: loan.montoOtorgado || 0,
       Tasa: loan.tasaInteres || 0,
-      Fecha: loan.fechaOtorgamiento ? new Date(loan.fechaOtorgamiento).toLocaleDateString() : '-',
+      'Fecha Otorgamiento': loan.fechaOtorgamiento ? new Date(loan.fechaOtorgamiento).toLocaleDateString() : '-',
       Estado: getLoanStatusLabel(loan.idEstado)
     }));
     exportToExcel(data, 'Reporte de Préstamos');

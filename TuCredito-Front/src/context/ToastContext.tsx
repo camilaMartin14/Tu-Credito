@@ -74,5 +74,5 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 }
 
 export const toast = {
-  success: (msg: string) => console.log('Toast not initialized', msg), // Placeholder until hook is used
+  success: (_msg: string) => {}, 
 };

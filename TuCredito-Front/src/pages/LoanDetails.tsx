@@ -3,11 +3,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getLoanById, getLoanSummary, deleteLoan } from '../services/loanService';
 import { getInstallments } from '../services/installmentService';
-import { ArrowLeft, Calendar, PieChart, AlertCircle, Clock, CreditCard, Trash2, Zap, Edit2, Save, X } from 'lucide-react';
+import { ArrowLeft, Calendar, PieChart, AlertCircle, Clock, CreditCard, Trash2, Zap, Edit2, Save, X, FileText } from 'lucide-react';
 import { Cuota } from '../types';
 import { LoanStatus, InstallmentStatus, getLoanStatusLabel, getInstallmentStatusLabel } from '../types/enums';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { formatCurrency, formatDate } from '../utils/formatters';
+import { exportLoanDetailPDF } from '../utils/pdfGenerator';
 import { PaymentModal } from '../components/payments/PaymentModal';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useToast } from '../context/ToastContext';
@@ -150,6 +151,15 @@ export function LoanDetails() {
         </div>
         
         <div className="flex items-center gap-4">
+          <button
+            onClick={() => loan && exportLoanDetailPDF(loan, summary, installments || [])}
+            className="flex items-center gap-2 px-4 py-2 bg-surfaceHighlight hover:bg-surfaceHighlight/80 text-main rounded-lg transition-colors border border-border"
+            title="Exportar Detalle PDF"
+          >
+            <FileText className="h-4 w-4" />
+            <span className="hidden sm:inline">Exportar</span>
+          </button>
+
           {(loan.idEstado === LoanStatus.Active && lastPendingInstallment) && (
             <button
               onClick={() => {

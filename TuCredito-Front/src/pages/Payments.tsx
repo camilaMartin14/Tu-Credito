@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getPayments, getPaymentsByFilter, updatePaymentStatus } from '../services/paymentService';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Search, Filter, Download, AlertCircle, CheckCircle2, X, Ban, Plus, Info, FileSpreadsheet } from 'lucide-react';
+import { Search, Filter, Download, AlertCircle, CheckCircle2, X, Ban, Plus, Info, FileSpreadsheet, FileText } from 'lucide-react';
 import { PaymentMethod, getPaymentMethodLabel } from '../types/enums';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import { StatusBadge } from '../components/ui/StatusBadge';
-import { exportToPDF } from '../utils/pdfGenerator';
+import { exportToPDF, exportPaymentVoucherPDF } from '../utils/pdfGenerator';
 import { exportToExcel } from '../utils/excelGenerator';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useToast } from '../context/ToastContext';
@@ -263,15 +263,25 @@ export function Payments() {
                      </StatusBadge>
                   </td>
                   <td className="px-6 py-4">
-                    {payment.estado !== 'Anulado' && (
+                    <div className="flex items-center gap-2">
                       <button
-                        onClick={() => handleUpdateStatus(payment.idPago, 'Anulado')}
-                        className="text-red-400 hover:text-red-300 hover:bg-red-400/10 p-1.5 rounded-lg transition-colors"
-                        title="Anular Pago"
+                        onClick={() => exportPaymentVoucherPDF(payment)}
+                        className="text-primary-400 hover:text-primary-300 hover:bg-primary-400/10 p-1.5 rounded-lg transition-colors"
+                        title="Ver Comprobante"
                       >
-                        <Ban className="h-4 w-4" />
+                        <FileText className="h-4 w-4" />
                       </button>
-                    )}
+
+                      {payment.estado !== 'Anulado' && (
+                        <button
+                          onClick={() => handleUpdateStatus(payment.idPago, 'Anulado')}
+                          className="text-red-400 hover:text-red-300 hover:bg-red-400/10 p-1.5 rounded-lg transition-colors"
+                          title="Anular Pago"
+                        >
+                          <Ban className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

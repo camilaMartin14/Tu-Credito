@@ -7,14 +7,19 @@ namespace TuCredito.Services.Implementations;
     public class DashboardService : IDashboardService
     {
         private readonly TuCreditoContext _context;
+        private readonly ICuotaService _cuotaService;
 
-        public DashboardService(TuCreditoContext context)
+        public DashboardService(TuCreditoContext context, ICuotaService cuotaService)
         {
             _context = context;
+            _cuotaService = cuotaService;
         }
 
         public async Task<DashboardKpisDTO> GetKpisAsync(DateTime? from = null, DateTime? to = null)
         {
+            // Actualizar estados de cuotas vencidas antes de calcular KPIs
+            await _cuotaService.ActualizarCuotasVencidas();
+
             var now = DateTime.Now;
             
             bool hasFilter = from.HasValue || to.HasValue;

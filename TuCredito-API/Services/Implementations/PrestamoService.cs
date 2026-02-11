@@ -43,7 +43,10 @@ namespace TuCredito.Services.Implementations
         {
             if (id <= 0) throw new ArgumentException("ID inválido");
 
-            var prestamo = await _context.Prestamos.FindAsync(id);
+            var prestamo = await _context.Prestamos
+                .Include(p => p.DniPrestatarioNavigation)
+                .FirstOrDefaultAsync(p => p.IdPrestamo == id);
+
             if (prestamo == null) throw new Exception("Préstamo no encontrado");
 
             return _mapper.Map<PrestamoDTO>(prestamo);
