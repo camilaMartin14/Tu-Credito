@@ -50,7 +50,6 @@ public partial class TuCreditoContext : DbContext
             entity.Property(e => e.EntityName)
                 .IsRequired()
                 .HasMaxLength(100);
-            entity.Property(e => e.Timestamp).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.UserId).HasMaxLength(100);
         });
 
@@ -94,7 +93,6 @@ public partial class TuCreditoContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.FechaSubida)
-                .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.NombreOriginal)
                 .IsRequired()

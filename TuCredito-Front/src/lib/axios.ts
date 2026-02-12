@@ -10,7 +10,6 @@ const getBaseUrl = () => {
   if (isDev) return `http://${hostname}:${apiPort}/api`;
   
   const envUrl = import.meta.env.VITE_API_URL || PROD_API_URL;
-  // Ensure the URL ends with /api to avoid 404s if user forgets it in env var
   return envUrl.endsWith('/api') ? envUrl : `${envUrl.replace(/\/$/, '')}/api`;
 };
 

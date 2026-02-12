@@ -120,6 +120,12 @@ builder.Services.AddDbContext<TuCreditoContext>((sp, options) =>
         options.UseNpgsql(connectionString)
                .AddInterceptors(interceptor);
     }
+    else if (dbProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase))
+    {
+        var sqliteConnection = connectionString ?? "Data Source=tucredito.db";
+        options.UseSqlite(sqliteConnection)
+               .AddInterceptors(interceptor);
+    }
     else
     {
         options.UseSqlServer(connectionString)
