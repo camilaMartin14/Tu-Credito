@@ -6,12 +6,16 @@ const apiPort = '5134';
 
 const PROD_API_URL = 'https://tu-credito-api.onrender.com/api';
 
-const baseURL = isDev 
-  ? `http://${hostname}:${apiPort}/api` 
-  : (import.meta.env.VITE_API_URL || PROD_API_URL);
+const getBaseUrl = () => {
+  if (isDev) return `http://${hostname}:${apiPort}/api`;
+  
+  const envUrl = import.meta.env.VITE_API_URL || PROD_API_URL;
+  // Ensure the URL ends with /api to avoid 404s if user forgets it in env var
+  return envUrl.endsWith('/api') ? envUrl : `${envUrl.replace(/\/$/, '')}/api`;
+};
 
 const api = axios.create({
-  baseURL,
+  baseURL: getBaseUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
