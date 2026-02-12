@@ -120,7 +120,7 @@ Tu-Credito/
 │   ├── Security/           # Autenticación y JWT
 │   └── Storage/            # Gestión de archivos (MinIO/Local)
 │
-├── tu-credito-front/       # 🎨 Frontend (React)
+├── tu-credito-front/       # 🖍️ Frontend (React)
 │   ├── src/
 │   │   ├── components/     # Componentes UI Reutilizables
 │   │   ├── pages/          # Vistas Principales
@@ -129,7 +129,7 @@ Tu-Credito/
 │   │   ├── context/        # Estado Global (Auth, Toast)
 │   │   └── types/          # Definiciones TypeScript
 │
-└── *.sql                   # 📜 Scripts de Base de Datos (en raíz)
+└── *.sql                   # Scripts de BD 
 ```
 
 ## 👩‍💻 Equipo de Desarrollo
