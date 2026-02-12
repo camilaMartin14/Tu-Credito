@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createBorrower } from '../services/borrowerService';
 import { PrestatarioDTO } from '../types';
-import { ArrowLeft, AlertTriangle } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { BorrowerForm, BorrowerFormData } from '../components/borrowers/BorrowerForm';
 import { useToast } from '../context/ToastContext';
 

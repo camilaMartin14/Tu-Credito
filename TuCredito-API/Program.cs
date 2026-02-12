@@ -67,7 +67,7 @@ builder.Services.AddCors(options =>
             policy.WithOrigins(frontendUrl, 
                              "https://tu-credito.vercel.app",
                              "https://tu-credito-front.vercel.app",
-                             "http://localhost:5173") // Localhost para pruebas
+                             "http://localhost:5173") 
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         }
@@ -115,17 +115,14 @@ builder.Services.AddDbContext<TuCreditoContext>((sp, options) =>
 
     var dbProvider = Environment.GetEnvironmentVariable("DB_PROVIDER");
 
-    // Si no se especifica proveedor, decidimos inteligentemente
     if (string.IsNullOrEmpty(dbProvider))
     {
-        // En producción (Render), si no se configuró nada explícito, usamos SQLite para el Sandbox
         if (!builder.Environment.IsDevelopment())
         {
              dbProvider = "Sqlite";
         }
         else
         {
-             // En desarrollo local, mantenemos SQL Server por defecto
              dbProvider = "SqlServer";
         }
     }
@@ -137,7 +134,6 @@ builder.Services.AddDbContext<TuCreditoContext>((sp, options) =>
     }
     else if (dbProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase))
     {
-        // Ignoramos la variable DATABASE_URL si estamos en modo Sqlite para evitar conflictos con URLs de Postgres en Render
         var sqliteConnection = "Data Source=tucredito.db";
         options.UseSqlite(sqliteConnection)
                .AddInterceptors(interceptor);

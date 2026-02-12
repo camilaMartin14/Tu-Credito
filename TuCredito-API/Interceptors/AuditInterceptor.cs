@@ -51,7 +51,6 @@ namespace TuCredito.Interceptors;
             {
                 var entityType = entry.Entity.GetType();
                 
-                // Filtrar solo entidades sensibles
                 if (!IsSensitiveEntity(entityType)) continue;
 
                 var auditEntry = new AuditLog
@@ -106,7 +105,6 @@ namespace TuCredito.Interceptors;
         private bool IsSensitiveEntity(Type type)
         {
             var name = type.Name;
-            // "Clientes"  es la entidad Prestatario
             return name == "Prestamo" || name == "Pago" || name == "Prestatario" || name == "Garante";
         }
 

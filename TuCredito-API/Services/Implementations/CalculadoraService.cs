@@ -99,11 +99,10 @@ public class CalculadoraService : ICalculadoraService
             var interes = Math.Round(saldo * (entry.InteresMensual / 100), 0, MidpointRounding.AwayFromZero);
             var capital = cuota - interes;
             
-            // Ajuste final
             if (k == n)
             {
                 capital = saldo;
-                cuota = capital + interes; // Puede variar levemente la última cuota
+                cuota = capital + interes; 
             }
 
             saldo -= capital;
@@ -119,7 +118,6 @@ public class CalculadoraService : ICalculadoraService
             });
         }
         
-        // Recalcular TotalAPagar basado en la suma real de cuotas (por ajustes de redondeo)
         resultado.TotalAPagar = resultado.DetalleCuotas.Sum(c => c.Monto);
         
         return resultado;
@@ -133,7 +131,7 @@ public class CalculadoraService : ICalculadoraService
         
         var resultado = new SimulacionPrestamoOutputDTO
         {
-            MontoCuota = 0, // Variable
+            MontoCuota = 0, 
             TotalAPagar = 0
         };
 
@@ -144,7 +142,7 @@ public class CalculadoraService : ICalculadoraService
 
             if (k == n)
             {
-                capital = saldo; // Ajuste final
+                capital = saldo; 
             }
 
             var cuota = capital + interes;

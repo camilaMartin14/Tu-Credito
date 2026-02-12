@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { getLoanById, getLoanSummary, deleteLoan } from '../services/loanService';
 import { getInstallments } from '../services/installmentService';
 import { ArrowLeft, Calendar, PieChart, AlertCircle, Clock, CreditCard, Trash2, Zap, Edit2, Save, X, FileText } from 'lucide-react';
@@ -17,7 +17,6 @@ import { useLoanAliases } from '../hooks/useLoanAliases';
 export function LoanDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { addToast } = useToast();
   const { getAlias, setAlias } = useLoanAliases();
   const loanId = parseInt(id || '0');

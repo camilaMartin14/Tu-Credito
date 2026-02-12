@@ -17,7 +17,6 @@ namespace TuCredito.Services.Implementations;
 
         public async Task<DashboardKpisDTO> GetKpisAsync(DateTime? from = null, DateTime? to = null)
         {
-            // Actualizar estados de cuotas vencidas antes de calcular KPIs
             await _cuotaService.ActualizarCuotasVencidas();
 
             var now = DateTime.Now;
@@ -44,7 +43,6 @@ namespace TuCredito.Services.Implementations;
             {
                 pagosQuery = pagosQuery.Where(p => p.FecPago >= startDate && p.FecPago <= endDate);
             }
-            // Si no hay filtro, tomamos TODO el histórico para que sea consistente con TotalPrestado
             
             var totalCobrado = await pagosQuery.SumAsync(p => p.Monto);
 

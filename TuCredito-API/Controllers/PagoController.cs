@@ -122,7 +122,7 @@ namespace TuCredito.Controllers;
         }
 
         [HttpPut("{id:int}/status")]
-        public async Task<IActionResult> UpdateEstado(int id, [FromBody] string estado) // eliminado x errores
+        public async Task<IActionResult> UpdateEstado(int id, [FromBody] string estado) 
         {
             if (string.IsNullOrWhiteSpace(estado)) 
                 return BadRequest(new { message = "El estado es obligatorio" });

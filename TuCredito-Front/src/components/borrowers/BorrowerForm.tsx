@@ -80,7 +80,7 @@ export function BorrowerForm({ initialData, onSubmit, isLoading, submitLabel }: 
               type="text"
               {...register('dni')}
               disabled={!!initialData} // DNI cannot be changed on edit
-              className={`w-full bg-surface/50 border border-border rounded-lg px-4 py-2.5 text-main placeholder-muted focus:outline-none focus:border-primary-500 transition-colors ${initialData ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`w-full bg-surface/50 border rounded-lg px-4 py-2.5 text-main placeholder-muted focus:outline-none transition-colors ${errors.dni ? 'border-red-500 focus:border-red-500' : 'border-border focus:border-primary-500'} ${initialData ? 'opacity-50 cursor-not-allowed' : ''}`}
               placeholder="12345678"
             />
             {errors.dni && <p className="text-xs text-red-400 mt-1">{errors.dni.message}</p>}
@@ -91,7 +91,7 @@ export function BorrowerForm({ initialData, onSubmit, isLoading, submitLabel }: 
                 <label className="block text-sm font-medium text-muted mb-1">Nombre *</label>
                 <input
                 {...register('nombre')}
-                className="w-full bg-surface/50 border border-border rounded-lg px-4 py-2.5 text-main placeholder-muted focus:outline-none focus:border-primary-500 transition-colors"
+                className={`w-full bg-surface/50 border rounded-lg px-4 py-2.5 text-main placeholder-muted focus:outline-none transition-colors ${errors.nombre ? 'border-red-500 focus:border-red-500' : 'border-border focus:border-primary-500'}`}
                 placeholder="Juan"
                 />
                 {errors.nombre && <p className="text-xs text-red-400 mt-1">{errors.nombre.message}</p>}
@@ -100,7 +100,7 @@ export function BorrowerForm({ initialData, onSubmit, isLoading, submitLabel }: 
                 <label className="block text-sm font-medium text-muted mb-1">Apellido *</label>
                 <input
                 {...register('apellido')}
-                className="w-full bg-surface/50 border border-border rounded-lg px-4 py-2.5 text-main placeholder-muted focus:outline-none focus:border-primary-500 transition-colors"
+                className={`w-full bg-surface/50 border rounded-lg px-4 py-2.5 text-main placeholder-muted focus:outline-none transition-colors ${errors.apellido ? 'border-red-500 focus:border-red-500' : 'border-border focus:border-primary-500'}`}
                 placeholder="Perez"
                 />
                 {errors.apellido && <p className="text-xs text-red-400 mt-1">{errors.apellido.message}</p>}
@@ -112,7 +112,7 @@ export function BorrowerForm({ initialData, onSubmit, isLoading, submitLabel }: 
             <input
               type="email"
               {...register('correo')}
-              className="w-full bg-surface/50 border border-border rounded-lg px-4 py-2.5 text-main placeholder-muted focus:outline-none focus:border-primary-500 transition-colors"
+              className={`w-full bg-surface/50 border rounded-lg px-4 py-2.5 text-main placeholder-muted focus:outline-none transition-colors ${errors.correo ? 'border-red-500 focus:border-red-500' : 'border-border focus:border-primary-500'}`}
               placeholder="juan@ejemplo.com"
             />
             {errors.correo && <p className="text-xs text-red-400 mt-1">{errors.correo.message}</p>}
@@ -122,7 +122,7 @@ export function BorrowerForm({ initialData, onSubmit, isLoading, submitLabel }: 
             <label className="block text-sm font-medium text-muted mb-1">Teléfono</label>
             <input
               {...register('telefono')}
-              className="w-full bg-surface/50 border border-border rounded-lg px-4 py-2.5 text-main placeholder-muted focus:outline-none focus:border-primary-500 transition-colors"
+              className={`w-full bg-surface/50 border rounded-lg px-4 py-2.5 text-main placeholder-muted focus:outline-none transition-colors ${errors.telefono ? 'border-red-500 focus:border-red-500' : 'border-border focus:border-primary-500'}`}
               placeholder="351 123 4567"
             />
              {errors.telefono && <p className="text-xs text-red-400 mt-1">{errors.telefono.message}</p>}
@@ -132,7 +132,7 @@ export function BorrowerForm({ initialData, onSubmit, isLoading, submitLabel }: 
             <label className="block text-sm font-medium text-muted mb-1">Domicilio</label>
             <input
               {...register('domicilio')}
-              className="w-full bg-surface/50 border border-border rounded-lg px-4 py-2.5 text-main placeholder-muted focus:outline-none focus:border-primary-500 transition-colors"
+              className={`w-full bg-surface/50 border rounded-lg px-4 py-2.5 text-main placeholder-muted focus:outline-none transition-colors ${errors.domicilio ? 'border-red-500 focus:border-red-500' : 'border-border focus:border-primary-500'}`}
               placeholder="Av. Colon 123, Córdoba"
             />
              {errors.domicilio && <p className="text-xs text-red-400 mt-1">{errors.domicilio.message}</p>}

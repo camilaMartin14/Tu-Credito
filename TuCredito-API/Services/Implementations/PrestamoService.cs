@@ -250,7 +250,6 @@ namespace TuCredito.Services.Implementations
 
             var cuotasSaldadas = cuotas.Where(c => c.IdEstado == 2).ToList(); // 2 = Saldada (según tu lógica)
 
-            // Pagos del préstamo (via Cuotas)
             var pagos = await _context.Pagos
                 .Where(p => _context.Cuotas.Any(c => c.IdCuota == p.IdCuota && c.IdPrestamo == prestamoId))
                 .ToListAsync();

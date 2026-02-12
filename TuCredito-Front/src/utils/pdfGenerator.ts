@@ -38,7 +38,8 @@ export const exportLoanDetailPDF = (loan: PrestamoDTO, summary: ResumenPrestamoD
   doc.setFontSize(22);
   doc.text(`Préstamo #${loan.idPrestamo}`, 14, 25);
   
-  doc.setFontSize(10);
+  
+  doc.text(`Nro. Comprobante:`, 15, 45);
   doc.text(`Fecha de emisión: ${new Date().toLocaleDateString()}`, pageWidth - 14, 25, { align: 'right' });
 
   // Client Info Section
@@ -144,8 +145,6 @@ export const exportPaymentVoucherPDF = (payment: PagoOutputDTO) => {
   // Voucher Info
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(10);
-  
-  const rightX = pageWidth - 60;
   
   doc.text(`Nro. Comprobante:`, 15, 45);
   doc.setFont("helvetica", "bold");

@@ -75,7 +75,6 @@ namespace TuCredito.Services.Implementations
             return _mapper.Map<List<PagoOutputDTO>>(pagos);
         }
 
-        // Un pago por cuota (puede ser parcial o total)
         public async Task<bool> NewPago(Pago pago)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();

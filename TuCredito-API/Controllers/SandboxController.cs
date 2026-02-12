@@ -18,16 +18,13 @@ namespace TuCredito.Controllers
         }
 
         [HttpPost("reset")]
-        [AllowAnonymous] // Permitir reset sin login para facilitar el testing inicial, o cambiar a [Authorize] si se prefiere seguridad
+        [AllowAnonymous] 
         public async Task<IActionResult> ResetDemoData()
         {
-            // 1. Identificar al usuario demo
             var demoUser = await _context.Prestamistas.FirstOrDefaultAsync(p => p.Usuario == "demo");
             
             if (demoUser != null)
             {
-                // 2. Eliminar datos relacionados al usuario demo para forzar la regeneración
-                // Eliminar préstamos (y en cascada cuotas/pagos si la FK está configurada, sino manualmente)
                 var prestamos = await _context.Prestamos
                     .Where(p => p.IdPrestamista == demoUser.Id)
                     .ToListAsync();
@@ -38,13 +35,8 @@ namespace TuCredito.Controllers
                     await _context.SaveChangesAsync();
                 }
                 
-                // Nota: No eliminamos al usuario demo en sí para mantener su ID y password,
-                // pero si quisiéramos un reset total, podríamos hacerlo.
-                // El DbInitializer actual es "aditivo", si faltan préstamos para el usuario demo, los crea.
-                // Al borrar los préstamos arriba, el DbInitializer los volverá a crear.
             }
 
-            // 3. Ejecutar el Initializer para regenerar los datos
             DbInitializer.Initialize(_context);
 
             return Ok(new { message = "Datos del entorno Sandbox restaurados correctamente." });

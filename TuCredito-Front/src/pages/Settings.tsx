@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Settings as SettingsIcon, Shield, Moon, User, Globe, Check, AlertCircle, Loader2, Eye, EyeOff, X } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
 import { updateProfile } from '../services/authService';
@@ -12,19 +12,15 @@ export function Settings() {
     const { theme, toggleTheme } = useTheme();
     const { user, login, token } = useAuth();
     const { addToast } = useToast();
-    const queryClient = useQueryClient();
     
-    // Password Change State
     const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
     const [showCurrent, setShowCurrent] = useState(false);
     const [showNew, setShowNew] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
 
-    // Profile Edit State
     const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
     const [profileError, setProfileError] = useState('');
 
-    // Password Form
     const { register, handleSubmit, formState: { errors }, reset, watch } = useForm({
         defaultValues: {
             contraseniaActual: '',
@@ -33,7 +29,6 @@ export function Settings() {
         }
     });
 
-    // Profile Form
     const { 
         register: registerProfile, 
         handleSubmit: handleSubmitProfile, 
@@ -48,7 +43,6 @@ export function Settings() {
         }
     });
 
-    // Update form default values when user changes
     useEffect(() => {
         if (user) {
             resetProfile({
@@ -63,13 +57,11 @@ export function Settings() {
     const profileMutation = useMutation({
         mutationFn: async (data: any) => {
             await updateProfile(data);
-            // Fetch updated user data
             const response = await api.get('/lenders/me');
             return response.data;
         },
         onSuccess: (updatedUser) => {
             addToast('Perfil actualizado correctamente', 'success');
-            // Update auth context
             if (token) {
                 login({ token, prestamista: updatedUser });
             }
@@ -101,7 +93,7 @@ export function Settings() {
 
     const onSubmitPassword = (data: any) => {
         if (data.nuevaContrasenia !== data.confirmarContrasenia) {
-            return; // handled by validation
+            return; 
         }
         mutation.mutate({
             contraseniaActual: data.contraseniaActual,

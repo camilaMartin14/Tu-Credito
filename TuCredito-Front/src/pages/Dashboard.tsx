@@ -144,7 +144,7 @@ export function Dashboard() {
                     <TrendingUp className="h-5 w-5 text-green-500" />
                 </div>
             </div>
-            <div className="h-[300px]">
+            <div className="h-[300px] w-full min-w-0">
                 {cashFlowProjection && cashFlowProjection.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={cashFlowProjection} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
@@ -197,7 +197,7 @@ export function Dashboard() {
              <p className="text-sm text-muted">Histórico de recaudación anual</p>
             </div>
           </div>
-          <div className="h-[300px]">
+          <div className="h-[300px] w-full min-w-0">
             {monthlyCollections && monthlyCollections.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthlyCollections}>
@@ -258,7 +258,7 @@ export function Dashboard() {
                 <p className="text-sm text-muted">Estado actual de préstamos activos</p>
             </div>
           </div>
-          <div className="h-[300px]">
+          <div className="h-[300px] w-full min-w-0">
             {loansByStatus && loansByStatus.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>

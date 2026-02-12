@@ -31,7 +31,6 @@ namespace TuCredito.Services.Implementations
 
             var cred = email.Trim();
 
-            // Permite loguear por Usuario o por Correo
             var prestamista = await _context.Prestamistas
                 .FirstOrDefaultAsync(p => p.Usuario == cred || p.Correo == cred);
 
@@ -138,13 +137,11 @@ namespace TuCredito.Services.Implementations
                 if (existeUsuario) throw new ArgumentException("El usuario ya está registrado.");
             }
 
-            // Aplicar cambios
             if (!string.IsNullOrWhiteSpace(dto.Nombre)) prestamista.Nombre = dto.Nombre;
             if (!string.IsNullOrWhiteSpace(dto.Apellido)) prestamista.Apellido = dto.Apellido;
             if (!string.IsNullOrWhiteSpace(dto.Usuario)) prestamista.Usuario = dto.Usuario;
             if (!string.IsNullOrWhiteSpace(dto.Email)) prestamista.Correo = dto.Email;
 
-            // Cambio de contraseña
             if (!string.IsNullOrWhiteSpace(dto.NuevaContrasenia))
             {
                 if (string.IsNullOrWhiteSpace(dto.ContraseniaActual))

@@ -33,7 +33,7 @@ namespace TuCredito.Services.Implementations
             if (!allowedTypes.Contains(request.Archivo.ContentType.ToLower()))
                 throw new ArgumentException("Formato de archivo no válido. Solo PDF, JPEG y PNG.");
 
-            if (request.UsuarioId == 1) // ID 1 es demo según seed_data
+            if (request.UsuarioId == 1) // ID 1 es demo 
             {
                 var count = await _context.Documentos.CountAsync(d => d.SubidoPor == 1 && d.Activo);
                 if (count >= 10)
@@ -128,7 +128,6 @@ namespace TuCredito.Services.Implementations
             {
                 case "prestatario":
                     {
-                        // Ajust� el DbSet/nombre si tu contexto lo llama distinto
                         var existe = await _context.Prestatarios.AnyAsync(p => p.Dni == entidadId);
                         if (!existe)
                             throw new Exception($"Prestatario con ID {entidadId} no encontrado.");

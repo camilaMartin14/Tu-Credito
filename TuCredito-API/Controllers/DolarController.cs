@@ -15,7 +15,7 @@ namespace TuCredito.Controllers;
             _service = service;
         }
 
-        [HttpGet("official/today")] // Solo el oficial!! Consultar al cliente si quiere conocer otras cotizaciones como blue, etc
+        [HttpGet("official/today")]
         public async Task<ActionResult<DolarOficialModel?>> GetDolarHoy()
         {
             try

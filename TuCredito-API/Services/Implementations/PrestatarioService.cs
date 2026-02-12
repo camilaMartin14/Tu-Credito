@@ -154,7 +154,6 @@ namespace TuCredito.Services.Implementations
             if (filtro.Dni.HasValue && filtro.Dni.Value > 0)
                 query = query.Where(p => p.Dni == filtro.Dni.Value);
 
-            // El campo Nombre se usa como búsqueda genérica (Nombre, Apellido o parcial de DNI)
             if (!string.IsNullOrWhiteSpace(filtro.Nombre))
             {
                 query = query.Where(p => 

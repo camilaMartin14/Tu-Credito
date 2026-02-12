@@ -131,7 +131,6 @@ namespace TuCredito.Services.Implementations
                 if (cuota.IdCuota <= 0)
                     return Result<bool>.Failure("ID de cuota inválido.");
 
-                // Traer la cuota real de BD
                 var dbCuota = await _context.Cuotas.FirstOrDefaultAsync(c => c.IdCuota == cuota.IdCuota);
                 if (dbCuota == null)
                     return Result<bool>.Failure("La cuota no existe.");
@@ -139,7 +138,6 @@ namespace TuCredito.Services.Implementations
                 if (dbCuota.IdEstado == ESTADO_SALDADA)
                     return Result<bool>.Failure("La cuota ya está saldada.");
 
-                // Total pagado desde la BD (no desde lo que viene en el request)
                 var totalPagado = await _context.Pagos
                     .Where(p => p.IdCuota == dbCuota.IdCuota)
                     .SumAsync(p => (decimal?)p.Monto) ?? 0m;
@@ -147,10 +145,8 @@ namespace TuCredito.Services.Implementations
                 if (totalPagado > dbCuota.Monto)
                     return Result<bool>.Failure("El total pagado supera el monto de la cuota.");
 
-                // Actualizar saldo pendiente
                 dbCuota.SaldoPendiente = dbCuota.Monto - totalPagado;
 
-                // Actualizar estado según saldo
                 dbCuota.IdEstado = dbCuota.SaldoPendiente == 0m
                     ? ESTADO_SALDADA
                     : ESTADO_PENDIENTE;
@@ -170,7 +166,6 @@ namespace TuCredito.Services.Implementations
         {
             try
             {
-                // Buscar el ID del estado "Vencida"
                 var estadoVencida = await _context.EstadosCuotas
                     .Where(e => e.Descripcion == "Vencida")
                     .Select(e => e.IdEstado)
@@ -179,7 +174,6 @@ namespace TuCredito.Services.Implementations
                 if (estadoVencida == 0)
                     return Result<int>.Failure("No se encontró el estado 'Vencida' en la base de datos.");
 
-                // Cuotas pendientes cuya fecha ya venció
                 var cuotasVencidas = await _context.Cuotas
                     .Where(c => c.IdEstado == ESTADO_PENDIENTE && c.FecVto.Date < DateTime.Today)
                     .ToListAsync();

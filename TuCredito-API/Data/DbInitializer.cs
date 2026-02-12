@@ -131,7 +131,6 @@ namespace TuCredito.Data
             var prestamista = context.Prestamistas.FirstOrDefault(p => p.Usuario == "demo");
             if (prestamista == null) return;
 
-            // Check if demo user has loans
             if (context.Prestamos.Any(p => p.IdPrestamista == prestamista.Id)) return;
 
             var p1 = context.Prestatarios.FirstOrDefault(p => p.Dni == 10000001);
@@ -147,8 +146,8 @@ namespace TuCredito.Data
                     FechaOtorgamiento = DateTime.Now.AddMonths(-7), // 7 meses atrás
                     Fec1erVto = DateTime.Now.AddMonths(-6),
                     FechaFinEstimada = DateTime.Now.AddMonths(-1),
-                    IdEstado = 2, // Finalizado
-                    IdSistAmortizacion = 4, // Tasa Fija
+                    IdEstado = 2, 
+                    IdSistAmortizacion = 4, 
                     SaldoRestante = 0.00m
                 };
                 context.Prestamos.Add(prestamo1);

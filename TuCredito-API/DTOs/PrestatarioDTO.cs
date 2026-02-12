@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace TuCredito.DTOs;
-    public class PrestatarioDTO // Datos completos del prestatario y garante
+    public class PrestatarioDTO 
     {
         [Required(ErrorMessage = "El DNI es obligatorio")]
         public int? Dni { get; set; }

@@ -5,7 +5,7 @@ import { getLoansByFilter } from '../../services/loanService';
 import { getInstallments } from '../../services/installmentService';
 import { PrestatarioDTO, PrestamoDTO, Cuota } from '../../types';
 import { InstallmentStatus } from '../../types/enums';
-import { X, Search, User, FileText, Calendar, ChevronRight, CreditCard, ArrowLeft } from 'lucide-react';
+import { X, Search, User, FileText, ChevronRight, CreditCard, ArrowLeft } from 'lucide-react';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 
 interface NewPaymentModalProps {

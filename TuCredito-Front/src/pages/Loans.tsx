@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getLoansByFilter, archiveLoan, deleteLoan } from '../services/loanService';
-import { Plus, Search, Filter, ArrowUpRight, AlertCircle, X, Download, Archive, Trash2, Info, FileSpreadsheet, Edit2, Save } from 'lucide-react';
+import { getLoansByFilter, deleteLoan } from '../services/loanService';
+import { Plus, Search, Filter, ArrowUpRight, AlertCircle, X, Download, Trash2, Info, FileSpreadsheet, Edit2, Save } from 'lucide-react';
 import { exportToPDF } from '../utils/pdfGenerator';
 import { exportToExcel } from '../utils/excelGenerator';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';

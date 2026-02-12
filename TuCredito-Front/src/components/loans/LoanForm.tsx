@@ -6,7 +6,7 @@ import * as z from 'zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { simulateLoan, createLoan } from '../../services/loanService';
 import { getBorrowers } from '../../services/borrowerService';
-import { SimulacionPrestamoOutputDTO, PrestatarioDTO } from '../../types';
+import { SimulacionPrestamoOutputDTO } from '../../types';
 import { Loader2, Calculator, CheckCircle, User, Search } from 'lucide-react';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
@@ -151,17 +151,26 @@ export function LoanForm() {
         <h2 className="mb-6 text-xl font-bold text-main">Nuevo Préstamo</h2>
         
         <div className="mb-6 p-4 bg-surfaceHighlight/50 rounded-xl border border-border">
-          <label className="block text-sm font-medium text-muted mb-2 flex items-center gap-2">
-            <User className="h-4 w-4 text-primary-500" />
-            Seleccionar Prestatario Existente (Opcional)
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-medium text-muted flex items-center gap-2">
+              <User className="h-4 w-4 text-primary-500" />
+              Seleccionar Prestatario *
+            </label>
+            <button 
+              type="button"
+              onClick={() => navigate('/borrowers/create')}
+              className="text-xs text-primary-500 hover:text-primary-400 font-medium hover:underline"
+            >
+              + Crear Nuevo Cliente
+            </button>
+          </div>
           <div className="relative">
             <select
               value={selectedBorrowerId}
               onChange={handleBorrowerSelect}
-              className="block w-full rounded-xl border border-border bg-surface px-4 py-3 text-main focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200 [&>option]:bg-surface"
+              className={`block w-full rounded-xl border bg-surface px-4 py-3 text-main focus:ring-1 transition-all duration-200 [&>option]:bg-surface ${errors.dniPrestatario ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-border focus:border-primary-500 focus:ring-primary-500'}`}
             >
-              <option value="">-- Nuevo Prestatario / Ingreso Manual --</option>
+              <option value="">-- Seleccione un Prestatario --</option>
               {borrowers?.map((borrower) => (
                 <option key={borrower.dni} value={borrower.dni}>
                   {borrower.apellido}, {borrower.nombre} (DNI: {borrower.dni})
@@ -172,6 +181,9 @@ export function LoanForm() {
               <Search className="h-4 w-4" />
             </div>
           </div>
+          {errors.dniPrestatario && !selectedBorrowerId && (
+             <p className="mt-1 text-xs text-red-400">Debe seleccionar un prestatario</p>
+          )}
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -179,22 +191,20 @@ export function LoanForm() {
             <label className="block text-sm font-medium text-muted">DNI Prestatario</label>
             <input
               {...register('dniPrestatario')}
-              className={`mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200 ${selectedBorrowerId ? 'opacity-75' : ''}`}
-              placeholder="Ingrese DNI"
-              readOnly={!!selectedBorrowerId}
+              className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted opacity-60 cursor-not-allowed"
+              placeholder="Seleccione un prestatario arriba"
+              readOnly
             />
-            {errors.dniPrestatario && <p className="mt-1 text-xs text-red-400">{errors.dniPrestatario.message}</p>}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-muted">Nombre Prestatario</label>
             <input
               {...register('nombrePrestatario')}
-              className={`mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200 ${selectedBorrowerId ? 'opacity-75' : ''}`}
-              placeholder="Ingrese Nombre Completo"
-              readOnly={!!selectedBorrowerId}
+              className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted opacity-60 cursor-not-allowed"
+              placeholder="Seleccione un prestatario arriba"
+              readOnly
             />
-            {errors.nombrePrestatario && <p className="mt-1 text-xs text-red-400">{errors.nombrePrestatario.message}</p>}
           </div>
 
           <div>
@@ -226,7 +236,7 @@ export function LoanForm() {
               <input
                 type="number"
                 {...register('montoOtorgado', { valueAsNumber: true })}
-                className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
+                className={`mt-1 block w-full rounded-xl border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:ring-1 transition-all duration-200 ${errors.montoOtorgado ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-border focus:border-primary-500 focus:ring-primary-500'}`}
               />
               {errors.montoOtorgado && <p className="mt-1 text-xs text-red-400">{errors.montoOtorgado.message}</p>}
             </div>
@@ -236,7 +246,7 @@ export function LoanForm() {
                 type="number"
                 step="0.1"
                 {...register('tasaInteres', { valueAsNumber: true })}
-                className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
+                className={`mt-1 block w-full rounded-xl border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:ring-1 transition-all duration-200 ${errors.tasaInteres ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-border focus:border-primary-500 focus:ring-primary-500'}`}
               />
               {errors.tasaInteres && <p className="mt-1 text-xs text-red-400">{errors.tasaInteres.message}</p>}
             </div>
@@ -248,7 +258,7 @@ export function LoanForm() {
               <input
                 type="number"
                 {...register('cantidadCtas', { valueAsNumber: true })}
-                className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
+                className={`mt-1 block w-full rounded-xl border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:ring-1 transition-all duration-200 ${errors.cantidadCtas ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-border focus:border-primary-500 focus:ring-primary-500'}`}
               />
               {errors.cantidadCtas && <p className="mt-1 text-xs text-red-400">{errors.cantidadCtas.message}</p>}
             </div>
@@ -272,7 +282,7 @@ export function LoanForm() {
               <input
                 type="date"
                 {...register('fechaOtorgamiento')}
-                className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
+                className={`mt-1 block w-full rounded-xl border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:ring-1 transition-all duration-200 ${errors.fechaOtorgamiento ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-border focus:border-primary-500 focus:ring-primary-500'}`}
               />
               {errors.fechaOtorgamiento && <p className="mt-1 text-xs text-red-400">{errors.fechaOtorgamiento.message}</p>}
             </div>
@@ -281,7 +291,7 @@ export function LoanForm() {
               <input
                 type="date"
                 {...register('fec1erVto')}
-                className="mt-1 block w-full rounded-xl border border-border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all duration-200"
+                className={`mt-1 block w-full rounded-xl border bg-surface/50 px-4 py-3 text-main placeholder-muted focus:ring-1 transition-all duration-200 ${errors.fec1erVto ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-border focus:border-primary-500 focus:ring-primary-500'}`}
               />
               {errors.fec1erVto && <p className="mt-1 text-xs text-red-400">{errors.fec1erVto.message}</p>}
             </div>

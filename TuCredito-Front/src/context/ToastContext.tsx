@@ -73,6 +73,4 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export const toast = {
-  success: (_msg: string) => {}, 
-};
+

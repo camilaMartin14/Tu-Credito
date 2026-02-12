@@ -10,7 +10,7 @@ import { formatCurrency, formatDate } from '../utils/formatters';
 import { LoanStatus } from '../types/enums';
 
 export function Calculator() {
-  const { register, handleSubmit, getValues, watch } = useForm<SimulacionPrestamoEntryDTO>({
+  const { register, handleSubmit } = useForm<SimulacionPrestamoEntryDTO>({
     defaultValues: {
       idSistAmortizacion: 1,
       moneda: 'ARS'
@@ -19,7 +19,6 @@ export function Calculator() {
   const [result, setResult] = useState<any>(null);
   const [simulationParams, setSimulationParams] = useState<SimulacionPrestamoEntryDTO | null>(null);
   
-  const selectedCurrency = watch('moneda');
   const { addToast } = useToast();
   const queryClient = useQueryClient();
 

@@ -8,7 +8,6 @@ namespace TuCredito.Controllers;
 
         public List<CuotaSimuladaDTO> DetalleCuotas { get; set; } = new();
 
-        // Pago anticipado
         public decimal? NuevoTotalAPagar { get; set; }
         public decimal? AhorroPorPagoAnticipado { get; set; }
     }
