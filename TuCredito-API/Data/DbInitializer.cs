@@ -316,6 +316,159 @@ namespace TuCredito.Data
                 context.Pagos.AddRange(pagos4);
                 context.SaveChanges();
             }
+
+            var p5 = context.Prestatarios.FirstOrDefault(p => p.Dni == 10000003);
+            if (p5 != null)
+            {
+                var prestamo5 = new Prestamo
+                {
+                    DniPrestatario = p5.Dni,
+                    IdPrestamista = prestamista.Id,
+                    MontoOtorgado = 80000.00m,
+                    TasaInteres = 8.00m,
+                    CantidadCtas = 6,
+                    FechaOtorgamiento = DateTime.Now.AddMonths(-1),
+                    Fec1erVto = DateTime.Now.AddDays(9), // Cae en semana 2
+                    FechaFinEstimada = DateTime.Now.AddMonths(5),
+                    IdEstado = 1,
+                    IdSistAmortizacion = 1,
+                    SaldoRestante = 80000.00m
+                };
+                context.Prestamos.Add(prestamo5);
+                context.SaveChanges();
+
+                var cuotasP5 = new List<Cuota>();
+                for (int i = 1; i <= 6; i++)
+                {
+                    cuotasP5.Add(new Cuota 
+                    { 
+                        IdPrestamo = prestamo5.IdPrestamo, 
+                        NroCuota = i, 
+                        FecVto = DateTime.Now.AddDays(9).AddMonths(i-1), 
+                        Monto = 15000, 
+                        Interes = 1200, 
+                        SaldoPendiente = 15000, 
+                        IdEstado = 1 // Pendiente
+                    });
+                }
+                context.Cuotas.AddRange(cuotasP5);
+            }
+
+            var p6 = context.Prestatarios.FirstOrDefault(p => p.Dni == 10000004);
+            if (p6 != null)
+            {
+                var prestamo6 = new Prestamo
+                {
+                    DniPrestatario = p6.Dni,
+                    IdPrestamista = prestamista.Id,
+                    MontoOtorgado = 150000.00m,
+                    TasaInteres = 9.00m,
+                    CantidadCtas = 12,
+                    FechaOtorgamiento = DateTime.Now.AddMonths(-2),
+                    Fec1erVto = DateTime.Now.AddMonths(-1), // Ya pagó una
+                    FechaFinEstimada = DateTime.Now.AddMonths(10),
+                    IdEstado = 1,
+                    IdSistAmortizacion = 1,
+                    SaldoRestante = 140000.00m
+                };
+                context.Prestamos.Add(prestamo6);
+                context.SaveChanges();
+
+                var cuotasP6 = new List<Cuota>();
+                for (int i = 1; i <= 12; i++)
+                {
+                    var fechaVto = i == 1 ? DateTime.Now.AddMonths(-1) : DateTime.Now.AddDays(16).AddMonths(i-2);
+                    
+                    cuotasP6.Add(new Cuota 
+                    { 
+                        IdPrestamo = prestamo6.IdPrestamo, 
+                        NroCuota = i, 
+                        FecVto = fechaVto, 
+                        Monto = 18000, 
+                        Interes = 1500, 
+                        SaldoPendiente = i == 1 ? 0 : 18000, 
+                        IdEstado = i == 1 ? 2 : 1 
+                    });
+                }
+                context.Cuotas.AddRange(cuotasP6);
+                
+                context.Pagos.Add(new Pago { IdCuota = cuotasP6[0].IdCuota, Monto = 18000, FecPago = DateTime.Now.AddMonths(-1).AddDays(-2), IdMedioPago = 1, Estado = "Aprobado", Observaciones = "Pago inicial", Saldo = 0 });
+            }
+
+            var p7 = context.Prestatarios.FirstOrDefault(p => p.Dni == 10000007);
+            if (p7 != null)
+            {
+                var prestamo7 = new Prestamo
+                {
+                    DniPrestatario = p7.Dni,
+                    IdPrestamista = prestamista.Id,
+                    MontoOtorgado = 300000.00m,
+                    TasaInteres = 7.00m,
+                    CantidadCtas = 18,
+                    FechaOtorgamiento = DateTime.Now.AddDays(-5),
+                    Fec1erVto = DateTime.Now.AddDays(25), // Semana 4
+                    FechaFinEstimada = DateTime.Now.AddMonths(18),
+                    IdEstado = 1,
+                    IdSistAmortizacion = 2,
+                    SaldoRestante = 300000.00m
+                };
+                context.Prestamos.Add(prestamo7);
+                context.SaveChanges();
+
+                var cuotasP7 = new List<Cuota>();
+                for (int i = 1; i <= 18; i++)
+                {
+                    cuotasP7.Add(new Cuota 
+                    { 
+                        IdPrestamo = prestamo7.IdPrestamo, 
+                        NroCuota = i, 
+                        FecVto = DateTime.Now.AddDays(25).AddMonths(i-1), 
+                        Monto = 22000, 
+                        Interes = 1800, 
+                        SaldoPendiente = 22000, 
+                        IdEstado = 1 
+                    });
+                }
+                context.Cuotas.AddRange(cuotasP7);
+            }
+
+            var p8 = context.Prestatarios.FirstOrDefault(p => p.Dni == 10000008);
+            if (p8 != null)
+            {
+                var prestamo8 = new Prestamo
+                {
+                    DniPrestatario = p8.Dni,
+                    IdPrestamista = prestamista.Id,
+                    MontoOtorgado = 40000.00m,
+                    TasaInteres = 20.00m,
+                    CantidadCtas = 4,
+                    FechaOtorgamiento = DateTime.Now.AddDays(-2),
+                    Fec1erVto = DateTime.Now.AddDays(12), // Semana 2
+                    FechaFinEstimada = DateTime.Now.AddDays(60),
+                    IdEstado = 1,
+                    IdSistAmortizacion = 4,
+                    SaldoRestante = 40000.00m
+                };
+                context.Prestamos.Add(prestamo8);
+                context.SaveChanges();
+
+                var cuotasP8 = new List<Cuota>();
+                for (int i = 1; i <= 4; i++)
+                {
+                    cuotasP8.Add(new Cuota 
+                    { 
+                        IdPrestamo = prestamo8.IdPrestamo, 
+                        NroCuota = i, 
+                        FecVto = DateTime.Now.AddDays(12 + (i-1)*15), 
+                        Monto = 12000, 
+                        Interes = 2000, 
+                        SaldoPendiente = 12000, 
+                        IdEstado = 1 
+                    });
+                }
+                context.Cuotas.AddRange(cuotasP8);
+            }
+            context.SaveChanges();
         }
     }
 }
