@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using TuCredito.DTOs;
 using TuCredito.Models;
 using TuCredito.Services.Interfaces;
@@ -8,15 +10,33 @@ namespace TuCredito.Services.Implementations
     public class PrestatarioService : IPrestatarioService
     {
         private readonly TuCreditoContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public PrestatarioService(TuCreditoContext context)
+        public PrestatarioService(TuCreditoContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        private bool IsDemoUser()
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
+            var name = user?.FindFirst(ClaimTypes.Name)?.Value;
+            return name?.ToLower() == "demo";
+        }
+
+        private bool IsSeedData(int dni)
+        {
+            // DNIs del 10000001 al 10000020 son considerados datos semilla protegidos
+            return dni >= 10000001 && dni <= 10000020;
         }
 
         public async Task<int> CrearAsync(Prestatario prestatario)
         {
             if (prestatario == null) throw new ArgumentNullException(nameof(prestatario));
+
+            if (IsDemoUser() && IsSeedData(prestatario.Dni))
+                throw new InvalidOperationException("No se pueden crear prestatarios con DNI reservado para datos de prueba (10000001-10000020).");
 
             if (string.IsNullOrWhiteSpace(prestatario.Nombre))
                 throw new ArgumentException("El nombre es obligatorio.");
@@ -69,6 +89,9 @@ namespace TuCredito.Services.Implementations
             if (prestatario.Dni <= 0)
                 throw new ArgumentException("DNI inválido.");
 
+            if (IsDemoUser() && IsSeedData(prestatario.Dni))
+                throw new InvalidOperationException("No se pueden modificar los prestatarios de prueba protegidos.");
+
             var existente = await _context.Prestatarios.FirstOrDefaultAsync(p => p.Dni == prestatario.Dni);
             if (existente == null)
                 throw new ArgumentException("Prestatario no encontrado.");
@@ -96,6 +119,9 @@ namespace TuCredito.Services.Implementations
         {
             if (dni <= 0)
                 throw new ArgumentException("DNI inválido.");
+
+            if (IsDemoUser() && IsSeedData(dni))
+                throw new InvalidOperationException("No se puede cambiar el estado de los prestatarios de prueba protegidos.");
 
             var existente = await _context.Prestatarios.FirstOrDefaultAsync(p => p.Dni == dni);
             if (existente == null)
