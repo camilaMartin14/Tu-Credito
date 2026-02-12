@@ -113,7 +113,22 @@ builder.Services.AddDbContext<TuCreditoContext>((sp, options) =>
                            ?? builder.Configuration.GetConnectionString("DefaultConnection")
                            ?? builder.Configuration.GetConnectionString("CamilaConnection");
 
-    var dbProvider = Environment.GetEnvironmentVariable("DB_PROVIDER") ?? "SqlServer";
+    var dbProvider = Environment.GetEnvironmentVariable("DB_PROVIDER");
+
+    // Si no se especifica proveedor, decidimos inteligentemente
+    if (string.IsNullOrEmpty(dbProvider))
+    {
+        // En producción (Render), si no se configuró nada explícito, usamos SQLite para el Sandbox
+        if (!builder.Environment.IsDevelopment())
+        {
+             dbProvider = "Sqlite";
+        }
+        else
+        {
+             // En desarrollo local, mantenemos SQL Server por defecto
+             dbProvider = "SqlServer";
+        }
+    }
 
     if (dbProvider.Equals("Postgres", StringComparison.OrdinalIgnoreCase))
     {
