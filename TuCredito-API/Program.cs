@@ -63,7 +63,11 @@ builder.Services.AddCors(options =>
         }
         else
         {
-            policy.WithOrigins("https://tudominio.com")
+            var frontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL") ?? "https://tu-credito.vercel.app";
+            policy.WithOrigins(frontendUrl, 
+                             "https://tu-credito.vercel.app",
+                             "https://tu-credito-front.vercel.app",
+                             "http://localhost:5173") // Localhost para pruebas
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         }
@@ -105,7 +109,6 @@ builder.Services.AddDbContext<TuCreditoContext>((sp, options) =>
 {
     var interceptor = sp.GetRequiredService<AuditInterceptor>();
     
-    // Check for Environment Variable (Render/Neon usually sets DATABASE_URL or similar)
     var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") 
                            ?? builder.Configuration.GetConnectionString("DefaultConnection")
                            ?? builder.Configuration.GetConnectionString("CamilaConnection");
@@ -153,7 +156,6 @@ builder.Services.AddScoped<JwtTokenGenerator>();
 builder.Services.AddAutoMapper(cfg => { }, AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<IFileStorage, LocalFileStorage>();
-//builder.Services.AddScoped<IFileStorage, MinioFileStorage>();
 builder.Services.AddScoped<IDocumentoService, DocumentoService>();
 builder.Services.AddScoped<AuditInterceptor>();
 
@@ -166,13 +168,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// Ensure Database Created and Seeded
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
