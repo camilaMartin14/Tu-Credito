@@ -137,7 +137,8 @@ builder.Services.AddDbContext<TuCreditoContext>((sp, options) =>
     }
     else if (dbProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase))
     {
-        var sqliteConnection = connectionString ?? "Data Source=tucredito.db";
+        // Ignoramos la variable DATABASE_URL si estamos en modo Sqlite para evitar conflictos con URLs de Postgres en Render
+        var sqliteConnection = "Data Source=tucredito.db";
         options.UseSqlite(sqliteConnection)
                .AddInterceptors(interceptor);
     }
