@@ -1,4 +1,4 @@
-# 🚀 Tu Crédito – Gestión Financiera Inteligente
+# Tu Crédito - Sistema de Gestión de Préstamos
 
 ![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge&logo=.net&logoColor=white)
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)
@@ -8,13 +8,6 @@
 
 > **Transforma la gestión de préstamos con una plataforma moderna, segura y escalable.**
 
-**Tu Crédito** es una solución fintech integral diseñada para automatizar y optimizar el ciclo de vida de los préstamos. Desde la evaluación de riesgo hasta la cobranza final, nuestra plataforma ofrece herramientas potentes para prestamistas que buscan profesionalizar su operación.
-
----
-
-## ✨ ¿Por qué Tu Crédito?
-
-Más que un simple sistema de registro, **Tu Crédito** es un aliado estratégico para la toma de decisiones financieras.
 
 ### 📊 Dashboard Ejecutivo en Tiempo Real
 Visualiza la salud de tu cartera en un solo vistazo.
@@ -42,18 +35,23 @@ Protege tu información crítica con estándares empresariales.
 
 ---
 
+## ➡️ [Prueba la aplicación](https://tu-credito.vercel.app/) 
+
+
+🪪 usuario: demo
+🔐 contraseña: demo
+
+---
 ## 🛠️ Stack Tecnológico
 
-Construido sobre una base tecnológica de vanguardia para garantizar rendimiento y mantenibilidad a largo plazo.
-
-### Backend (The Core)
+### Backend 
 - **Framework:** .NET 10 (Web API)
 - **ORM:** Entity Framework Core (Code First)
 - **Base de Datos:** SQL Server
 - **Almacenamiento:** MinIO (S3 Compatible) para gestión documental
 - **Arquitectura:** Clean Architecture + CQRS pattern inspiration + Repository Pattern
 
-### Frontend (The Experience)
+### Frontend 
 - **Framework:** React 18 + Vite
 - **Lenguaje:** TypeScript
 - **Estilos:** Tailwind CSS (Diseño responsivo y moderno)
@@ -62,9 +60,7 @@ Construido sobre una base tecnológica de vanguardia para garantizar rendimiento
 
 ---
 
-## 🚀 Quick Start
-
-¿Listo para ver **Tu Crédito** en acción? Sigue estos pasos para desplegar el entorno de desarrollo.
+## 🚀 Despliegue
 
 ### Prerrequisitos
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
