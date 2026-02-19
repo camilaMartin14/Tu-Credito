@@ -71,10 +71,14 @@ namespace TuCredito.Services.Implementations
 
             if (!string.IsNullOrWhiteSpace(nombre))
             {
-                query = query.Where(p => 
-                    p.DniPrestatarioNavigation.Nombre.Contains(nombre) || 
-                    p.DniPrestatarioNavigation.Apellido.Contains(nombre) ||
-                    p.DniPrestatario.ToString().Contains(nombre));
+                var terms = nombre.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                foreach (var term in terms)
+                {
+                    query = query.Where(p => 
+                        p.DniPrestatarioNavigation.Nombre.Contains(term) || 
+                        p.DniPrestatarioNavigation.Apellido.Contains(term) ||
+                        p.DniPrestatario.ToString().Contains(term));
+                }
             }
 
             if (estado.HasValue)

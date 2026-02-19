@@ -156,10 +156,14 @@ namespace TuCredito.Services.Implementations
 
             if (!string.IsNullOrWhiteSpace(filtro.Nombre))
             {
-                query = query.Where(p => 
-                    p.Nombre.Contains(filtro.Nombre) || 
-                    p.Apellido.Contains(filtro.Nombre) ||
-                    p.Dni.ToString().Contains(filtro.Nombre));
+                var terms = filtro.Nombre.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                foreach (var term in terms)
+                {
+                    query = query.Where(p => 
+                        p.Nombre.Contains(term) || 
+                        p.Apellido.Contains(term) ||
+                        p.Dni.ToString().Contains(term));
+                }
             }
 
             if (filtro.EsActivo.HasValue)

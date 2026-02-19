@@ -88,10 +88,16 @@ namespace TuCredito.Services.Implementations
                     query = query.Where(c => c.FecVto.Month == mesVto.Value);
 
                 if (!string.IsNullOrWhiteSpace(prestatario))
-                    query = query.Where(c =>
-                        c.IdPrestamoNavigation.DniPrestatarioNavigation.Nombre.Contains(prestatario) ||
-                        c.IdPrestamoNavigation.DniPrestatarioNavigation.Apellido.Contains(prestatario) ||
-                        c.IdPrestamoNavigation.DniPrestatario.ToString().Contains(prestatario));
+                {
+                    var terms = prestatario.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var term in terms)
+                    {
+                        query = query.Where(c =>
+                            c.IdPrestamoNavigation.DniPrestatarioNavigation.Nombre.Contains(term) ||
+                            c.IdPrestamoNavigation.DniPrestatarioNavigation.Apellido.Contains(term) ||
+                            c.IdPrestamoNavigation.DniPrestatario.ToString().Contains(term));
+                    }
+                }
                 
                 if (idPrestamo.HasValue)
                     query = query.Where(c => c.IdPrestamo == idPrestamo.Value);
