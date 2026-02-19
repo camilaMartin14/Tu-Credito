@@ -20,11 +20,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         {
             try
             {
-                var pagos = await _service.GetAllPagos();
+                var pagos = await _service.GetAllPagos(cancellationToken);
                 var dtos = _mapper.Map<List<PagoOutputDTO>>(pagos);
                 return Ok(dtos);
             }
@@ -35,11 +35,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
         {
             try
             {
-                var pago = await _service.GetPagoById(id);
+                var pago = await _service.GetPagoById(id, cancellationToken);
                 if (pago == null) return NotFound(new { message = "El pago indicado no existe" });
                 return Ok(pago);
             }
@@ -54,11 +54,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet("filter")]
-        public async Task<IActionResult> GetConFiltro( [FromQuery] string? nombre, [FromQuery] int? mes)
+        public async Task<IActionResult> GetConFiltro( [FromQuery] string? nombre, [FromQuery] int? mes, CancellationToken cancellationToken)
         {
             try
             {
-                var pagos = await _service.GetPagoConFiltro(nombre, mes);
+                var pagos = await _service.GetPagoConFiltro(nombre, mes, cancellationToken);
                 if (pagos == null) return Ok(new List<PagoOutputDTO>());
                 
                 return Ok(pagos);
@@ -74,7 +74,7 @@ namespace TuCredito.Controllers;
         }
 
         [HttpPost]
-        public async Task<IActionResult> RegistrarPago([FromBody] PagoInputDTO nvoPago)
+        public async Task<IActionResult> RegistrarPago([FromBody] PagoInputDTO nvoPago, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -82,7 +82,7 @@ namespace TuCredito.Controllers;
             try
             {
                 var pago = _mapper.Map<Pago>(nvoPago);
-                await _service.NewPago(pago);
+                await _service.NewPago(pago, cancellationToken);
                 return Ok(new { message = "Pago registrado correctamente" });
             }
             catch (ArgumentException ex)
@@ -100,7 +100,7 @@ namespace TuCredito.Controllers;
         }
 
         [HttpPost("advance")]
-        public async Task<IActionResult> RegistrarPagoAnticipado([FromBody] PagoInputDTO nvoPago)
+        public async Task<IActionResult> RegistrarPagoAnticipado([FromBody] PagoInputDTO nvoPago, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -108,7 +108,7 @@ namespace TuCredito.Controllers;
             try
             {
                 var pago = _mapper.Map<Pago>(nvoPago);
-                await _service.RegistrarPagoAnticipadoAsync(pago);
+                await _service.RegistrarPagoAnticipadoAsync(pago, cancellationToken);
                 return Ok(new { message = "Pago anticipado registrado correctamente" });
             }
             catch (ArgumentException ex)
@@ -122,14 +122,14 @@ namespace TuCredito.Controllers;
         }
 
         [HttpPut("{id:int}/status")]
-        public async Task<IActionResult> UpdateEstado(int id, [FromBody] string estado) 
+        public async Task<IActionResult> UpdateEstado(int id, [FromBody] string estado, CancellationToken cancellationToken) 
         {
             if (string.IsNullOrWhiteSpace(estado)) 
                 return BadRequest(new { message = "El estado es obligatorio" });
 
             try
             {
-                await _service.UpdatePago(id, estado);
+                await _service.UpdatePago(id, estado, cancellationToken);
                 return Ok(new { message = "Estado del pago actualizado" });
             }
             catch (ArgumentException ex)

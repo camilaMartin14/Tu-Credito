@@ -24,7 +24,7 @@ namespace TuCredito.Services.Implementations
         }
 
         
-        public async Task<Prestamista?> LoginAsync(string email, string contrasenia)
+        public async Task<Prestamista?> LoginAsync(string email, string contrasenia, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(email)) return null;
             if (string.IsNullOrWhiteSpace(contrasenia)) return null;
@@ -32,7 +32,7 @@ namespace TuCredito.Services.Implementations
             var cred = email.Trim();
 
             var prestamista = await _context.Prestamistas
-                .FirstOrDefaultAsync(p => p.Usuario == cred || p.Correo == cred);
+                .FirstOrDefaultAsync(p => p.Usuario == cred || p.Correo == cred, cancellationToken);
 
             if (prestamista == null) return null;
 
@@ -42,23 +42,23 @@ namespace TuCredito.Services.Implementations
             return prestamista;
         }
 
-        public async Task<Prestamista?> ObtenerPrestamistaPorEmailAsync(string email)
+        public async Task<Prestamista?> ObtenerPrestamistaPorEmailAsync(string email, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(email)) return null;
 
             return await _context.Prestamistas
-                .FirstOrDefaultAsync(p => p.Correo == email);
+                .FirstOrDefaultAsync(p => p.Correo == email, cancellationToken);
         }
 
-        public async Task<Prestamista?> ObtenerPrestamistaPorIdAsync(int idPrestamista)
+        public async Task<Prestamista?> ObtenerPrestamistaPorIdAsync(int idPrestamista, CancellationToken cancellationToken = default)
         {
             if (idPrestamista <= 0) return null;
 
             return await _context.Prestamistas
-                .FirstOrDefaultAsync(p => p.Id == idPrestamista);
+                .FirstOrDefaultAsync(p => p.Id == idPrestamista, cancellationToken);
         }
 
-        public async Task<int> RegistrarPrestamistaAsync(PrestamistaRegisterDto dto)
+        public async Task<int> RegistrarPrestamistaAsync(PrestamistaRegisterDto dto, CancellationToken cancellationToken = default)
         {
             if (dto == null) throw new ArgumentNullException(nameof(dto));
 
@@ -71,11 +71,11 @@ namespace TuCredito.Services.Implementations
             if (string.IsNullOrWhiteSpace(dto.Contrasenia))
                 throw new ArgumentException("La contraseña es obligatoria.");
 
-            var existeEmail = await _context.Prestamistas.AnyAsync(p => p.Correo == dto.Correo);
+            var existeEmail = await _context.Prestamistas.AnyAsync(p => p.Correo == dto.Correo, cancellationToken);
             if (existeEmail)
                 throw new Exception("El correo ya está registrado.");
 
-            var existeUsuario = await _context.Prestamistas.AnyAsync(p => p.Usuario == dto.Usuario);
+            var existeUsuario = await _context.Prestamistas.AnyAsync(p => p.Usuario == dto.Usuario, cancellationToken);
             if (existeUsuario)
                 throw new Exception("El nombre de usuario ya está registrado.");
 
@@ -83,12 +83,12 @@ namespace TuCredito.Services.Implementations
             prestamista.ContraseniaHash = PasswordHasher.Hash(dto.Contrasenia);
 
             _context.Prestamistas.Add(prestamista);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             return prestamista.Id;
         }
 
-        public Task<int> ObtenerIdUsuarioLogueado()
+        public Task<int> ObtenerIdUsuarioLogueado(CancellationToken cancellationToken = default)
         {
             var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("IdPrestamista");
 
@@ -101,12 +101,12 @@ namespace TuCredito.Services.Implementations
             return Task.FromResult(id);
         }
 
-        public async Task<bool> UpdatePerfilAsync(int id, PrestamistaUpdateDTO dto)
+        public async Task<bool> UpdatePerfilAsync(int id, PrestamistaUpdateDTO dto, CancellationToken cancellationToken = default)
         {
             if (id <= 0) throw new ArgumentException("ID inválido.");
             if (dto == null) throw new ArgumentNullException(nameof(dto));
 
-            var prestamista = await _context.Prestamistas.FirstOrDefaultAsync(p => p.Id == id);
+            var prestamista = await _context.Prestamistas.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
             if (prestamista == null) throw new ArgumentException("Prestamista no encontrado.");
 
             // GUARD: PROTECCIÓN CUENTA DEMO
@@ -124,7 +124,7 @@ namespace TuCredito.Services.Implementations
             if (!string.IsNullOrWhiteSpace(dto.Email) && dto.Email != prestamista.Correo)
             {
                 var existeEmail = await _context.Prestamistas
-                    .AnyAsync(p => p.Correo == dto.Email && p.Id != id);
+                    .AnyAsync(p => p.Correo == dto.Email && p.Id != id, cancellationToken);
 
                 if (existeEmail) throw new ArgumentException("El correo ya está registrado.");
             }
@@ -132,7 +132,7 @@ namespace TuCredito.Services.Implementations
             if (!string.IsNullOrWhiteSpace(dto.Usuario) && dto.Usuario != prestamista.Usuario)
             {
                 var existeUsuario = await _context.Prestamistas
-                    .AnyAsync(p => p.Usuario == dto.Usuario && p.Id != id);
+                    .AnyAsync(p => p.Usuario == dto.Usuario && p.Id != id, cancellationToken);
 
                 if (existeUsuario) throw new ArgumentException("El usuario ya está registrado.");
             }
@@ -153,7 +153,7 @@ namespace TuCredito.Services.Implementations
                 prestamista.ContraseniaHash = PasswordHasher.Hash(dto.NuevaContrasenia);
             }
 
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
             return true;
         }
     }

@@ -20,7 +20,7 @@ namespace TuCredito.Controllers;
         }
 
     [HttpPost]
-    public async Task<IActionResult> Crear([FromBody] PrestatarioDTO dto)
+    public async Task<IActionResult> Crear([FromBody] PrestatarioDTO dto, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -29,7 +29,7 @@ namespace TuCredito.Controllers;
         {
             var prestatario = _mapper.Map<Prestatario>(dto);
             
-            var dni = await _service.CrearAsync(prestatario);
+            var dni = await _service.CrearAsync(prestatario, cancellationToken);
 
             var salida = _mapper.Map<PrestatarioDTO>(prestatario);
 
@@ -46,11 +46,11 @@ namespace TuCredito.Controllers;
     }
 
     [HttpGet("{dni:int}")]
-        public async Task<IActionResult> ObtenerPorDni(int dni)
+        public async Task<IActionResult> ObtenerPorDni(int dni, CancellationToken cancellationToken)
         {
             try
             {
-                var prestatario = await _service.ObtenerPorDniAsync(dni);
+                var prestatario = await _service.ObtenerPorDniAsync(dni, cancellationToken);
 
                 if (prestatario == null)
                     return NotFound(new { message = "Prestatario no encontrado." });
@@ -65,7 +65,7 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet]
-        public async Task<IActionResult> ObtenerConFiltros([FromQuery] PrestatarioSearchDTO filtro)
+        public async Task<IActionResult> ObtenerConFiltros([FromQuery] PrestatarioSearchDTO filtro, CancellationToken cancellationToken)
         {
             try
             {
@@ -80,7 +80,7 @@ namespace TuCredito.Controllers;
                     EsActivo = filtro.EsActivo
                 };
 
-                var lista = await _service.ObtenerConFiltrosAsync(dto);
+                var lista = await _service.ObtenerConFiltrosAsync(dto, cancellationToken);
                 var dtos = _mapper.Map<List<PrestatarioDTO>>(lista);
                 return Ok(dtos);
             }
@@ -91,14 +91,14 @@ namespace TuCredito.Controllers;
         }
 
         [HttpPut("{dni:int}")]
-        public async Task<IActionResult> Actualizar(int dni, [FromBody] Prestatario prestatario)
+        public async Task<IActionResult> Actualizar(int dni, [FromBody] Prestatario prestatario, CancellationToken cancellationToken)
         {
             try
             {
                 if (dni != prestatario.Dni)
                     return BadRequest(new { message = "El DNI de la URL no coincide con el del cuerpo." });
 
-                var actualizado = await _service.ActualizarAsync(prestatario);
+                var actualizado = await _service.ActualizarAsync(prestatario, cancellationToken);
 
                 if (!actualizado)
                     return NotFound(new { message = "No se pudo actualizar. Prestatario no encontrado." });
@@ -112,11 +112,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpPatch("{dni:int}/status")]
-        public async Task<IActionResult> CambiarEstado(int dni, [FromQuery] bool activo)
+        public async Task<IActionResult> CambiarEstado(int dni, [FromQuery] bool activo, CancellationToken cancellationToken)
         {
             try
             {
-                var ok = await _service.CambiarEstadoAsync(dni, activo);
+                var ok = await _service.CambiarEstadoAsync(dni, activo, cancellationToken);
 
                 if (!ok)
                     return NotFound(new { message = "No se pudo cambiar el estado. Prestatario no encontrado." });

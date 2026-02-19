@@ -31,7 +31,7 @@ namespace TuCredito.Services.Implementations
             return dni >= 10000001 && dni <= 10000020;
         }
 
-        public async Task<int> CrearAsync(Prestatario prestatario)
+        public async Task<int> CrearAsync(Prestatario prestatario, CancellationToken cancellationToken = default)
         {
             if (prestatario == null) throw new ArgumentNullException(nameof(prestatario));
 
@@ -47,7 +47,7 @@ namespace TuCredito.Services.Implementations
             if (prestatario.Dni <= 0)
                 throw new ArgumentException("El DNI es inválido.");
 
-            var existe = await _context.Prestatarios.AnyAsync(p => p.Dni == prestatario.Dni);
+            var existe = await _context.Prestatarios.AnyAsync(p => p.Dni == prestatario.Dni, cancellationToken);
             if (existe)
                 throw new ArgumentException("Ya existe un prestatario con ese DNI.");
 
@@ -61,7 +61,7 @@ namespace TuCredito.Services.Implementations
                 else
                 {
                     var garanteExistente = await _context.Garantes
-                        .FirstOrDefaultAsync(g => g.Dni == prestatario.IdGaranteNavigation.Dni);
+                        .FirstOrDefaultAsync(g => g.Dni == prestatario.IdGaranteNavigation.Dni, cancellationToken);
 
                     if (garanteExistente != null)
                     {
@@ -75,14 +75,14 @@ namespace TuCredito.Services.Implementations
                 }
             }
 
-            await _context.Prestatarios.AddAsync(prestatario);
-            await _context.SaveChangesAsync();
+            await _context.Prestatarios.AddAsync(prestatario, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
 
           
             return prestatario.Dni;
         }
 
-        public async Task<bool> ActualizarAsync(Prestatario prestatario)
+        public async Task<bool> ActualizarAsync(Prestatario prestatario, CancellationToken cancellationToken = default)
         {
             if (prestatario == null) throw new ArgumentNullException(nameof(prestatario));
 
@@ -92,7 +92,7 @@ namespace TuCredito.Services.Implementations
             if (IsDemoUser() && IsSeedData(prestatario.Dni))
                 throw new InvalidOperationException("No se pueden modificar los prestatarios de prueba protegidos.");
 
-            var existente = await _context.Prestatarios.FirstOrDefaultAsync(p => p.Dni == prestatario.Dni);
+            var existente = await _context.Prestatarios.FirstOrDefaultAsync(p => p.Dni == prestatario.Dni, cancellationToken);
             if (existente == null)
                 throw new ArgumentException("Prestatario no encontrado.");
 
@@ -111,11 +111,11 @@ namespace TuCredito.Services.Implementations
 
             
 
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
             return true;
         }
 
-        public async Task<bool> CambiarEstadoAsync(int dni, bool activo)
+        public async Task<bool> CambiarEstadoAsync(int dni, bool activo, CancellationToken cancellationToken = default)
         {
             if (dni <= 0)
                 throw new ArgumentException("DNI inválido.");
@@ -123,26 +123,26 @@ namespace TuCredito.Services.Implementations
             if (IsDemoUser() && IsSeedData(dni))
                 throw new InvalidOperationException("No se puede cambiar el estado de los prestatarios de prueba protegidos.");
 
-            var existente = await _context.Prestatarios.FirstOrDefaultAsync(p => p.Dni == dni);
+            var existente = await _context.Prestatarios.FirstOrDefaultAsync(p => p.Dni == dni, cancellationToken);
             if (existente == null)
                 throw new ArgumentException("Prestatario no encontrado.");
 
             
             existente.EsActivo = activo;
 
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
             return true;
         }
 
-        public async Task<Prestatario?> ObtenerPorDniAsync(int dni)
+        public async Task<Prestatario?> ObtenerPorDniAsync(int dni, CancellationToken cancellationToken = default)
         {
             if (dni <= 0)
                 throw new ArgumentException("DNI inválido.");
 
-            return await _context.Prestatarios.FirstOrDefaultAsync(p => p.Dni == dni);
+            return await _context.Prestatarios.FirstOrDefaultAsync(p => p.Dni == dni, cancellationToken);
         }
 
-        public async Task<List<Prestatario>> ObtenerConFiltrosAsync(PrestatarioDTO filtro)
+        public async Task<List<Prestatario>> ObtenerConFiltrosAsync(PrestatarioDTO filtro, CancellationToken cancellationToken = default)
         {
             
             filtro ??= new PrestatarioDTO();
@@ -165,7 +165,7 @@ namespace TuCredito.Services.Implementations
             if (filtro.EsActivo.HasValue)
                 query = query.Where(p => p.EsActivo == filtro.EsActivo.Value);
 
-            return await query.ToListAsync();
+            return await query.ToListAsync(cancellationToken);
         }
     }
 }

@@ -15,9 +15,9 @@ namespace TuCredito.Services.Implementations;
             _cuotaService = cuotaService;
         }
 
-        public async Task<DashboardKpisDTO> GetKpisAsync(DateTime? from = null, DateTime? to = null)
+        public async Task<DashboardKpisDTO> GetKpisAsync(DateTime? from = null, DateTime? to = null, CancellationToken cancellationToken = default)
         {
-            await _cuotaService.ActualizarCuotasVencidas();
+            await _cuotaService.ActualizarCuotasVencidas(cancellationToken);
 
             var now = DateTime.Now;
             
@@ -30,13 +30,13 @@ namespace TuCredito.Services.Implementations;
             {
                 prestamosQuery = prestamosQuery.Where(p => p.FechaOtorgamiento >= startDate && p.FechaOtorgamiento <= endDate);
             }
-            var totalPrestado = await prestamosQuery.SumAsync(p => p.MontoOtorgado);
+            var totalPrestado = await prestamosQuery.SumAsync(p => p.MontoOtorgado, cancellationToken);
 
             var capitalPendiente = await _context.Cuotas
                 .Include(c => c.IdEstadoNavigation)
                 .Where(c => c.IdEstadoNavigation.Descripcion == "Pendiente"
                          || c.IdEstadoNavigation.Descripcion == "Vencida")
-                .SumAsync(c => c.Monto - (c.Interes ?? 0));
+                .SumAsync(c => c.Monto - (c.Interes ?? 0), cancellationToken);
 
             IQueryable<Pago> pagosQuery = _context.Pagos;
             if (hasFilter)
@@ -51,7 +51,7 @@ namespace TuCredito.Services.Implementations;
                       p => p.IdCuota,
                       c => c.IdCuota,
                       (p, c) => new { PagoMonto = p.Monto, CuotaMonto = c.Monto, CuotaInteres = c.Interes ?? 0 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             decimal totalInteresCobrado = 0;
             foreach (var item in pagosConCuota)
@@ -66,7 +66,7 @@ namespace TuCredito.Services.Implementations;
             var totalEnMora = await _context.Cuotas
                 .Include(c => c.IdEstadoNavigation)
                 .Where(c => c.IdEstadoNavigation.Descripcion == "Vencida")
-                .SumAsync(c => c.Monto);
+                .SumAsync(c => c.Monto, cancellationToken);
 
             decimal porcentajeMorosidad = 0;
             if (capitalPendiente > 0)
@@ -88,7 +88,7 @@ namespace TuCredito.Services.Implementations;
             };
         }
 
-        public async Task<List<GraficoDatoDTO>> GetProyeccionFlujoCajaAsync()
+        public async Task<List<GraficoDatoDTO>> GetProyeccionFlujoCajaAsync(CancellationToken cancellationToken = default)
         {
             var today = DateTime.Today;
             var endDate = today.AddDays(28);
@@ -98,7 +98,7 @@ namespace TuCredito.Services.Implementations;
                 .Where(c => c.IdEstadoNavigation.Descripcion == "Pendiente"
                         && c.FecVto >= today && c.FecVto <= endDate)
                 .Select(c => new { c.FecVto, c.Monto })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             var result = new List<GraficoDatoDTO>();
             for (int i = 0; i < 4; i++)
@@ -116,7 +116,7 @@ namespace TuCredito.Services.Implementations;
             return result;
         }
 
-        public async Task<List<SerieTiempoDTO>> GetEvolucionColocacionAsync(DateTime? from = null, DateTime? to = null)
+        public async Task<List<SerieTiempoDTO>> GetEvolucionColocacionAsync(DateTime? from = null, DateTime? to = null, CancellationToken cancellationToken = default)
         {
              var query = _context.Prestamos.AsQueryable();
 
@@ -136,17 +136,17 @@ namespace TuCredito.Services.Implementations;
                 })
                 .OrderBy(x => x.Anio)
                 .ThenBy(x => x.Mes)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<GraficoDatoDTO>> GetComposicionRiesgoAsync()
+        public async Task<List<GraficoDatoDTO>> GetComposicionRiesgoAsync(CancellationToken cancellationToken = default)
         {
             var today = DateTime.Today;
             var vencidas = await _context.Cuotas
                 .Include(c => c.IdEstadoNavigation)
                 .Where(c => c.IdEstadoNavigation.Descripcion == "Vencida")
                 .Select(c => new { c.FecVto, c.Monto })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             return new List<GraficoDatoDTO>
             {
@@ -157,7 +157,7 @@ namespace TuCredito.Services.Implementations;
             };
         }
 
-        public async Task<List<GraficoDatoDTO>> GetPrestamosPorEstadoAsync()
+        public async Task<List<GraficoDatoDTO>> GetPrestamosPorEstadoAsync(CancellationToken cancellationToken = default)
         {
             return await _context.Prestamos
                 .Include(p => p.IdEstadoNavigation)
@@ -167,10 +167,10 @@ namespace TuCredito.Services.Implementations;
                     Etiqueta = g.Key,
                     Valor = g.Count()
                 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<SerieTiempoDTO>> GetFlujoCobranzasAsync(DateTime? from = null, DateTime? to = null)
+        public async Task<List<SerieTiempoDTO>> GetFlujoCobranzasAsync(DateTime? from = null, DateTime? to = null, CancellationToken cancellationToken = default)
         {
             var query = _context.Pagos.AsQueryable();
 
@@ -190,10 +190,10 @@ namespace TuCredito.Services.Implementations;
                 })
                 .OrderBy(x => x.Anio)
                 .ThenBy(x => x.Mes)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<MorosidadDetalleDTO>> GetMorosidadDetalladaAsync()
+        public async Task<List<MorosidadDetalleDTO>> GetMorosidadDetalladaAsync(CancellationToken cancellationToken = default)
         {
             var query =
                 from c in _context.Cuotas
@@ -209,10 +209,10 @@ namespace TuCredito.Services.Implementations;
                     MontoAdeudado = c.Monto
                 };
 
-            return await query.ToListAsync();
+            return await query.ToListAsync(cancellationToken);
         }
 
-        public async Task<List<CuotaVencerDTO>> GetCuotasAVencerAsync()
+        public async Task<List<CuotaVencerDTO>> GetCuotasAVencerAsync(CancellationToken cancellationToken = default)
         {
             var today = DateTime.Today;
             var limitDate = today.AddDays(15);
@@ -238,10 +238,10 @@ namespace TuCredito.Services.Implementations;
                     DiasParaVencer = (c.FecVto - today).Days
                 };
 
-            return await query.OrderBy(x => x.FechaVencimiento).ToListAsync();
+            return await query.OrderBy(x => x.FechaVencimiento).ToListAsync(cancellationToken);
         }
 
-        public async Task<List<TransactionDTO>> GetRecentTransactionsAsync()
+        public async Task<List<TransactionDTO>> GetRecentTransactionsAsync(CancellationToken cancellationToken = default)
         {
             var loans = await _context.Prestamos
                 .Include(p => p.DniPrestatarioNavigation)
@@ -256,7 +256,7 @@ namespace TuCredito.Services.Implementations;
                     EntityName = p.DniPrestatarioNavigation.Nombre + " " + p.DniPrestatarioNavigation.Apellido,
                     Status = p.IdEstadoNavigation.Descripcion
                 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             var payments = await _context.Pagos
                 .Include(p => p.IdCuotaNavigation)
@@ -272,7 +272,7 @@ namespace TuCredito.Services.Implementations;
                     EntityName = p.IdCuotaNavigation.IdPrestamoNavigation.DniPrestatarioNavigation.Nombre + " " + p.IdCuotaNavigation.IdPrestamoNavigation.DniPrestatarioNavigation.Apellido,
                     Status = "Completado"
                 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             return loans.Concat(payments)
                 .OrderByDescending(x => x.Date)
@@ -280,7 +280,7 @@ namespace TuCredito.Services.Implementations;
                 .ToList();
         }
 
-        public async Task<List<GraficoDatoDTO>> GetRankingClientesDeudaAsync()
+        public async Task<List<GraficoDatoDTO>> GetRankingClientesDeudaAsync(CancellationToken cancellationToken = default)
         {
             return await _context.Cuotas
                 .Include(c => c.IdEstadoNavigation)
@@ -302,12 +302,12 @@ namespace TuCredito.Services.Implementations;
                 })
                 .OrderByDescending(x => x.Valor)
                 .Take(10)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<AnalistaTasaDTO> GetAnalisisTasasAsync()
+        public async Task<AnalistaTasaDTO> GetAnalisisTasasAsync(CancellationToken cancellationToken = default)
         {
-            var prestamos = await _context.Prestamos.ToListAsync();
+            var prestamos = await _context.Prestamos.ToListAsync(cancellationToken);
 
             if (!prestamos.Any())
                 return new AnalistaTasaDTO();
@@ -326,15 +326,15 @@ namespace TuCredito.Services.Implementations;
             };
         }
 
-        public async Task<List<SerieTiempoDTO>> GetEvolucionSaldoAsync()
+        public async Task<List<SerieTiempoDTO>> GetEvolucionSaldoAsync(CancellationToken cancellationToken = default)
         {
             var loans = await _context.Prestamos
                 .Select(p => new { p.FechaOtorgamiento.Year, p.FechaOtorgamiento.Month, Monto = p.MontoOtorgado })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             var payments = await _context.Pagos
                 .Select(p => new { p.FecPago.Year, p.FecPago.Month, Monto = -p.Monto })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             var eventos = loans.Concat(payments)
                 .GroupBy(e => new { e.Year, e.Month })

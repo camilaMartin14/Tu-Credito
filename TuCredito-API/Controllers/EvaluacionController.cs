@@ -15,11 +15,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpPost]
-        public async Task<ActionResult<EvaluacionCrediticiaResponseDTO>> Evaluar([FromBody] EvaluacionCrediticiaRequestDTO request)
+        public async Task<ActionResult<EvaluacionCrediticiaResponseDTO>> Evaluar([FromBody] EvaluacionCrediticiaRequestDTO request, CancellationToken cancellationToken = default)
         {
             try
             {
-                var resultado = await _evaluacionService.EvaluarRiesgoAsync(request);
+                var resultado = await _evaluacionService.EvaluarRiesgoAsync(request, cancellationToken);
                 return Ok(resultado);
             }
             catch (Exception ex)

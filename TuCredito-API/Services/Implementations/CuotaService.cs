@@ -18,14 +18,14 @@ namespace TuCredito.Services.Implementations
             _context = context;
         }
 
-        public async Task<Result<bool>> AddCuota(Cuota cuota)
+        public async Task<Result<bool>> AddCuota(Cuota cuota, CancellationToken cancellationToken = default)
         {
             try
             {
                 if (cuota.IdPrestamo <= 0)
                     return Result<bool>.Failure("La cuota debe estar asociada a un préstamo.");
 
-                var prestamo = await _context.Prestamos.FindAsync(cuota.IdPrestamo);
+                var prestamo = await _context.Prestamos.FindAsync(new object[] { cuota.IdPrestamo }, cancellationToken);
                 if (prestamo == null)
                     return Result<bool>.Failure("El préstamo no existe.");
 
@@ -52,8 +52,8 @@ namespace TuCredito.Services.Implementations
 
                 cuota.SaldoPendiente = cuota.Monto;
 
-                await _context.Cuotas.AddAsync(cuota);
-                var result = await _context.SaveChangesAsync();
+                await _context.Cuotas.AddAsync(cuota, cancellationToken);
+                var result = await _context.SaveChangesAsync(cancellationToken);
 
                 return Result<bool>.Success(result > 0);
             }
@@ -63,7 +63,7 @@ namespace TuCredito.Services.Implementations
             }
         }
 
-        public async Task<Result<List<Cuota>>> GetByFiltro(int? estado, int? mesVto, string? prestatario, int? idPrestamo)
+        public async Task<Result<List<Cuota>>> GetByFiltro(int? estado, int? mesVto, string? prestatario, int? idPrestamo, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -96,7 +96,7 @@ namespace TuCredito.Services.Implementations
                 if (idPrestamo.HasValue)
                     query = query.Where(c => c.IdPrestamo == idPrestamo.Value);
 
-                var cuotas = await query.ToListAsync();
+                var cuotas = await query.ToListAsync(cancellationToken);
                 return Result<List<Cuota>>.Success(cuotas);
             }
             catch (Exception ex)
@@ -105,14 +105,14 @@ namespace TuCredito.Services.Implementations
             }
         }
 
-        public async Task<Result<Cuota>> GetById(int id)
+        public async Task<Result<Cuota>> GetById(int id, CancellationToken cancellationToken = default)
         {
             try
             {
                 if (id <= 0)
                     return Result<Cuota>.Failure("Ingrese un identificador válido.");
 
-                var cuota = await _context.Cuotas.FindAsync(id);
+                var cuota = await _context.Cuotas.FindAsync(new object[] { id }, cancellationToken);
                 if (cuota == null)
                     return Result<Cuota>.Failure("La cuota no existe.");
 
@@ -124,14 +124,14 @@ namespace TuCredito.Services.Implementations
             }
         }
 
-        public async Task<Result<bool>> UpdateCuota(Cuota cuota)
+        public async Task<Result<bool>> UpdateCuota(Cuota cuota, CancellationToken cancellationToken = default)
         {
             try
             {
                 if (cuota.IdCuota <= 0)
                     return Result<bool>.Failure("ID de cuota inválido.");
 
-                var dbCuota = await _context.Cuotas.FirstOrDefaultAsync(c => c.IdCuota == cuota.IdCuota);
+                var dbCuota = await _context.Cuotas.FirstOrDefaultAsync(c => c.IdCuota == cuota.IdCuota, cancellationToken);
                 if (dbCuota == null)
                     return Result<bool>.Failure("La cuota no existe.");
 
@@ -140,7 +140,7 @@ namespace TuCredito.Services.Implementations
 
                 var totalPagado = await _context.Pagos
                     .Where(p => p.IdCuota == dbCuota.IdCuota)
-                    .SumAsync(p => (decimal?)p.Monto) ?? 0m;
+                    .SumAsync(p => (decimal?)p.Monto, cancellationToken) ?? 0m;
 
                 if (totalPagado > dbCuota.Monto)
                     return Result<bool>.Failure("El total pagado supera el monto de la cuota.");
@@ -152,7 +152,7 @@ namespace TuCredito.Services.Implementations
                     : ESTADO_PENDIENTE;
 
                 _context.Cuotas.Update(dbCuota);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
 
                 return Result<bool>.Success(true);
             }
@@ -162,21 +162,21 @@ namespace TuCredito.Services.Implementations
             }
         }
 
-        public async Task<Result<int>> ActualizarCuotasVencidas()
+        public async Task<Result<int>> ActualizarCuotasVencidas(CancellationToken cancellationToken = default)
         {
             try
             {
                 var estadoVencida = await _context.EstadosCuotas
                     .Where(e => e.Descripcion == "Vencida")
                     .Select(e => e.IdEstado)
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefaultAsync(cancellationToken);
 
                 if (estadoVencida == 0)
                     return Result<int>.Failure("No se encontró el estado 'Vencida' en la base de datos.");
 
                 var cuotasVencidas = await _context.Cuotas
                     .Where(c => c.IdEstado == ESTADO_PENDIENTE && c.FecVto.Date < DateTime.Today)
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
 
                 if (!cuotasVencidas.Any())
                     return Result<int>.Success(0);
@@ -184,7 +184,7 @@ namespace TuCredito.Services.Implementations
                 foreach (var c in cuotasVencidas)
                     c.IdEstado = estadoVencida;
 
-                var count = await _context.SaveChangesAsync();
+                var count = await _context.SaveChangesAsync(cancellationToken);
                 return Result<int>.Success(count);
             }
             catch (Exception ex)
@@ -193,7 +193,7 @@ namespace TuCredito.Services.Implementations
             }
         }
 
-        public async Task<Result<List<Cuota>>> Getall(int idPrestamo)
+        public async Task<Result<List<Cuota>>> Getall(int idPrestamo, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -202,7 +202,7 @@ namespace TuCredito.Services.Implementations
 
                 var cuotas = await _context.Cuotas
                     .Where(c => c.IdPrestamo == idPrestamo)
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
 
                 return Result<List<Cuota>>.Success(cuotas);
             }

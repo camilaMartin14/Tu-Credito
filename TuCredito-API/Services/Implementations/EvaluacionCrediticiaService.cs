@@ -13,13 +13,13 @@ namespace TuCredito.Services.Implementations;
             _bcraService = bcraService;
         }
 
-        public async Task<EvaluacionCrediticiaResponseDTO> EvaluarRiesgoAsync(EvaluacionCrediticiaRequestDTO request)
+        public async Task<EvaluacionCrediticiaResponseDTO> EvaluarRiesgoAsync(EvaluacionCrediticiaRequestDTO request, CancellationToken cancellationToken = default)
         {
             int maxSituacion = 1;
             bool errorBcra = false;
             try 
             {
-                var deudaResponse = await _bcraService.GetDeudasByCuitAsync(request.Cuit);
+                var deudaResponse = await _bcraService.GetDeudasByCuitAsync(request.Cuit, cancellationToken);
                 if (deudaResponse != null && deudaResponse.Deudas != null && deudaResponse.Deudas.Any())
                 {
                     maxSituacion = deudaResponse.Deudas.Max(d => (int)d.Situacion);

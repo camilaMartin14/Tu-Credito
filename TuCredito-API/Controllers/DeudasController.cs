@@ -15,7 +15,7 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet("{cuit}")]
-        public async Task<IActionResult> GetDeudas(string cuit)
+        public async Task<IActionResult> GetDeudas(string cuit, CancellationToken cancellationToken = default)
         {
             if (!long.TryParse(cuit, out var cuitNumerico))
             {
@@ -24,7 +24,7 @@ namespace TuCredito.Controllers;
 
             try
             {
-                var resultado = await _deudaService.GetDeudasByCuitAsync(cuitNumerico);
+                var resultado = await _deudaService.GetDeudasByCuitAsync(cuitNumerico, cancellationToken);
 
                 if (resultado == null)
                     return NotFound(new { message = "No se encontraron deudas para el CUIT informado." });

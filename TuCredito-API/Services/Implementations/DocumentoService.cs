@@ -17,7 +17,7 @@ namespace TuCredito.Services.Implementations
             _fileStorage = fileStorage;
         }
 
-        public async Task SubirAsync(SubirDocumentoRequestDTO request)
+        public async Task SubirAsync(SubirDocumentoRequestDTO request, CancellationToken cancellationToken = default)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (request.EntidadId <= 0) throw new ArgumentException("El ID de la entidad es inv�lido.");
@@ -35,12 +35,12 @@ namespace TuCredito.Services.Implementations
 
             if (request.UsuarioId == 1) // ID 1 es demo 
             {
-                var count = await _context.Documentos.CountAsync(d => d.SubidoPor == 1 && d.Activo);
+                var count = await _context.Documentos.CountAsync(d => d.SubidoPor == 1 && d.Activo, cancellationToken);
                 if (count >= 10)
                     throw new InvalidOperationException("La cuenta DEMO ha alcanzado el límite de archivos (10).");
             }
 
-            await ValidarEntidadAsync(request.EntidadTipo, request.EntidadId);
+            await ValidarEntidadAsync(request.EntidadTipo, request.EntidadId, cancellationToken);
 
             var ruta = $"{request.EntidadTipo.ToLower()}/" +
                        $"{request.EntidadId}/" +
@@ -48,7 +48,7 @@ namespace TuCredito.Services.Implementations
                        $"{Guid.NewGuid()}_{request.Archivo.FileName}";
 
             using var stream = request.Archivo.OpenReadStream();
-            await _fileStorage.SubirAsync(stream, ruta, request.Archivo.ContentType);
+            await _fileStorage.SubirAsync(stream, ruta, request.Archivo.ContentType, cancellationToken);
 
             var documento = new Documento
             {
@@ -64,20 +64,20 @@ namespace TuCredito.Services.Implementations
             };
 
             _context.Documentos.Add(documento);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<List<RespuestaDocumentoDto>> ListarAsync(string entidadTipo, int entidadId)
+        public async Task<List<RespuestaDocumentoDto>> ListarAsync(string entidadTipo, int entidadId, CancellationToken cancellationToken = default)
         {
             if (entidadId <= 0) throw new ArgumentException("El ID de la entidad es inv�lido.");
             if (string.IsNullOrWhiteSpace(entidadTipo)) throw new ArgumentException("El tipo de entidad es obligatorio.");
 
-            await ValidarEntidadAsync(entidadTipo, entidadId);
+            await ValidarEntidadAsync(entidadTipo, entidadId, cancellationToken);
 
             var documentos = await _context.Documentos
                 .Where(d => d.EntidadTipo == entidadTipo && d.EntidadId == entidadId && d.Activo)
                 .OrderByDescending(d => d.FechaSubida)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             return documentos.Select(d => new RespuestaDocumentoDto
             {
@@ -88,39 +88,39 @@ namespace TuCredito.Services.Implementations
             }).ToList();
         }
 
-        public async Task<(Stream Stream, string ContentType, string NombreOriginal)> DescargarAsync(int idDocumento)
+        public async Task<(Stream Stream, string ContentType, string NombreOriginal)> DescargarAsync(int idDocumento, CancellationToken cancellationToken = default)
         {
             if (idDocumento <= 0) throw new ArgumentException("ID de documento inv�lido.");
 
             var documento = await _context.Documentos
-                .FirstOrDefaultAsync(d => d.IdDocumento == idDocumento && d.Activo);
+                .FirstOrDefaultAsync(d => d.IdDocumento == idDocumento && d.Activo, cancellationToken);
 
             if (documento == null)
                 throw new Exception("Documento no encontrado.");
 
-            var stream = await _fileStorage.DescargarAsync(documento.RutaStorage);
+            var stream = await _fileStorage.DescargarAsync(documento.RutaStorage, cancellationToken);
 
             return (stream, documento.ContentType, documento.NombreOriginal);
         }
 
-        public async Task EliminarAsync(int idDocumento)
+        public async Task EliminarAsync(int idDocumento, CancellationToken cancellationToken = default)
         {
             if (idDocumento <= 0) throw new ArgumentException("ID de documento inválido.");
 
             var documento = await _context.Documentos
-                .FirstOrDefaultAsync(d => d.IdDocumento == idDocumento);
+                .FirstOrDefaultAsync(d => d.IdDocumento == idDocumento, cancellationToken);
 
             if (documento == null)
                 throw new Exception("Documento no encontrado.");
 
             // Hard Delete: Eliminar archivo físico de MinIO y registro de BD
-            await _fileStorage.EliminarAsync(documento.RutaStorage);
+            await _fileStorage.EliminarAsync(documento.RutaStorage, cancellationToken);
             
             _context.Documentos.Remove(documento);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
-        private async Task ValidarEntidadAsync(string entidadTipo, int entidadId)
+        private async Task ValidarEntidadAsync(string entidadTipo, int entidadId, CancellationToken cancellationToken)
         {
             var tipo = entidadTipo.Trim().ToLower();
 
@@ -128,7 +128,7 @@ namespace TuCredito.Services.Implementations
             {
                 case "prestatario":
                     {
-                        var existe = await _context.Prestatarios.AnyAsync(p => p.Dni == entidadId);
+                        var existe = await _context.Prestatarios.AnyAsync(p => p.Dni == entidadId, cancellationToken);
                         if (!existe)
                             throw new Exception($"Prestatario con ID {entidadId} no encontrado.");
                         break;
@@ -136,7 +136,7 @@ namespace TuCredito.Services.Implementations
 
                 case "prestamo":
                     {
-                        var existe = await _context.Prestamos.AnyAsync(p => p.IdPrestamo == entidadId);
+                        var existe = await _context.Prestamos.AnyAsync(p => p.IdPrestamo == entidadId, cancellationToken);
                         if (!existe)
                             throw new Exception($"Pr�stamo con ID {entidadId} no encontrado.");
                         break;

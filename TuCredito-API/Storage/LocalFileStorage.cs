@@ -15,7 +15,7 @@ public class LocalFileStorage : IFileStorage
         }
     }
 
-    public async Task SubirAsync(Stream archivo, string ruta, string contentType)
+    public async Task SubirAsync(Stream archivo, string ruta, string contentType, CancellationToken cancellationToken = default)
     {
         var fullPath = Path.Combine(_basePath, ruta.Replace("/", Path.DirectorySeparatorChar.ToString()));
         var directory = Path.GetDirectoryName(fullPath);
@@ -27,10 +27,10 @@ public class LocalFileStorage : IFileStorage
 
         using var fileStream = new FileStream(fullPath, FileMode.Create, FileAccess.Write);
         archivo.Position = 0;
-        await archivo.CopyToAsync(fileStream);
+        await archivo.CopyToAsync(fileStream, cancellationToken);
     }
 
-    public async Task<Stream> DescargarAsync(string ruta)
+    public async Task<Stream> DescargarAsync(string ruta, CancellationToken cancellationToken = default)
     {
         var fullPath = Path.Combine(_basePath, ruta.Replace("/", Path.DirectorySeparatorChar.ToString()));
         
@@ -42,14 +42,14 @@ public class LocalFileStorage : IFileStorage
         var memoryStream = new MemoryStream();
         using (var fileStream = new FileStream(fullPath, FileMode.Open, FileAccess.Read))
         {
-            await fileStream.CopyToAsync(memoryStream);
+            await fileStream.CopyToAsync(memoryStream, cancellationToken);
         }
         
         memoryStream.Position = 0;
         return memoryStream;
     }
 
-    public Task EliminarAsync(string ruta)
+    public Task EliminarAsync(string ruta, CancellationToken cancellationToken = default)
     {
         var fullPath = Path.Combine(_basePath, ruta.Replace("/", Path.DirectorySeparatorChar.ToString()));
         

@@ -20,11 +20,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult> Registrar([FromBody] PrestamistaRegisterDto dto)
+        public async Task<ActionResult> Registrar([FromBody] PrestamistaRegisterDto dto, CancellationToken cancellationToken = default)
         {
             try
             {
-                var id = await _service.RegistrarPrestamistaAsync(dto);
+                var id = await _service.RegistrarPrestamistaAsync(dto, cancellationToken);
                 return CreatedAtAction(nameof(ObtenerActual), new { id }, null);
             }
             catch (Exception ex)
@@ -35,7 +35,7 @@ namespace TuCredito.Controllers;
 
         [Authorize]
         [HttpGet("me")]
-        public async Task<ActionResult<PrestamistaResponseDTO>> ObtenerActual()
+        public async Task<ActionResult<PrestamistaResponseDTO>> ObtenerActual(CancellationToken cancellationToken = default)
         {
             try
             {
@@ -45,7 +45,7 @@ namespace TuCredito.Controllers;
 
                 int prestamistaId = int.Parse(prestamistaIdClaim.Value);
 
-                var prestamista = await _service.ObtenerPrestamistaPorIdAsync(prestamistaId);
+                var prestamista = await _service.ObtenerPrestamistaPorIdAsync(prestamistaId, cancellationToken);
                 if (prestamista == null)
                     return NotFound(new { message = "Prestamista no encontrado." });
 
@@ -68,11 +68,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult> Login([FromBody] PrestamistaLoginDTO dto)
+        public async Task<ActionResult> Login([FromBody] PrestamistaLoginDTO dto, CancellationToken cancellationToken = default)
         {
             try
             {
-                var prestamista = await _service.LoginAsync(dto.Usuario, dto.Contrasenia);
+                var prestamista = await _service.LoginAsync(dto.Usuario, dto.Contrasenia, cancellationToken);
                 if (prestamista == null)
                     return Unauthorized(new { message = "Credenciales incorrectas." });
 
@@ -102,7 +102,7 @@ namespace TuCredito.Controllers;
 
         [Authorize]
         [HttpPut("me")]
-        public async Task<ActionResult> ActualizarPerfil([FromBody] PrestamistaUpdateDTO dto)
+        public async Task<ActionResult> ActualizarPerfil([FromBody] PrestamistaUpdateDTO dto, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -112,7 +112,7 @@ namespace TuCredito.Controllers;
 
                 int id = int.Parse(prestamistaIdClaim.Value);
                 
-                var resultado = await _service.UpdatePerfilAsync(id, dto);
+                var resultado = await _service.UpdatePerfilAsync(id, dto, cancellationToken);
                 if (resultado) return Ok(new { message = "Perfil actualizado correctamente." });
                 return BadRequest(new { message = "No se pudo actualizar el perfil." });
             }

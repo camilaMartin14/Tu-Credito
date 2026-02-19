@@ -33,26 +33,26 @@ namespace TuCredito.Services.Implementations
 
         }
 
-        public async Task<List<PrestamoDTO>> GetAll()
+        public async Task<List<PrestamoDTO>> GetAll(CancellationToken cancellationToken = default)
         {
-            var Lista = await _context.Prestamos.ToListAsync();
+            var Lista = await _context.Prestamos.ToListAsync(cancellationToken);
             return _mapper.Map<List<PrestamoDTO>>(Lista);
         }
 
-        public async Task<PrestamoDTO> GetPrestamoById(int id)
+        public async Task<PrestamoDTO> GetPrestamoById(int id, CancellationToken cancellationToken = default)
         {
             if (id <= 0) throw new ArgumentException("ID inválido");
 
             var prestamo = await _context.Prestamos
                 .Include(p => p.DniPrestatarioNavigation)
-                .FirstOrDefaultAsync(p => p.IdPrestamo == id);
+                .FirstOrDefaultAsync(p => p.IdPrestamo == id, cancellationToken);
 
             if (prestamo == null) throw new Exception("Préstamo no encontrado");
 
             return _mapper.Map<PrestamoDTO>(prestamo);
         }
 
-        public async Task<List<PrestamoDTO>> GetPrestamoConFiltro(string? nombre, int? estado, int? mesVto, int? anio)
+        public async Task<List<PrestamoDTO>> GetPrestamoConFiltro(string? nombre, int? estado, int? mesVto, int? anio, CancellationToken cancellationToken = default)
         {
             if (mesVto.HasValue && (mesVto.Value > 12 || mesVto.Value < 1))
                 throw new ArgumentException("El mes debe estar contenido entre 1 y 12");
@@ -87,12 +87,12 @@ namespace TuCredito.Services.Implementations
                     c.FecVto.Year == anio.Value));
             }
 
-            var resultado = await query.ToListAsync();
+            var resultado = await query.ToListAsync(cancellationToken);
             return _mapper.Map<List<PrestamoDTO>>(resultado);
         }
         
 
-        public async Task<bool> PostPrestamo(PrestamoDTO nvoPrestamo)
+        public async Task<bool> PostPrestamo(PrestamoDTO nvoPrestamo, CancellationToken cancellationToken = default)
         {
             if (nvoPrestamo.MontoOtorgado <= 0)
                 throw new ArgumentException("El monto debe ser mayor que cero");
@@ -104,14 +104,14 @@ namespace TuCredito.Services.Implementations
                 throw new ArgumentException("Ingrese un número de cuotas válido");
 
             var existePrestatario = await _context.Prestatarios
-                .AnyAsync(p => p.Dni == nvoPrestamo.DniPrestatario);
+                .AnyAsync(p => p.Dni == nvoPrestamo.DniPrestatario, cancellationToken);
 
             if (!existePrestatario)
                 throw new ArgumentException("El DNI ingresado no está registrado");
 
             var entidad = _mapper.Map<Prestamo>(nvoPrestamo);
 
-            entidad.IdPrestamista = await _prestamista.ObtenerIdUsuarioLogueado();
+            entidad.IdPrestamista = await _prestamista.ObtenerIdUsuarioLogueado(cancellationToken);
 
             entidad.SaldoRestante = entidad.MontoOtorgado;
 
@@ -143,53 +143,53 @@ namespace TuCredito.Services.Implementations
             GenerarCuotas(entidad);
 
             _context.Prestamos.Add(entidad);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             return true;
         }
         
 
-        public async Task<bool> SoftDelete(int id)
+        public async Task<bool> SoftDelete(int id, CancellationToken cancellationToken = default)
         {
             if (id <= 0) throw new ArgumentException("ID inválido");
 
-            var prestamo = await _context.Prestamos.FindAsync(id);
+            var prestamo = await _context.Prestamos.FindAsync(new object[] { id }, cancellationToken);
             if (prestamo == null) throw new ArgumentException("El préstamo indicado no existe");
 
             if (prestamo.IdEstado == 2) throw new ArgumentException("El préstamo ya se encuentra finalizado");
             if (prestamo.IdEstado == 3) throw new ArgumentException("El préstamo indicado está eliminado");
 
-            if (await TienePagosPendientes(id)) throw new ArgumentException("No se pueden finalizar préstamos que aún tengan pagos pendientes");
+            if (await TienePagosPendientes(id, cancellationToken)) throw new ArgumentException("No se pueden finalizar préstamos que aún tengan pagos pendientes");
 
             prestamo.IdEstado = 2;
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             return true;
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task<bool> Delete(int id, CancellationToken cancellationToken = default)
         {
             if (id <= 0) throw new ArgumentException("ID inválido");
 
-            var prestamo = await _context.Prestamos.FindAsync(id);
+            var prestamo = await _context.Prestamos.FindAsync(new object[] { id }, cancellationToken);
             if (prestamo == null) throw new ArgumentException("El préstamo indicado no existe");
 
             if (prestamo.IdEstado == 3) throw new ArgumentException("El préstamo ya se encuentra eliminado");
 
             prestamo.IdEstado = 3;
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             return true;
         }
 
-        private async Task<bool> TienePagosPendientes(int idPrestamo)
+        private async Task<bool> TienePagosPendientes(int idPrestamo, CancellationToken cancellationToken)
         {
             return await _context.Cuotas
                 .Where(c => c.IdPrestamo == idPrestamo)
                 .AnyAsync(c =>
                     (_context.Pagos
                         .Where(p => p.IdCuota == c.IdCuota)
-                        .Sum(p => (decimal?)p.Monto) ?? 0m) < c.Monto);
+                        .Sum(p => (decimal?)p.Monto) ?? 0m) < c.Monto, cancellationToken);
         }
 
         public void GenerarCuotas(Prestamo prestamo)
@@ -221,11 +221,11 @@ namespace TuCredito.Services.Implementations
         }
 
 
-        public async Task<Prestamo> GetPrestamoEntityById(int id)
+        public async Task<Prestamo> GetPrestamoEntityById(int id, CancellationToken cancellationToken = default)
         {
             if (id <= 0) throw new ArgumentException("ID inválido");
 
-            var prestamo = await _context.Prestamos.FindAsync(id);
+            var prestamo = await _context.Prestamos.FindAsync(new object[] { id }, cancellationToken);
             if (prestamo == null) throw new Exception("Préstamo no encontrado");
 
             return prestamo;
@@ -237,22 +237,22 @@ namespace TuCredito.Services.Implementations
         }
 
 
-        public async Task<ResumenPrestamoDTO> GetResumenPrestamo(int prestamoId)
+        public async Task<ResumenPrestamoDTO> GetResumenPrestamo(int prestamoId, CancellationToken cancellationToken = default)
         {
             if (prestamoId <= 0) throw new ArgumentException("ID inválido");
 
-            var prestamo = await _context.Prestamos.FindAsync(prestamoId);
+            var prestamo = await _context.Prestamos.FindAsync(new object[] { prestamoId }, cancellationToken);
             if (prestamo == null) throw new Exception("Préstamo no encontrado");
 
             var cuotas = await _context.Cuotas
                 .Where(c => c.IdPrestamo == prestamoId)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             var cuotasSaldadas = cuotas.Where(c => c.IdEstado == 2).ToList(); // 2 = Saldada (según tu lógica)
 
             var pagos = await _context.Pagos
                 .Where(p => _context.Cuotas.Any(c => c.IdCuota == p.IdCuota && c.IdPrestamo == prestamoId))
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             DateTime? ultimaFechaPago = pagos.Any()
                 ? pagos.Max(p => p.FecPago)

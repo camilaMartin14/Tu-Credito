@@ -10,9 +10,9 @@ namespace TuCredito.Services.Implementations.Clients;
             _httpClient = httpClient;
         }
 
-        public async Task<DolarOficialModel?> GetDolarOficialAsync()
+        public async Task<DolarOficialModel?> GetDolarOficialAsync(CancellationToken cancellationToken = default)
         {
-            var response = await _httpClient.GetFromJsonAsync<DolarOficialModel>("https://dolarapi.com/v1/dolares/oficial");
+            var response = await _httpClient.GetFromJsonAsync<DolarOficialModel>("https://dolarapi.com/v1/dolares/oficial", cancellationToken);
 
             return response;
         }

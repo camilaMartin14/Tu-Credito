@@ -19,20 +19,20 @@ namespace TuCredito.Controllers
 
         [HttpPost("reset")]
         [AllowAnonymous] 
-        public async Task<IActionResult> ResetDemoData()
+        public async Task<IActionResult> ResetDemoData(CancellationToken cancellationToken = default)
         {
-            var demoUser = await _context.Prestamistas.FirstOrDefaultAsync(p => p.Usuario == "demo");
+            var demoUser = await _context.Prestamistas.FirstOrDefaultAsync(p => p.Usuario == "demo", cancellationToken);
             
             if (demoUser != null)
             {
                 var prestamos = await _context.Prestamos
                     .Where(p => p.IdPrestamista == demoUser.Id)
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
 
                 if (prestamos.Any())
                 {
                     _context.Prestamos.RemoveRange(prestamos);
-                    await _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync(cancellationToken);
                 }
                 
             }

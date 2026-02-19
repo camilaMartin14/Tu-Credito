@@ -28,7 +28,7 @@ namespace TuCredito.MinIO;
                 .Build();
         }
 
-        public async Task SubirAsync(Stream archivo, string ruta, string contentType)
+        public async Task SubirAsync(Stream archivo, string ruta, string contentType, CancellationToken cancellationToken = default)
         {
             await _minio.PutObjectAsync(
                 new PutObjectArgs()
@@ -36,11 +36,12 @@ namespace TuCredito.MinIO;
                     .WithObject(ruta)
                     .WithStreamData(archivo)
                     .WithObjectSize(archivo.Length)
-                    .WithContentType(contentType)
+                    .WithContentType(contentType),
+                cancellationToken: cancellationToken
             );
         }
 
-        public async Task<Stream> DescargarAsync(string ruta)
+        public async Task<Stream> DescargarAsync(string ruta, CancellationToken cancellationToken = default)
         {
             var ms = new MemoryStream();
 
@@ -48,19 +49,21 @@ namespace TuCredito.MinIO;
                 new GetObjectArgs()
                     .WithBucket(_bucket)
                     .WithObject(ruta)
-                    .WithCallbackStream(s => s.CopyTo(ms))
+                    .WithCallbackStream(s => s.CopyTo(ms)),
+                cancellationToken: cancellationToken
             );
 
             ms.Position = 0;
             return ms;
         }
 
-        public async Task EliminarAsync(string ruta)
+        public async Task EliminarAsync(string ruta, CancellationToken cancellationToken = default)
         {
             await _minio.RemoveObjectAsync(
                 new RemoveObjectArgs()
                     .WithBucket(_bucket)
-                    .WithObject(ruta)
+                    .WithObject(ruta),
+                cancellationToken: cancellationToken
             );
         }
     }

@@ -15,13 +15,13 @@ namespace TuCredito.Services.Implementations.Clients;
             _httpClient = httpClient;
         }
 
-        public async Task<DeudaResponse> GetDeudasByCuitAsync(long cuit)
+        public async Task<DeudaResponse> GetDeudasByCuitAsync(long cuit, CancellationToken cancellationToken = default)
         {
             var requestUrl = $"Deudas/{cuit}";
 
             try
             {
-                var response = await _httpClient.GetAsync(requestUrl);
+                var response = await _httpClient.GetAsync(requestUrl, cancellationToken);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -38,7 +38,7 @@ namespace TuCredito.Services.Implementations.Clients;
                     Converters = { new JsonStringEnumConverter() } 
                 };
 
-                var bcraResponse = await response.Content.ReadFromJsonAsync<BcraApiResponse>(options);
+                var bcraResponse = await response.Content.ReadFromJsonAsync<BcraApiResponse>(options, cancellationToken);
                 
                 if (bcraResponse == null || bcraResponse.Results == null) return null;
 

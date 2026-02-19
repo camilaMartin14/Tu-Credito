@@ -16,23 +16,23 @@ public class CuotaController : ControllerBase
     }
     
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
     {
-        var result = await _service.GetById(id);
+        var result = await _service.GetById(id, cancellationToken);
         if (result.IsFailure) return BadRequest(new { message = result.Error });
         return Ok(result.Value);
     }
 
     [HttpGet("filter")]
-    public async Task<IActionResult> GetByFiltro([FromQuery] int? estado, [FromQuery] int? mesVto,[FromQuery] string? prestatario, [FromQuery] int? idPrestamo)
+    public async Task<IActionResult> GetByFiltro([FromQuery] int? estado, [FromQuery] int? mesVto,[FromQuery] string? prestatario, [FromQuery] int? idPrestamo, CancellationToken cancellationToken)
     {
-        var result = await _service.GetByFiltro(estado, mesVto, prestatario, idPrestamo);
+        var result = await _service.GetByFiltro(estado, mesVto, prestatario, idPrestamo, cancellationToken);
         if (result.IsFailure) return BadRequest(new { message = result.Error });
         return Ok(result.Value);
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddCuota([FromBody] CuotaInputDTO nvaCuota)
+    public async Task<IActionResult> AddCuota([FromBody] CuotaInputDTO nvaCuota, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -46,7 +46,7 @@ public class CuotaController : ControllerBase
             IdEstado = 1 // Pendiente
         };
 
-        var result = await _service.AddCuota(cuota);
+        var result = await _service.AddCuota(cuota, cancellationToken);
         if (result.IsFailure) return BadRequest(new { message = result.Error });
         
         return Ok(new { message = "Cuota creada correctamente" });

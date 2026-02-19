@@ -26,27 +26,27 @@ namespace TuCredito.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<List<Pago>> GetAllPagos()
+        public async Task<List<Pago>> GetAllPagos(CancellationToken cancellationToken = default)
         {
             return await _context.Pagos
                 .Include(p => p.IdCuotaNavigation)
                     .ThenInclude(c => c.IdPrestamoNavigation)
                         .ThenInclude(pr => pr.DniPrestatarioNavigation)
                 .OrderByDescending(p => p.FecPago)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<Pago> GetPagoById(int id)
+        public async Task<Pago> GetPagoById(int id, CancellationToken cancellationToken = default)
         {
             if (id <= 0) throw new ArgumentException("Ingrese un identificador válido.");
 
-            var pago = await _context.Pagos.FindAsync(id);
+            var pago = await _context.Pagos.FindAsync(new object[] { id }, cancellationToken);
             if (pago == null) throw new ArgumentException("No se encontró el pago indicado.");
 
             return pago;
         }
 
-        public async Task<List<PagoOutputDTO>> GetPagoConFiltro(string? nombre, int? mes)
+        public async Task<List<PagoOutputDTO>> GetPagoConFiltro(string? nombre, int? mes, CancellationToken cancellationToken = default)
         {
             if (mes.HasValue && (mes.Value < 1 || mes.Value > 12))
                 throw new ArgumentException("El mes debe estar entre 1 y 12.");
@@ -71,13 +71,13 @@ namespace TuCredito.Services.Implementations
                 query = query.Where(p => p.FecPago.Month == mes.Value);
             }
 
-            var pagos = await query.ToListAsync();
+            var pagos = await query.ToListAsync(cancellationToken);
             return _mapper.Map<List<PagoOutputDTO>>(pagos);
         }
 
-        public async Task<bool> NewPago(Pago pago)
+        public async Task<bool> NewPago(Pago pago, CancellationToken cancellationToken = default)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
 
             try
             {
@@ -88,7 +88,7 @@ namespace TuCredito.Services.Implementations
 
                 var cuotaObjetivo = await _context.Cuotas
                     .Include(c => c.IdPrestamoNavigation)
-                    .FirstOrDefaultAsync(c => c.IdCuota == pago.IdCuota);
+                    .FirstOrDefaultAsync(c => c.IdCuota == pago.IdCuota, cancellationToken);
 
                 if (cuotaObjetivo == null)
                     throw new ArgumentException("Número de cuota incorrecto.");
@@ -134,7 +134,7 @@ namespace TuCredito.Services.Implementations
 
                     var quedanPendientes = await _context.Cuotas.AnyAsync(c =>
                         c.IdPrestamo == prestamo.IdPrestamo &&
-                        c.IdEstado != CUOTA_SALDADA);
+                        c.IdEstado != CUOTA_SALDADA, cancellationToken);
 
                     if (!quedanPendientes)
                         prestamo.IdEstado = PRESTAMO_FINALIZADO;
@@ -148,42 +148,42 @@ namespace TuCredito.Services.Implementations
                 pago.Estado = PAGO_REGISTRADO;
                 pago.Saldo = cuotaObjetivo.SaldoPendiente ?? 0;
 
-                await _context.Pagos.AddAsync(pago);
+                await _context.Pagos.AddAsync(pago, cancellationToken);
 
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
+                await _context.SaveChangesAsync(cancellationToken);
+                await transaction.CommitAsync(cancellationToken);
 
                 return true;
             }
             catch
             {
-                await transaction.RollbackAsync();
+                await transaction.RollbackAsync(cancellationToken);
                 throw;
             }
         }
 
-        public async Task<bool> UpdatePago(int id, string estado)
+        public async Task<bool> UpdatePago(int id, string estado, CancellationToken cancellationToken = default)
         {
             if (id <= 0) throw new ArgumentException("Ingrese un identificador válido.");
             if (string.IsNullOrWhiteSpace(estado)) throw new ArgumentException("Ingrese un estado válido.");
 
-            var pago = await _context.Pagos.FindAsync(id);
+            var pago = await _context.Pagos.FindAsync(new object[] { id }, cancellationToken);
             if (pago == null) throw new ArgumentException("No se encontró el pago indicado.");
 
             pago.Estado = estado;
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             return true;
         }
 
-        public async Task<bool> RegistrarPagoAnticipadoAsync(Pago pago)
+        public async Task<bool> RegistrarPagoAnticipadoAsync(Pago pago, CancellationToken cancellationToken = default)
         {
             if (pago == null) throw new ArgumentNullException(nameof(pago));
             if (pago.IdCuota <= 0) throw new ArgumentException("Ingrese una cuota válida.");
 
             var cuota = await _context.Cuotas
                 .Include(c => c.IdPrestamoNavigation)
-                .FirstOrDefaultAsync(c => c.IdCuota == pago.IdCuota);
+                .FirstOrDefaultAsync(c => c.IdCuota == pago.IdCuota, cancellationToken);
 
             if (cuota == null) throw new ArgumentException("Cuota no encontrada.");
 
@@ -197,7 +197,7 @@ namespace TuCredito.Services.Implementations
             var ultimaPendiente = await _context.Cuotas
                 .Where(c => c.IdPrestamo == prestamo.IdPrestamo && c.IdEstado == CUOTA_PENDIENTE)
                 .OrderByDescending(c => c.NroCuota)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (ultimaPendiente == null)
                 throw new ArgumentException("No hay cuotas pendientes para cancelar anticipadamente.");
@@ -205,18 +205,18 @@ namespace TuCredito.Services.Implementations
             if (cuota.IdCuota != ultimaPendiente.IdCuota)
                 throw new ArgumentException("Solo se permite pagar anticipadamente la última cuota pendiente.");
 
-            await NewPago(pago);
+            await NewPago(pago, cancellationToken);
             return true;
         }
 
-        public async Task<List<Pago>> GetPagoByIdPrestamo(int id)
+        public async Task<List<Pago>> GetPagoByIdPrestamo(int id, CancellationToken cancellationToken = default)
         {
             if (id <= 0) throw new ArgumentException("Ingrese un préstamo válido.");
 
             return await _context.Pagos
                 .Include(p => p.IdCuotaNavigation)
                 .Where(p => p.IdCuotaNavigation.IdPrestamo == id)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
     }
 }

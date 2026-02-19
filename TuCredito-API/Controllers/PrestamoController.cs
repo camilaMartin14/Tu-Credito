@@ -20,11 +20,11 @@ namespace TuCredito.Controllers;
             _service = service;
         }
         [HttpGet]
-        public async Task<ActionResult<List<PrestamoDTO>>> ObtenerTodos()
+        public async Task<ActionResult<List<PrestamoDTO>>> ObtenerTodos(CancellationToken cancellationToken)
         {
             try
             {
-                var lista = await _service.GetAll();
+                var lista = await _service.GetAll(cancellationToken);
                 return Ok(lista);
             }
             catch (Exception ex)
@@ -35,11 +35,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PrestamoDTO>> ObtenerPorId(int id)
+        public async Task<ActionResult<PrestamoDTO>> ObtenerPorId(int id, CancellationToken cancellationToken)
         {
             try
             {
-                var prestamo = await _service.GetPrestamoById(id);
+                var prestamo = await _service.GetPrestamoById(id, cancellationToken);
                 if (prestamo == null)
                     return NotFound(new { message = "Préstamo no encontrado." });
                 return Ok(prestamo);
@@ -51,11 +51,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet("filter")] 
-        public async Task<ActionResult<List<PrestamoDTO>>> ObtenerConFiltro(string? nombre, int? estado, int? mesVto, int? anio)
+        public async Task<ActionResult<List<PrestamoDTO>>> ObtenerConFiltro(string? nombre, int? estado, int? mesVto, int? anio, CancellationToken cancellationToken)
         {
             try
             {
-                var lista = await _service.GetPrestamoConFiltro(nombre, estado, mesVto, anio);
+                var lista = await _service.GetPrestamoConFiltro(nombre, estado, mesVto, anio, cancellationToken);
                 return Ok(lista);
             }
             catch (Exception ex)
@@ -65,11 +65,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet("{id}/summary")]
-        public async Task<ActionResult<ResumenPrestamoDTO>> ObtenerResumen(int id)
+        public async Task<ActionResult<ResumenPrestamoDTO>> ObtenerResumen(int id, CancellationToken cancellationToken)
         {
             try
             {
-                var resumen = await _service.GetResumenPrestamo(id);
+                var resumen = await _service.GetResumenPrestamo(id, cancellationToken);
                 if (resumen == null)
                     return NotFound(new { message = "Resumen no encontrado." });
                 return Ok(resumen);
@@ -81,11 +81,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpPost]
-        public async Task<ActionResult> Crear([FromBody] PrestamoDTO prestamo)
+        public async Task<ActionResult> Crear([FromBody] PrestamoDTO prestamo, CancellationToken cancellationToken)
         {
             try
             {
-                var resultado = await _service.PostPrestamo(prestamo);
+                var resultado = await _service.PostPrestamo(prestamo, cancellationToken);
                 if (!resultado) return BadRequest(new { message = "No se pudo registrar el préstamo. Verifique los datos ingresados." });
                 
                 return StatusCode(201, new { message = "Préstamo registrado correctamente." });
@@ -97,11 +97,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpPut("{id}/archive")]
-        public async Task<IActionResult> Archivar(int id)
+        public async Task<IActionResult> Archivar(int id, CancellationToken cancellationToken)
         {
             try
             {
-                var resultado = await _service.SoftDelete(id);
+                var resultado = await _service.SoftDelete(id, cancellationToken);
                 if (resultado) return Ok(new { message = "Préstamo finalizado correctamente." });
                 return BadRequest(new { message = "No se pudo finalizar el préstamo." });
             }
@@ -112,11 +112,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Eliminar(int id)
+        public async Task<IActionResult> Eliminar(int id, CancellationToken cancellationToken)
         {
             try
             {
-                var resultado = await _service.Delete(id);
+                var resultado = await _service.Delete(id, cancellationToken);
                 if (resultado) return Ok(new { message = "Préstamo eliminado correctamente." });
                 return BadRequest(new { message = "No se pudo eliminar el préstamo." });
             }

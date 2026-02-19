@@ -16,11 +16,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet("official/today")]
-        public async Task<ActionResult<DolarOficialModel?>> GetDolarHoy()
+        public async Task<ActionResult<DolarOficialModel?>> GetDolarHoy(CancellationToken cancellationToken = default)
         {
             try
             {
-                return await _service.GetDolarOficialAsync();
+                return await _service.GetDolarOficialAsync(cancellationToken);
             }
             catch (Exception ex)
             {

@@ -16,11 +16,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet("kpis")]
-        public async Task<ActionResult<DashboardKpisDTO>> GetKpis([FromQuery] DateTime? from, [FromQuery] DateTime? to)
+        public async Task<ActionResult<DashboardKpisDTO>> GetKpis([FromQuery] DateTime? from, [FromQuery] DateTime? to, CancellationToken cancellationToken)
         {
             try
             {
-                var kpis = await _dashboardService.GetKpisAsync(from, to);
+                var kpis = await _dashboardService.GetKpisAsync(from, to, cancellationToken);
                 return Ok(kpis);
             }
             catch (Exception ex)
@@ -30,11 +30,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet("cash-flow-projection")]
-        public async Task<ActionResult<List<GraficoDatoDTO>>> GetProyeccionFlujoCaja()
+        public async Task<ActionResult<List<GraficoDatoDTO>>> GetProyeccionFlujoCaja(CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _dashboardService.GetProyeccionFlujoCajaAsync();
+                var result = await _dashboardService.GetProyeccionFlujoCajaAsync(cancellationToken);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -44,11 +44,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet("loans-trend")]
-        public async Task<ActionResult<List<SerieTiempoDTO>>> GetEvolucionColocacion([FromQuery] DateTime? from, [FromQuery] DateTime? to)
+        public async Task<ActionResult<List<SerieTiempoDTO>>> GetEvolucionColocacion([FromQuery] DateTime? from, [FromQuery] DateTime? to, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _dashboardService.GetEvolucionColocacionAsync(from, to);
+                var result = await _dashboardService.GetEvolucionColocacionAsync(from, to, cancellationToken);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -58,11 +58,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet("risk-composition")]
-        public async Task<ActionResult<List<GraficoDatoDTO>>> GetComposicionRiesgo()
+        public async Task<ActionResult<List<GraficoDatoDTO>>> GetComposicionRiesgo(CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _dashboardService.GetComposicionRiesgoAsync();
+                var result = await _dashboardService.GetComposicionRiesgoAsync(cancellationToken);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -72,11 +72,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet("loans-by-status")]
-        public async Task<ActionResult<List<GraficoDatoDTO>>> GetPrestamosPorEstado()
+        public async Task<ActionResult<List<GraficoDatoDTO>>> GetPrestamosPorEstado(CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _dashboardService.GetPrestamosPorEstadoAsync();
+                var result = await _dashboardService.GetPrestamosPorEstadoAsync(cancellationToken);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -86,11 +86,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet("monthly-collections")]
-        public async Task<ActionResult<List<SerieTiempoDTO>>> GetFlujoCobranzas([FromQuery] DateTime? from, [FromQuery] DateTime? to)
+        public async Task<ActionResult<List<SerieTiempoDTO>>> GetFlujoCobranzas([FromQuery] DateTime? from, [FromQuery] DateTime? to, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _dashboardService.GetFlujoCobranzasAsync(from, to);
+                var result = await _dashboardService.GetFlujoCobranzasAsync(from, to, cancellationToken);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -100,11 +100,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet("delinquency")]
-        public async Task<ActionResult<List<MorosidadDetalleDTO>>> GetMorosidadDetallada()
+        public async Task<ActionResult<List<MorosidadDetalleDTO>>> GetMorosidadDetallada(CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _dashboardService.GetMorosidadDetalladaAsync();
+                var result = await _dashboardService.GetMorosidadDetalladaAsync(cancellationToken);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -114,11 +114,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet("upcoming-installments")]
-        public async Task<ActionResult<List<CuotaVencerDTO>>> GetCuotasAVencer()
+        public async Task<ActionResult<List<CuotaVencerDTO>>> GetCuotasAVencer(CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _dashboardService.GetCuotasAVencerAsync();
+                var result = await _dashboardService.GetCuotasAVencerAsync(cancellationToken);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -128,11 +128,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet("recent-transactions")]
-        public async Task<ActionResult<List<TransactionDTO>>> GetRecentTransactions()
+        public async Task<ActionResult<List<TransactionDTO>>> GetRecentTransactions(CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _dashboardService.GetRecentTransactionsAsync();
+                var result = await _dashboardService.GetRecentTransactionsAsync(cancellationToken);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -142,11 +142,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet("customer-ranking")]
-        public async Task<ActionResult<List<GraficoDatoDTO>>> GetRankingClientes()
+        public async Task<ActionResult<List<GraficoDatoDTO>>> GetRankingClientes(CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _dashboardService.GetRankingClientesDeudaAsync();
+                var result = await _dashboardService.GetRankingClientesDeudaAsync(cancellationToken);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -156,11 +156,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet("rate-analysis")]
-        public async Task<ActionResult<AnalistaTasaDTO>> GetAnalisisTasas()
+        public async Task<ActionResult<AnalistaTasaDTO>> GetAnalisisTasas(CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _dashboardService.GetAnalisisTasasAsync();
+                var result = await _dashboardService.GetAnalisisTasasAsync(cancellationToken);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -171,11 +171,11 @@ namespace TuCredito.Controllers;
 
 
         [HttpGet("balance-evolution")]
-        public async Task<ActionResult<List<SerieTiempoDTO>>> GetEvolucionSaldo()
+        public async Task<ActionResult<List<SerieTiempoDTO>>> GetEvolucionSaldo(CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _dashboardService.GetEvolucionSaldoAsync();
+                var result = await _dashboardService.GetEvolucionSaldoAsync(cancellationToken);
                 return Ok(result);
             }
             catch (Exception ex)

@@ -17,11 +17,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Subir([FromForm] SubirDocumentoRequestDTO request)
+        public async Task<IActionResult> Subir([FromForm] SubirDocumentoRequestDTO request, CancellationToken cancellationToken)
         {
             try
             {
-                await _service.SubirAsync(request);
+                await _service.SubirAsync(request, cancellationToken);
                 return Ok(new { message = "Documento subido correctamente." });
             }
             catch (Exception ex)
@@ -33,11 +33,12 @@ namespace TuCredito.Controllers;
         [HttpGet]
         public async Task<IActionResult> Listar(
             [FromQuery] string entidadTipo,
-            [FromQuery] int entidadId)
+            [FromQuery] int entidadId,
+            CancellationToken cancellationToken)
         {
             try
             {
-                var docs = await _service.ListarAsync(entidadTipo, entidadId);
+                var docs = await _service.ListarAsync(entidadTipo, entidadId, cancellationToken);
                 return Ok(docs);
             }
             catch (Exception ex)
@@ -47,11 +48,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpGet("{idDocumento}/download")]
-        public async Task<IActionResult> Descargar(int idDocumento)
+        public async Task<IActionResult> Descargar(int idDocumento, CancellationToken cancellationToken)
         {
             try
             {
-                var archivo = await _service.DescargarAsync(idDocumento);
+                var archivo = await _service.DescargarAsync(idDocumento, cancellationToken);
                 return File(
                     archivo.Stream,
                     archivo.ContentType,
@@ -64,11 +65,11 @@ namespace TuCredito.Controllers;
         }
 
         [HttpDelete("{idDocumento}")]
-        public async Task<IActionResult> Eliminar(int idDocumento)
+        public async Task<IActionResult> Eliminar(int idDocumento, CancellationToken cancellationToken)
         {
             try
             {
-                await _service.EliminarAsync(idDocumento);
+                await _service.EliminarAsync(idDocumento, cancellationToken);
                 return NoContent();
             }
             catch (Exception ex)
